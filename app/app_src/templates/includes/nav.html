@@ -1,0 +1,89 @@
+{% load static %}
+
+
+<nav class='navbar rr-secondary py-1' role='navigation' aria-label='main navigation'>
+
+    <div class="navbar-brand">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class='navbar-menu'>
+
+        <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
+            <div class='navbar-start'>
+                <a class='navbar-item rr-white {% if home %} is-active {% endif %}' href="{% url 'home' %}">
+                    Home
+                </a>
+                <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'
+                    href="{% url 'documentation' %}">
+                    Documentation
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                    <a class="button is-warning mr-2" href="{% url 'admin:index' %}">
+                        <i class="fas fa-tools mr-1"></i>
+                        <strong>&nbsp;Admin Interface
+                        </strong>
+                    </a>
+                    {% endif %}
+
+                    <a class="button is-light mr-2" href="{% url 'userprofile' %}">
+                        <i class="fas fa-user-alt mr-1"></i>
+                        <strong>&nbsp;{{ user }} </strong>
+                    </a>
+
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button is-danger is-light" value="Submit Query">
+                            <i class="fas fa-sign-out-alt mr-1"></i>
+                            <strong>Logout</strong>
+                        </button>
+                    </form>
+
+                    {% else %}
+                    <div class="buttons">
+                        <a class="button is-light" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt mr-1"></i>
+                            <strong>Login</strong>
+                        </a>
+                    </div>
+                    <div class="buttons">
+                        <a class="button is-light" href="{% url 'signup' %}">
+                            <i class="fas fa-user-plus mr-1"></i>
+                            <strong>Sign Up</strong>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        // Add a click event on each of them
+        $navbarBurgers.forEach(el => {
+            el.addEventListener('click', () => {
+                // Get the target from the "data-target" attribute
+                const target = el.dataset.target;
+                const $target = document.getElementById(target);
+
+                // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
+                $target.classList.toggle('is-active');
+            });
+        });
+    });
+</script>

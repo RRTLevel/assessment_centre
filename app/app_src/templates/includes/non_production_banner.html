@@ -1,0 +1,13 @@
+{% if application_environment|lower != "production" %}
+<section class='hero is-warning is-light is-small' style="position: sticky; top: 0; z-index: 100;">
+    <div class='hero-body py-2'>
+        <div class='container'>
+            <div class="columns">
+                <div class="column is-half is-offset-one-quarter">
+                    <p>You are currently accessing a non production version of this application. ({{ application_environment }})</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

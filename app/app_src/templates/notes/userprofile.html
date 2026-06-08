@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load bulma_tags %}
+
+{% block content %}
+
+<section class="section">
+
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column">
+                <div class="box">
+                    <div class="columns is-centered mb-0">
+                        <div class="column px-4 pb-0">
+
+                            <div class="field my-4">
+                                <label class="label">Username</label>
+                                <div class="">
+                                    {{ user.username}}
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Email</label>
+                                <div class="control has-icons-left">
+                                    {{ user.email}}
+                                </div>
+                            </div>
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

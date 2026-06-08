@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load bulma_tags %}
+
+{% block content %}
+
+<section class="section">
+
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column">
+                <div class="box">
+                    <div class="columns is-centered mb-0">
+                        <div class="column px-4 pb-0">
+
+                            <div class="field my-4">
+                                <label class="label">Error 404 - Not Found</label>
+                                <div class="">
+                                    Sorry, the requested resource cannot be found.
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="buttons">
+                                <a class="button rr-primary rr-white" href="{% url 'home' %}">
+                                    Home
+                                </a>
+                            </div>
+
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% load static %}
+
+<footer class="footer py-4 rr-secondary">
+    <div class="content has-text-left">
+        <div class="columns">
+            <div class="column is-narrow px-1" style="border-right: #fff;">
+                <img class="image is-16x16 mt-1" src="{% static 'images/rr-logo-white.svg' %}"
+                    alt="Rolls-Royce Logo">
+            </div>
+            <div class="column is-narrow px-1">
+                <div style="width: 1px;height: -webkit-fill-available;background: white;"></div>
+            </div>
+            <div class="column is-narrow px-1">
+                <p class="is-size-6">
+                    {{ application_name }} <span class="is-size-7">v{{ application_version }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

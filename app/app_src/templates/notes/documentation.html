@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load bulma_tags %}
+
+{% block content %}
+<style>
+    .content h1 {
+        margin-bottom: 1rem !important;
+    }
+
+    .content h3 {
+        margin-top: 2rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+
+    .content p {
+        margin-bottom: 0.4rem !important;
+        margin-top: 0 !important;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="columns">
+        <div class="column is-2">
+            <aside class="is-medium menu" style="position: sticky; top: 0;">
+                <p class="menu-label pt-6">
+                    Contents
+                </p>
+                <ul class="menu-list">
+                    <li><a href="#overview" class="has-text-rr-primary">Overview</a></li>
+                    <li><a href="#getting-started" class="has-text-rr-primary">Getting Started</a></li>
+                    <li><a href="#configuration" class="has-text-rr-primary">Configuration</a></li>
+                    <li><a href="#application" class="has-text-rr-primary">Notes</a></li>
+                    <li><a href="#support" class="has-text-rr-primary">Support</a></li>
+                </ul>
+            </aside>
+        </div>
+        <div class="column is-10">
+            <div class="content is-medium">
+                <h3 class="title is-3 mb-4">{{ application_name }} - Documentation</h3>
+                <br>
+
+                <div class="box mb-4" id="overview">
+                    <h4 class="title is-4">Overview</h4>
+
+                    <div class="my-3 is-size-6">
+                        <p>
+                            This minimal application is a Django boilerplate for web applications.
+                        </p>
+                        <br>
+                        <p>
+                            It contains everything you need to get started so that you can start building your
+                            functionality straight away.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="box mb-4" id="getting-started">
+                    <h4 class="title is-4">Getting Started</h4>
+
+                    <div class="my-3 is-size-6">
+                        <p>
+                            This project uses Python 3.13 and Django 5.2.
+                            <br>
+                            To setup the application, you will need to create a virtual environment and install the
+                            requirements:
+                        </p>
+                        <ul>
+                            <li><code>python -m venv venv</code></li>
+                            <li><code>venv\scripts\activate</code></li>
+                            <li><code>pip install -r requirements.txt</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            Copy the example environment variables:
+                        </p>
+                        <ul>
+                            <li><code>cp example.env .env</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            Create your local database:
+                        </p>
+                        <ul>
+                            <li><code>python app\manage.py migrate</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            Load the example fixtures:
+                        </p>
+                        <ul>
+                            <li><code>python app\manage.py loaddata app\app_src\fixtures\01_users.json</code></li>
+                            <li><code>python app\manage.py loaddata app\app_src\fixtures\02_notes.json</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            Create a local superuser account and answer the prompts:
+                        </p>
+                        <ul>
+                            <li><code>python app\manage.py createsuperuser</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            Run the application, please ensure you choose a port that is not in use:
+                        </p>
+                        <ul>
+                            <li><code>python app\manage.py runserver 8000</code></li>
+                        </ul>
+                        <br>
+                        <p>
+                            You should now be able to visit the running application at
+                            <code>http://localhost:8000</code>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="box mb-4" id="configuration">
+                    <h4 class="title is-4">Configuration</h4>
+
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The following variables in <code>app\app_site\settings.py</code> can be set to configure
+                            application behaviour:
+                            <br>
+                        </p>
+                        <ul>
+                            <li><code>APPLICATION_NAME</code> - the name of the application, used throughout the site.
+                            </li>
+                            <li><code>APPLICATION_VERSION</code> - the version of the application, indicated in the
+                                header/footer.</li>
+                            <li><code>APPLICATION_ENVIRONMENT</code> - the environment in which the application is
+                                running.</li>
+                        </ul>
+                        <br>
+                        <p>
+                            The following variables in <code>.env</code> can be set to configure application behaviour:
+                        </p>
+                        <p>
+                            <strong>Note:</strong> to do this you must first copy the <code>example.env</code> as <code>.env</code> -
+                            e.g. <code>cp example.env .env</code>
+                        </p>
+                        <ul>
+                            <li><code>DEBUG</code> - set this to <code>True</code> for local development to see verbose
+                                debugging information.</li>
+                            <li><code>SECRET_KEY</code> - define a secret key to prevent it being randomly generated at
+                                runtime.</li>
+                            <li><code>APPLICATION_ENVIRONMENT</code> - set the application environment such as Staging or
+                                Production (default: <code>local</code>).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="box mb-4" id="application">
+                    <h4 class="title is-4">Notes Application</h4>
+
+                    <div class="my-3 is-size-6">
+                        <p>
+                            This example application allows users to create notes, the home page will
+                            display the 5 most recent notes.
+                        </p>
+                        <br>
+                        <p>
+                            A simple API route has also been setup, in this example you can visit the following API
+                            endpoint to see the list of notes.
+                        </p>
+                        <ul>
+                            <li><code>http://localhost:8000/api/notes/</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="box mb-4" id="support">
+                    <h4 class="title is-4">Support</h4>
+
+                    <div class="my-3 is-size-6">
+                        <p>
+                            <strong>{{ application_name }}</strong> is supported by the [Support Team].
+                        </p>
+                        <p>
+                            Please raise any issues or feedback with them directly.
+                        </p>
+                        <br>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load bulma_tags %}
+{% load render_markdown %}
+
+{% block content %}
+<style>
+  .content h1 {
+    margin-bottom: 1rem !important;
+  }
+
+  .content h3 {
+    margin-top: 2rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+
+  .content p {
+    margin-bottom: 0.4rem !important;
+    margin-top: 0 !important;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="columns">
+    <div class="column is-5">
+
+      <aside class="is-medium menu pt-5" style="position: sticky; top: 0;">
+
+        <div class="box">
+
+          <form class="post-form" action="" method="POST">
+
+            {% csrf_token %}
+
+            <div class="field form-group my-2">
+              <label class="label">Title</label>
+              <div class="control has-icons-left has-icons-right">
+                {{ form.title }}
+                <span class="icon is-small is-left">
+                  <i class="fas fa-quote-left"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="field form-group my-4">
+              <label class="label mb-0">Post</label>
+              <span class="has-text-weight-light is-size-7">Markdown supported</span>
+              <div class="control has-icons-left has-icons-right">
+                {{ form.body }}
+                <span class="icon is-small is-left">
+                  <i class="fas fa-pen"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="field is-grouped form-group">
+              <div class="control">
+                <button class="button rr-primary rr-white" onclick="loadingIcon()">Submit</button>
+              </div>
+            </div>
+  
+            <progress style="display: none;" id="progress-bar" max="100" class="mx-3 progress is-small is-primary">
+                15%
+            </progress>
+
+          </form>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+    <div class="column is-7">
+      <div class="content is-medium pt-5">
+
+        {% for note in notes %}
+
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+
+                <span class="icon mt-4 mx-2 is-small is-left">
+                  <i class="far is-size-3 fa-sticky-note"></i>
+                </span>
+
+              </div>
+              <div class="media-content">
+                <p class="title is-5">{{ note.title }}</p>
+                <p class="subtitle is-6">{% if note.author.last_name %} {{ note.author.last_name }}, {{ note.author.first_name }} {% else %} @{{ note.author.username }} {% endif %}</p>
+              </div>
+            </div>
+
+            <div class="content">
+              <p class="is-size-5">{{ note.body|render_markdown }}</p>
+              <p class="is-size-7 my-3">{{ note.pub_date }}</p>
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

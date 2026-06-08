@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'bulma/css/style.min.css'%}">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" type="text/css" href="{% if application_environment|lower != 'production' %} {% static 'css/admin-dev.css' %} {% else %} {% static 'css/admin-prd.css' %} {% endif %}"/>
+{% endblock %}
+
+{% block branding %}
+<span>
+    <h1 class="my-2" id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Administration') }}</a></h1>
+
+{% if application_environment|lower != "production" %}
+
+<p>You are currently accessing a non production version of this application. ({{ application_environment }})</p>
+
+{% else %}
+
+<p>You are currently accessing a <span class="rr-underlined">production</span> version of this application.</p>
+
+{% endif %}
+</span>
+
+
+
+{% endblock %}
+<br>
+{% block nav-global %}
+{% endblock %}

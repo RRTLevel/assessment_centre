@@ -1,0 +1,29 @@
+{% load static %}
+
+<section class='hero rr-primary is-small'>
+    <div class='hero-body'>
+        <div class='container'>
+            <div class="columns">
+                <div class="column is-narrow">
+                    <a href="{% url 'home' %}">
+                        <div class="columns">
+                            <div class="column is-narrow" style="border-right: #fff;">
+                                <img class="image is-48x48 mt-2" src="{% static 'images/rr-logo-white.svg' %}"
+                                    alt="Rolls-Royce Logo">
+                            </div>
+                            <div class="column is-narrow px-0">
+                                <div style="width: 1px;height: -webkit-fill-available;background: white;">
+                                </div>
+                            </div>
+                            <div class="column is-narrow">
+                                <h1 class='title rr-white'>{{ application_name }}</h1>
+                                <h4 class='subtitle rr-white'>v{{ application_version }} </h4>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="column">
+                </div>
+            </div>
+        </div>
+</section>

@@ -1,0 +1,15 @@
+/* HEADER */
+
+#header {
+    background: #417690;
+    color: #fff ;
+}
+
+#branding h1 a:link, #branding h1 a:visited {
+    color: #fff ;
+}
+
+strong {
+    color: #fff;
+    font-weight: 700;
+}

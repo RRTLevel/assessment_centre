@@ -1,0 +1,8 @@
+asgiref==3.11.1
+Django==5.2.11
+django-bulma==0.10.0
+djangorestframework==3.16.1
+Markdown==3.10.2
+python-dotenv==1.2.1
+sqlparse==0.5.5
+tzdata==2025.3

@@ -1,0 +1,22 @@
+[
+    {
+        "model": "app_src.note",
+        "pk": 1,
+        "fields": {
+            "author": 1,
+            "title": "Support",
+            "body": "This project is supported and maintained by:\r\n\r\n - [Support Team]\r\n\r\n---\r\n\r\nPlease raise any issues or feedback with them directly.\r\n\r\n---",
+            "pub_date": "2026-02-18T11:10:37.424Z"
+        }
+    },
+    {
+        "model": "app_src.note",
+        "pk": 2,
+        "fields": {
+            "author": 1,
+            "title": "Overview",
+            "body": "This minimal application is a Django boilerplate for web applications.\r\n\r\n<br>\r\n\r\nIt contains everything you need to get started so that you can start building your functionality straight away.\r\n\r\n---\r\n\r\nRead more on the [documentation](documentation/) page.\r\n\r\n---",
+            "pub_date": "2026-02-18T11:10:46.719Z"
+        }
+    }
+]
