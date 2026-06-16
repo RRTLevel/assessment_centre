@@ -84,3 +84,6 @@ class Custom404View(TemplateView):
 class Custom500View(TemplateView):
 
     template_name = "500.html"
+
+def interview(request):
+    return render(request, "interview/interview.html")
