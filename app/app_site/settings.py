@@ -87,39 +87,37 @@ CACHES = {
     }
 }
 
-# Define where logs should be written to
-LOG_FOLDER = os.path.join(BASE_DIR.parents[0], "log")
+#this is where the database is fixed
+LOG_DIR = BASE_DIR / "log"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-# Define logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+
     'formatters': {
         'fileformatter': {
-            # exact format is not important, this is the minimum information
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         },
     },
+
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'log/app.log',
+            'filename': str(LOG_DIR / 'app.log'),
             'formatter': 'fileformatter',
         },
         'console': {
             'class': 'logging.StreamHandler',
         },
     },
-    'loggers': {
-        '': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
+
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'INFO',
     },
 }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -158,3 +156,4 @@ LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")
 SERVER_EMAIL = EMAIL_FROM   
+

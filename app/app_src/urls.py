@@ -1,6 +1,10 @@
 from django.urls import path
 from . import views
+
 from .views import interview
+
+from .views import applications
+
 
 urlpatterns = [
 
@@ -13,5 +17,9 @@ urlpatterns = [
 
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
-    
-    ]
+
+
+    path('create-pack/', views.create_pack, name='create_pack'),
+    path('applications/', views.applications, name='applications'),
+
+]

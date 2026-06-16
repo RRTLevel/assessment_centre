@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
@@ -11,6 +11,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from .forms import AddNoteForm
 from .models import Note
+from .forms import PackForm
+from .models import Pack
+
 
 
 logger = logging.getLogger("")
@@ -85,5 +88,22 @@ class Custom500View(TemplateView):
 
     template_name = "500.html"
 
+
 def interview(request):
     return render(request, "interview/interview.html")
+
+def applications(request):
+    packs = Pack.objects.all().order_by('-created_at')
+    return render(request, "pre_interview/applications.html", {"packs": packs})
+
+def create_pack(request):
+    if request.method == "POST":
+        form = PackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('applications') 
+    else:
+        form = PackForm()
+
+    return render(request, "pre_interview/create_pack.html", {"form": form})
+
