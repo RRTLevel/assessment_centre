@@ -13,7 +13,7 @@ from .forms import AddNoteForm
 from .models import Note
 from .forms import PackForm
 from .models import Pack
-
+from .models import QuestionTable
 
 
 logger = logging.getLogger("")
@@ -90,7 +90,12 @@ class Custom500View(TemplateView):
 
 
 def interview(request):
-    return render(request, "interview/interview.html")
+
+    questions = QuestionTable.objects.all()
+
+    return render(request, "interview/interview.html",
+        {"questions": questions})
+
 
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
@@ -106,4 +111,3 @@ def create_pack(request):
         form = PackForm()
 
     return render(request, "pre_interview/create_pack.html", {"form": form})
-

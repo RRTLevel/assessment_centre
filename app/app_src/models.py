@@ -35,3 +35,9 @@ class Pack(models.Model):
 
     def __str__(self):
         return self.title
+    
+class QuestionTable(models.Model):
+    question = models.TextField()
+    
+    def __str__(self):
+        return self.question

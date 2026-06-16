@@ -20,6 +20,6 @@ urlpatterns = [
 
 
     path('create-pack/', views.create_pack, name='create_pack'),
-    path('applications/', views.applications, name='applications'),
+    path('applications/', views.applications, name='applications')
 
 ]

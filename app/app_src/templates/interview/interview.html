@@ -1,103 +1,69 @@
 <!DOCTYPE html>
 <html>
-<Head> 
-    <Title> Interview </Title>
 
-{% load static %}
+<head>
+    <title>Interview</title>
+
+    {% load static %}
 
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css'%}">
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
     <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
-
-    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
 
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
 
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-
 </head>
 
 <body>
-    
+
     {% include 'includes/non_production_banner.html' %}
 
     <header>
-
         {% include 'includes/title.html' %}
-        
         {% include 'includes/nav.html' %}
-
     </header>
 
-    <main>
-        <style>
-            .box {
-                border: 1px solid #1800A8;
-                padding: 5px;
-                width: 250px;
-                height: 50px;
-                margin: 5px 0;
-            }
-            .submit-btn {
-                padding: 10px 20px;
-                font-size: 16px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
+    <main class="section">
 
-            .submit-btn:hover {
-                background-color: #45a049;
-            }
-        </style>
+        <div class="container interview-container">
 
-
-        <div class='container mb-6'>
             {% block content %}
 
-            <div>
-            <head>
-                 <b> Question Package </b>
-            </head>
-            <h1> 
-                <b> Interview Questions: </b> 
-            </h1>
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Interview Questions
+                </h1>
+
+                <p class="interview-count">
+                    Total Questions: {{ questions|length }}
+                </p>
             </div>
 
-            <br><br>
+            {% for question in questions %}
+                <div class="question-card">
+                    <p class="question-text">
+                        {{ question.question }}
+                    </p>
+                </div>
+            {% empty %}
+                <div class="no-questions">
+                    No interview questions available.
+                </div>
+            {% endfor %}
 
-                <h1>Question 1: Score -     0 / 10</h1>
-                        <div class="box"></div>
-                <br>
-                <br>
-
-                <h1>Question 2: Score -     0 / 10</h1>
-                        <div class="box"></div>
-                <br>
-                <br>
-
-                <h1>Question 3: Score -     0 / 10</h1>
-                        <div class="box"></div>
-                <br>
-                <br>
-
-                <h1>Question 4: Score -     0 / 10</h1>
-                        <div class="box"></div>
-                        
-                <br><br>
-
-                <h1>Question 5: Score -     0 / 10</h1>
-                        <div class="box"></div>
-
-                <br><br>
-
-            <button type="submit" class="submit-btn">Submit</button>
+            <div class="submit-section">
+                <button class="submit-btn">
+                    Submit
+                </button>
+            </div>
 
             {% endblock %}
+
         </div>
+
     </main>
 
     {% include 'includes/footer.html' %}
