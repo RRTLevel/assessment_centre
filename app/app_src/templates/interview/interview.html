@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Interview</title>
+
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    {% include 'includes/non_production_banner.html' %}
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container interview-container">
+
+            {% block content %}
+
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Interview Questions
+                </h1>
+
+                <p class="interview-count">
+                    Total Questions: {{ questions|length }}
+                </p>
+            </div>
+
+            {% for question in questions %}
+                <div class="question-card">
+                    <p class="question-text">
+                        {{ question.question }}
+                    </p>
+                </div>
+            {% empty %}
+                <div class="no-questions">
+                    No interview questions available.
+                </div>
+            {% endfor %}
+
+            <div class="submit-section">
+                <button class="submit-btn">
+                    Submit
+                </button>
+            </div>
+
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+</body>
+
+</html>

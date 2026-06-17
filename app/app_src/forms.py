@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.utils.translation import gettext_lazy as _
 
 from .models import DomainUser, Note
+from .models import Pack
 
 
 class DomainUserChangeForm(UserChangeForm):
@@ -35,3 +36,8 @@ class AddNoteForm(forms.ModelForm):
                 'rows': 4
             }),
         }
+
+class PackForm(forms.ModelForm):
+    class Meta:
+        model = Pack
+        fields = ['title', 'description']

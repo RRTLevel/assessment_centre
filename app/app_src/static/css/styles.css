@@ -104,3 +104,77 @@ footer {
         padding: 0;
     }
 }
+
+/* Interview Page */
+
+.interview-container {
+    max-width: 900px;
+}
+
+.interview-header {
+    border-bottom: 3px solid #1800A8;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.interview-title {
+    color: #1800A8;
+    margin-bottom: 0.5rem;
+}
+
+.interview-count {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.question-card {
+    background-color: #838282;
+    border: 1px solid #dcdcdc;
+    border-left: 5px solid #1800A8;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #222;
+    margin: 0;
+}
+
+.no-questions {
+    background-color: #fff8db;
+    border: 1px solid #ffe08a;
+    border-radius: 6px;
+    padding: 1rem;
+    color: #7a5c00;
+}
+
+.submit-section {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.submit-btn {
+    background-color: #1800A8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.9rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #12007d;
+}
