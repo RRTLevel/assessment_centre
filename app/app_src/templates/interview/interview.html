@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<Head> 
+    <Title> Interview </Title>
+
+{% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css'%}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+
+    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+</head>
+
+<body>
+    
+    {% include 'includes/non_production_banner.html' %}
+
+    <header>
+
+        {% include 'includes/title.html' %}
+        
+        {% include 'includes/nav.html' %}
+
+    </header>
+
+    <main>
+        <style>
+            .box {
+                border: 1px solid #1800A8;
+                padding: 5px;
+                width: 250px;
+                height: 50px;
+                margin: 5px 0;
+            }
+            .submit-btn {
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+            .submit-btn:hover {
+                background-color: #45a049;
+            }
+            .question {
+            width: 250px;
+            height: 40px;
+            padding: 5px;
+            font-size: 16px;
+            color: #1800A8;
+            background-color: white;
+            border: 2px solid #1800A8;
+            border-radius: 5px;
+            }
+        </style>
+
+
+        <div class='container mb-6'>
+            {% block content %}
+        </div>
+
+        <div>
+            <h1><b>
+                Question Package - 
+                <br>
+                Interview Questions: 
+            </b></h1>
+        </div>
+
+        <br><br>
+
+        <div>
+           
+
+            <br>
+    
+            {% for question in questions %}
+                <h1>{Question_count} Score - 0 / 10</h1> <
+                <label> {questions} </label> 
+                <br>
+            {% endfor %}
+
+            <br><br>
+
+            <button type="submit" class="submit-btn">Submit</button>
+
+            {% endblock %}
+        </div>
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+</body>
+
+</html>

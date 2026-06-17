@@ -1,5 +1,5 @@
 import logging
-
+from random import sample
 from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -84,3 +84,37 @@ class Custom404View(TemplateView):
 class Custom500View(TemplateView):
 
     template_name = "500.html"
+
+def interview(request):
+    Questions =[
+        "Tell me about yourself and your background.",
+        "What are your greatest strengths and weaknesses?",
+        "Why do you want to work for this company?",
+        "Where do you see yourself in five years?",
+        "Describe a challenging situation and how you overcame it.",
+        "How do you handle working under pressure or tight deadlines?",
+        "Tell me about a time you worked successfully in a team.",
+        "What motivates you in your work?",
+        "How do you prioritise tasks when managing multiple projects?",
+        "Describe a time you made a mistake and how you handled it.",
+        "What are your salary expectations?",
+        "How do you stay up to date with industry trends?",
+        "Tell me about a time you showed leadership.",
+        "Why are you leaving your current position?",
+        "Do you have any questions for us?"
+            ]
+    
+    question_list = sample(Questions, 10)
+    score = 10
+    question_count = 1
+    question_labels = []
+    for i in range(len(question_list)):
+        question_label = f"Question {question_count}: Score = {score}/ 10"
+        question_labels.append(question_label)
+        question_count += 1
+        
+    return render(
+        request,
+        "interview/interview.html",
+        {"questions": question_list, "question_label": question_labels}
+    )
