@@ -19,7 +19,7 @@
 
 <body>
 
-    {% include 'includes/non_production_banner.html' %}
+   <!-- {% include 'includes/non_production_banner.html' %} -->
 
     <header>
         {% include 'includes/title.html' %}
@@ -42,16 +42,39 @@
                 </p>
             </div>
 
-            {% for question in questions %}
+           {% for question in questions %}
+            <div class="question-row">
+
                 <div class="question-card">
                     <p class="question-text">
                         {{ question.question }}
                     </p>
                 </div>
-            {% empty %}
-                <div class="no-questions">
-                    No interview questions available.
+
+                <div class="Score-Box">
+                    <p>Score / 10</p>
+                    <select name="Scores">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
                 </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="no-questions">
+                No interview questions available.
+            </div>
+
             {% endfor %}
 
             <div class="submit-section">

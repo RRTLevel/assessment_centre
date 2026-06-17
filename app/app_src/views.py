@@ -89,14 +89,6 @@ class Custom500View(TemplateView):
     template_name = "500.html"
 
 
-def interview(request):
-
-    questions = QuestionTable.objects.all()
-
-    return render(request, "interview/interview.html",
-        {"questions": questions})
-
-
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
     return render(request, "pre_interview/applications.html", {"packs": packs})
@@ -111,3 +103,11 @@ def create_pack(request):
         form = PackForm()
 
     return render(request, "pre_interview/create_pack.html", {"form": form})
+
+
+def interview(request):
+
+    questions = QuestionTable.objects.all()
+
+    return render(request, "interview/interview.html",
+        {"questions": questions})
