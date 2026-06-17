@@ -42,24 +42,32 @@
                                 {% endfor %}
                                 {% endif %}
 
+                                <!-- UPDATED PASSWORD FIELD -->
                                 <div class="field my-4">
                                     <label class="label">Password</label>
-                                    <div class="control has-icons-left">
+                                    <div class="control has-icons-left has-icons-right">
                                         <input class="input" name="password1" id="id_password1" type="password"
                                             required>
                                         <span class="icon is-small is-left">
                                             <i class="fas fa-key"></i>
                                         </span>
+                                        <span class="icon is-small is-right toggle-password" data-target="id_password1" style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye toggle-icon"></i>
+                                        </span>
                                     </div>
                                 </div>
 
+                                <!-- UPDATED REPEAT PASSWORD FIELD -->
                                 <div class="field">
                                     <label class="label">Repeat Password</label>
-                                    <div class="control has-icons-left">
+                                    <div class="control has-icons-left has-icons-right">
                                         <input class="input" name="password2" id="id_password2" type="password"
                                             required>
                                         <span class="icon is-small is-left">
                                             <i class="fas fa-key"></i>
+                                        </span>
+                                        <span class="icon is-small is-right toggle-password" data-target="id_password2" style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye toggle-icon"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -83,5 +91,25 @@
 
     </div>
 </section>
+
+<!-- JAVASCRIPT TO TOGGLE BOTH PASWORDS REUSABLY -->
+<script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function () {
+            // Get the target input ID from the data attribute
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            const toggleIcon = this.querySelector('.toggle-icon');
+
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle the eye / eye-slash class names
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
 
 {% endblock %}
