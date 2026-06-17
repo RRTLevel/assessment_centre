@@ -5,11 +5,10 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .forms import AddNoteForm
+from .forms import AddNoteForm, DomainUserCreationForm
 from .models import Note
 from .forms import PackForm
 from .models import Pack
@@ -20,7 +19,7 @@ logger = logging.getLogger("")
 
 class SignUpView(SuccessMessageMixin, CreateView):
 
-    form_class = UserCreationForm
+    form_class = DomainUserCreationForm
     success_url = reverse_lazy("login")
     success_message = "Your account has been created! Please login:"
     template_name = "registration/signup.html"

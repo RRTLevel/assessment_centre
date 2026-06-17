@@ -27,6 +27,16 @@
                                     </div>
                                 </div>
 
+                                <div class="field my-4">
+                                    <label class="label">Email</label>
+                                    <div class="control has-icons-left">
+                                        <input class="input" name="email" id="id_email" type="email" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-envelope"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
                                 {% if form.errors %}
                                 {% for field in form %}
                                 {% for error in field.errors %}
@@ -54,6 +64,15 @@
                                         <span class="icon is-small is-right toggle-password" data-target="id_password1" style="pointer-events: all; cursor: pointer;">
                                             <i class="fas fa-eye toggle-icon"></i>
                                         </span>
+                                    </div>
+                                </div>
+
+                                <div class="field my-4">
+                                    <label class="label">Account Type</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{ form.account_type }}
+                                        </div>
                                     </div>
                                 </div>
 
