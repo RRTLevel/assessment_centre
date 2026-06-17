@@ -1,23 +1,25 @@
 import logging
 from random import sample
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .forms import AddNoteForm
+from .forms import AddNoteForm, DomainUserCreationForm
 from .models import Note
+from .forms import PackForm
+from .models import Pack
+from .models import QuestionTable
 
 
 logger = logging.getLogger("")
 
 class SignUpView(SuccessMessageMixin, CreateView):
 
-    form_class = UserCreationForm
+    form_class = DomainUserCreationForm
     success_url = reverse_lazy("login")
     success_message = "Your account has been created! Please login:"
     template_name = "registration/signup.html"
@@ -85,6 +87,7 @@ class Custom500View(TemplateView):
 
     template_name = "500.html"
 
+<<<<<<< HEAD
 def interview(request):
     Questions =[
         "Tell me about yourself and your background.",
@@ -118,3 +121,28 @@ def interview(request):
         "interview/interview.html",
         {"questions": question_list, "question_label": question_labels}
     )
+=======
+
+def applications(request):
+    packs = Pack.objects.all().order_by('-created_at')
+    return render(request, "pre_interview/applications.html", {"packs": packs})
+
+def create_pack(request):
+    if request.method == "POST":
+        form = PackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('applications') 
+    else:
+        form = PackForm()
+
+    return render(request, "pre_interview/create_pack.html", {"form": form})
+
+
+def interview(request):
+
+    questions = QuestionTable.objects.all()
+
+    return render(request, "interview/interview.html",
+        {"questions": questions})
+>>>>>>> 77fbbb5ac5cde2d8481e03a35e53ee8f3cad4f8c

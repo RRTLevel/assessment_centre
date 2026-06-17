@@ -16,11 +16,14 @@
         <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
             <div class='navbar-start'>
                 <a class='navbar-item rr-white {% if home %} is-active {% endif %}' href="{% url 'home' %}">
-                    Home
+                    Option 1
                 </a>
                 <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'
                     href="{% url 'documentation' %}">
-                    Documentation
+                    Option 2
+                </a>
+                <a class='navbar-item rr-white {% if interview %} is-active {% endif %}' href="{% url 'interview' %}">
+                    interview Questions
                 </a>
             </div>
 
