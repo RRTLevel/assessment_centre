@@ -17,8 +17,8 @@ DEBUG = os.getenv("DEBUG", default='False').lower() == 'true'
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
 
 # Set the application Name, Version and Environment
-APPLICATION_NAME = "Django Template"
-APPLICATION_VERSION = "0.0.1"
+APPLICATION_NAME = "Rolls Royce"
+APPLICATION_VERSION = "0.0.2"
 APPLICATION_ENVIRONMENT = os.getenv("APPLICATION_ENVIRONMENT", default="local")
 
 # A list representing the host/domain names to serve to
@@ -26,7 +26,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'app_src',
+    'app_src.apps.AppSrcConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
