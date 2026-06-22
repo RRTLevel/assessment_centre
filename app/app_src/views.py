@@ -16,10 +16,8 @@ from .models import QuestionTable
 from .forms import ApplicantForm
 from .models import Application
 
-from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout, update_session_auth_hash  # Added update_session_auth_hash
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.views import View
 
 
@@ -66,6 +64,36 @@ class userprofileView(LoginRequiredMixin, TemplateView):
         context["AccountType"] = group
         
         return context
+
+    # Added post method to handle the direct password change form submission securely
+    def post(self, request, *kwargs):
+        user = request.user
+        old_pass = request.POST.get("old_password")
+        new_pass1 = request.POST.get("new_password1")
+        new_pass2 = request.POST.get("new_password2")
+
+        # 1. Verify old password matches current database records
+        if not user.check_password(old_pass):
+            messages.error(request, "Your current password was entered incorrectly.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 2. Confirm matching field confirmation values
+        if new_pass1 != new_pass2:
+            messages.error(request, "The two new password fields didn't match.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 3. Check password complexity metrics (length requirement check)
+        if len(new_pass1) < 8:
+            messages.error(request, "Your new password must be at least 8 characters long.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 4. Save new password safely and protect the active session authentication key hash
+        user.set_password(new_pass1)
+        user.save()
+        update_session_auth_hash(request, user)
+        
+        messages.success(request, "Your password was successfully updated!", extra_tags="success")
+        return redirect("userprofile")
 
 
 class homeView(LoginRequiredMixin, CreateView):
