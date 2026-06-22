@@ -20,6 +20,8 @@ urlpatterns = [
 
 
     path('create-pack/', views.create_pack, name='create_pack'),
-    path('applications/', views.applications, name='applications')
+    path('applications/', views.applications, name='applications'),
+    path("applicant-form/<int:pack_id>/", views.applicant_form, name="applicant_form"),
+     path("application_review/", views.application_review, name="applications_review"),
 
 ]

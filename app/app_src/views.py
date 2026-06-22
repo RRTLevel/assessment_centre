@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
@@ -13,6 +13,8 @@ from .models import Note
 from .forms import PackForm
 from .models import Pack
 from .models import QuestionTable
+from .forms import ApplicantForm
+from .models import Application
 
 
 logger = logging.getLogger("")
@@ -87,7 +89,6 @@ class Custom500View(TemplateView):
 
     template_name = "500.html"
 
-
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
     return render(request, "pre_interview/applications.html", {"packs": packs})
@@ -110,3 +111,41 @@ def interview(request):
 
     return render(request, "interview/interview.html",
         {"questions": questions})
+
+def applicant_form(request, pack_id):
+    pack = get_object_or_404(Pack, id=pack_id)
+
+    if request.method == "POST":
+        form = ApplicantForm(request.POST)
+
+        if form.is_valid():
+            answers = form.cleaned_data
+
+            Application.objects.create(
+                user=request.user,
+                pack=pack,
+                answer_1=answers["answer_1"],
+                answer_2=answers["answer_2"],
+                answer_3=answers["answer_3"],
+            )
+
+            return redirect("applications")
+
+    else:
+        form = ApplicantForm()
+
+    return render(
+        request,
+        "pre_interview/applicant_form.html",
+        {
+            "pack": pack,
+            "form": form,
+        }
+    )
+
+def application_review(request):
+    applications = Application.objects.all().select_related('user', 'pack')
+
+    return render(request, "pre_interview/application_review.html", {
+        "applications": applications
+    })
