@@ -1,7 +1,7 @@
 import logging
 from random import sample
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
@@ -13,9 +13,31 @@ from .models import Note
 from .forms import PackForm
 from .models import Pack
 from .models import QuestionTable
+from .forms import ApplicantForm
+from .models import Application
+
+from django.contrib.auth import logout, update_session_auth_hash  # Added update_session_auth_hash
+from django.contrib import messages
+from django.views import View
 
 
 logger = logging.getLogger("")
+
+class DeleteAccountView(LoginRequiredMixin, View):
+    login_url = "/login"
+
+    def post(self, request):
+        password = request.POST.get("password")
+
+        if not request.user.check_password(password):
+            messages.error(request, "Incorrect password.")
+            return redirect("userprofile")
+
+        user = request.user
+        logout(request)
+        user.delete()
+
+        return redirect("/")
 
 class SignUpView(SuccessMessageMixin, CreateView):
 
@@ -35,8 +57,43 @@ class userprofileView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         context["page_title"] = settings.APPLICATION_NAME + ' - Profile'
+
+        user = self.request.user
+        group = self.request.user.groups.first()
+
+        context["AccountType"] = group
         
         return context
+
+    # Added post method to handle the direct password change form submission securely
+    def post(self, request, *kwargs):
+        user = request.user
+        old_pass = request.POST.get("old_password")
+        new_pass1 = request.POST.get("new_password1")
+        new_pass2 = request.POST.get("new_password2")
+
+        # 1. Verify old password matches current database records
+        if not user.check_password(old_pass):
+            messages.error(request, "Your current password was entered incorrectly.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 2. Confirm matching field confirmation values
+        if new_pass1 != new_pass2:
+            messages.error(request, "The two new password fields didn't match.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 3. Check password complexity metrics (length requirement check)
+        if len(new_pass1) < 8:
+            messages.error(request, "Your new password must be at least 8 characters long.", extra_tags="danger")
+            return redirect("userprofile")
+
+        # 4. Save new password safely and protect the active session authentication key hash
+        user.set_password(new_pass1)
+        user.save()
+        update_session_auth_hash(request, user)
+        
+        messages.success(request, "Your password was successfully updated!", extra_tags="success")
+        return redirect("userprofile")
 
 
 class homeView(LoginRequiredMixin, CreateView):
@@ -87,7 +144,6 @@ class Custom500View(TemplateView):
 
     template_name = "500.html"
 
-
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
     return render(request, "pre_interview/applications.html", {"packs": packs})
@@ -108,18 +164,43 @@ def interview(request):
     # SHOW ALL QUESTIONS IN DATABASE ORDER
     questions = QuestionTable.objects.all().order_by("id")
 
+    return render(request, "interview/interview.html",
+        {"questions": questions})
 
-    context = {
+def applicant_form(request, pack_id):
+    pack = get_object_or_404(Pack, id=pack_id)
 
-        "questions": questions,
+    if request.method == "POST":
+        form = ApplicantForm(request.POST)
 
-        "question_count": questions.count(),
+        if form.is_valid():
+            answers = form.cleaned_data
 
-    }
+            Application.objects.create(
+                user=request.user,
+                pack=pack,
+                answer_1=answers["answer_1"],
+                answer_2=answers["answer_2"],
+                answer_3=answers["answer_3"],
+            )
 
+            return redirect("applications")
+
+    else:
+        form = ApplicantForm()
 
     return render(
         request,
-        "interview/interview.html",
-        context
+        "pre_interview/applicant_form.html",
+        {
+            "pack": pack,
+            "form": form,
+        }
     )
+
+def application_review(request):
+    applications = Application.objects.all().select_related('user', 'pack')
+
+    return render(request, "pre_interview/application_review.html", {
+        "applications": applications
+    })

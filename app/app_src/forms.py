@@ -88,4 +88,36 @@ class AddNoteForm(forms.ModelForm):
 class PackForm(forms.ModelForm):
     class Meta:
         model = Pack
-        fields = ['title', 'description']
+        fields = [
+            'title',
+            'description',
+            'pack_class', 
+            'pre_interview_question_1',
+            'pre_interview_question_2',
+            'pre_interview_question_3',
+        ]
+        
+class ApplicantForm(forms.Form):
+    answer_1 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'textarea',
+            'placeholder': 'Your answer to question 1...'
+        })
+    )
+
+    answer_2 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'textarea',
+            'placeholder': 'Your answer to question 2...'
+        })
+    )
+
+    answer_3 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'textarea',
+            'placeholder': 'Your answer to question 3...'
+        })
+    )

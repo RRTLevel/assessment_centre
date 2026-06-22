@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container interview-container">
+
+    <!-- HEADER -->
+    <div class="interview-header">
+      <h1 class="title interview-title rr-primary p-3">
+        {{ pack.title }}
+      </h1>
+
+      <p class="interview-count">
+        {{ pack.description }}
+      </p>
+    </div>
+
+    <h2 class="title is-4 text-rr-primary rr-underlined">
+      Pre Interview Questions
+    </h2>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- QUESTION 1 -->
+      {% if pack.pre_interview_question_1 %}
+      <div class="question-card mb-4">
+        <p><strong>{{ pack.pre_interview_question_1 }}</strong></p>
+        {{ form.answer_1 }}
+      </div>
+      {% endif %}
+
+      <!-- QUESTION 2 -->
+      {% if pack.pre_interview_question_2 %}
+      <div class="question-card mb-4">
+        <p><strong>{{ pack.pre_interview_question_2 }}</strong></p>
+        {{ form.answer_2 }}
+      </div>
+      {% endif %}
+
+      <!-- QUESTION 3 -->
+      {% if pack.pre_interview_question_3 %}
+      <div class="question-card mb-4">
+        <p><strong>{{ pack.pre_interview_question_3 }}</strong></p>
+        {{ form.answer_3 }}
+      </div>
+      {% endif %}
+
+      <!-- SUBMIT -->
+      <div class="submit-section">
+        <button type="submit" class="submit-btn">
+          Submit Answers
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</section>
+
+{% endblock %}
