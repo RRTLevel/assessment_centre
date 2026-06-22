@@ -16,4 +16,8 @@ urlpatterns = [
     path("applicant-form/<int:pack_id>/", views.applicant_form, name="applicant_form"),
     path("application_review/", views.application_review, name="applications_review"),
 
+    path("categories/", views.create_category, name="categories"),
+    path("applications/<int:id>/approve/", views.approve_application, name="approve_application"),
+    path("applications/<int:id>/deny/", views.deny_application, name="deny_application"),
+    path("applications/<int:pk>/", views.application_detail, name="application_detail")
 ]

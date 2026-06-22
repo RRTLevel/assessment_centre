@@ -15,6 +15,7 @@ from .models import Pack
 from .models import QuestionTable
 from .forms import ApplicantForm
 from .models import Application
+from .forms import CategoryForm
 
 from django.contrib.auth import logout, update_session_auth_hash  # Added update_session_auth_hash
 from django.contrib import messages
@@ -203,4 +204,35 @@ def application_review(request):
 
     return render(request, "pre_interview/application_review.html", {
         "applications": applications
+    })
+
+
+def create_category(request):
+    if request.method == "POST":
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('applications')
+    else:
+        form = CategoryForm()
+
+    return render(request, "pre_interview/create_category.html", {"form": form})
+
+def approve_application(request, id):
+    app = Application.objects.get(id=id)
+    app.status = "approved"
+    app.save()
+    return redirect("applications_review")
+
+def deny_application(request, id):
+    if request.method == "POST":
+        application = get_object_or_404(Application, id=id)
+        application.delete()
+    return redirect("applications_review")
+
+def application_detail(request, pk):
+    application = get_object_or_404(Application, pk=pk)
+
+    return render(request, "pre_interview/view_more.html", {
+        "application": application
     })

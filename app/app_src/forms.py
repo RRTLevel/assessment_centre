@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import DomainUser, Note
 from .models import Pack
+from .models import Category
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -89,12 +90,12 @@ class PackForm(forms.ModelForm):
     class Meta:
         model = Pack
         fields = [
-            'title',
-            'description',
-            'pack_class', 
-            'pre_interview_question_1',
-            'pre_interview_question_2',
-            'pre_interview_question_3',
+            "title",
+            "description",
+            "category",
+            "pre_interview_question_1",
+            "pre_interview_question_2",
+            "pre_interview_question_3",
         ]
         
 class ApplicantForm(forms.Form):
@@ -121,3 +122,9 @@ class ApplicantForm(forms.Form):
             'placeholder': 'Your answer to question 3...'
         })
     )
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name", "description"]

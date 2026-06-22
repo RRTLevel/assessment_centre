@@ -2,38 +2,103 @@
 
 {% block content %}
 
-<h1>All Applications</h1>
+<section class="section">
+    <div class="container">
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Application ID</th>
-            <th>Pack</th>
-            <th>Answer 1</th>
-            <th>Answer 2</th>
-            <th>Answer 3</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for application in applications %}
-        <tr>
-            <td>{{ application.user.username }}</td>
-            <td>{{ application.application_id }}</td>
-            <td>{{ application.pack }}</td>
-            <td>{{ application.answer_1 }}</td>
-            <td>{{ application.answer_2 }}</td>
-            <td>{{ application.answer_3 }}</td>
-            <td>{{ application.created_at }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7">No applications found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <div class="interview-header">
+            <h1 class="title interview-title text-rr-primary">
+                Application Review Dashboard
+            </h1>
+            <p class="interview-count">
+                Review incoming applications and approve or reject them.
+            </p>
+        </div>
 
+        {% if applications %}
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-hoverable is-align-middle">
+                <thead class="rr-secondary">
+                    <tr>
+                        <th>User</th>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Answers</th>
+                        <th>Created</th>
+                        <th style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for application in applications %}
+                    <tr>
+                        <td>
+                            <strong>{{ application.user.username }}</strong>
+                        </td>
+
+                        <td>
+                            <span class="tag is-light">
+                                {{ application.application_id }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="tag is-info">
+                                {{ application.pack.category }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div>
+                                <p><strong>Q1:</strong> {{ application.answer_1 }}</p>
+                                <p><strong>Q2:</strong> {{ application.answer_2 }}</p>
+                                <p><strong>Q3:</strong> {{ application.answer_3 }}</p>
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ application.created_at }}
+                        </td>
+
+                        <td>
+                            <div class="buttons are-small">
+
+                                <!-- ACCEPT -->
+                                <form method="post" action="{% url 'approve_application' application.id %}">
+                                    {% csrf_token %}
+                                    <button class="button is-success is-outlined">
+                                        Accept
+                                    </button>
+                                </form>
+
+                                <!-- DENY -->
+                                <form method="post" action="{% url 'deny_application' application.id %}">
+                                    {% csrf_token %}
+                                    <button class="button is-danger is-outlined">
+                                        Deny
+                                    </button>
+                                </form>
+
+                                <a class="button is-link is-light is-small"
+                                    href="{% url 'application_detail' application.id %}">
+                                    View More
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+        <div class="notification is-warning is-light">
+            No applications found.
+        </div>
+        {% endif %}
+
+    </div>
+</section>
 
 {% endblock %}
