@@ -21,22 +21,8 @@
 
                             <div class="field my-4">
                                 <label class="label">Email</label>
-<<<<<<< Updated upstream
-                                <div class="control has-icons-left">
-                                    {{ user.email }}
-                                </div>
-                            </div>
-
-                            <br>
-
-                            <div class="field">
-                                <label class="label">Account Type</label>
-                                <div class="control has-icons-left">
-                                    {{ AccountType }}
-=======
                                 <div>
                                     {{ user.email }}
->>>>>>> Stashed changes
                                 </div>
                             </div>
 
@@ -45,7 +31,8 @@
                                 <label class="label">Account Type</label>
                                 <div>
                                     <span class="tag rr-secondary is-medium">
-                                        {{ user.account_type|default:"Standard User" }}
+                                        <!-- Fixed: Relying entirely on your team's custom backend context variable -->
+                                        {{ AccountType|default:"Standard User" }}
                                     </span>
                                 </div>
                             </div>
@@ -117,6 +104,7 @@
                             </form>
                             <br>
 
+                            <!-- Teammate Added Feature: Danger Zone Delete Button -->
                             <div class="field mt-5">
                                 <button type="button" class="button is-danger" onclick="openDeleteModal()">
                                     Delete Account
@@ -131,7 +119,7 @@
     </div>
 </section>
 
-<<<<<<< Updated upstream
+<!-- Teammate Added Feature: Delete Account Modal Overlay -->
 <div id="deleteModal" class="modal">
     <div class="modal-background" onclick="closeDeleteModal()"></div>
 
@@ -161,7 +149,6 @@
                 <button type="submit" class="button is-danger">
                     Confirm Delete
                 </button>
-
                 <button type="button" class="button" onclick="closeDeleteModal()">
                     Cancel
                 </button>
@@ -170,20 +157,9 @@
     </div>
 </div>
 
+<!-- Scripts for Passwords and Modal Functionality -->
 <script>
-    function openDeleteModal() {
-        document.getElementById("deleteModal").classList.add("is-active")
-    }
-
-    function closeDeleteModal() {
-        document.getElementById("deleteModal").classList.remove("is-active")
-    }
-</script>
-
-{% endblock %}
-=======
-<!-- Reusable eye toggle script for all password inputs on this page -->
-<script>
+    // Eye toggles for passwords
     document.querySelectorAll('.toggle-password').forEach(button => {
         button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
@@ -197,7 +173,15 @@
             toggleIcon.classList.toggle('fa-eye-slash');
         });
     });
+
+    // Delete Modal controls
+    function openDeleteModal() {
+        document.getElementById('deleteModal').classList.add('is-active');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('is-active');
+    }
 </script>
 
 {% endblock %}
->>>>>>> Stashed changes
