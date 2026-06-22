@@ -87,41 +87,6 @@ class Custom500View(TemplateView):
 
     template_name = "500.html"
 
-<<<<<<< HEAD
-def interview(request):
-    Questions =[
-        "Tell me about yourself and your background.",
-        "What are your greatest strengths and weaknesses?",
-        "Why do you want to work for this company?",
-        "Where do you see yourself in five years?",
-        "Describe a challenging situation and how you overcame it.",
-        "How do you handle working under pressure or tight deadlines?",
-        "Tell me about a time you worked successfully in a team.",
-        "What motivates you in your work?",
-        "How do you prioritise tasks when managing multiple projects?",
-        "Describe a time you made a mistake and how you handled it.",
-        "What are your salary expectations?",
-        "How do you stay up to date with industry trends?",
-        "Tell me about a time you showed leadership.",
-        "Why are you leaving your current position?",
-        "Do you have any questions for us?"
-            ]
-    
-    question_list = sample(Questions, 10)
-    score = 10
-    question_count = 1
-    question_labels = []
-    for i in range(len(question_list)):
-        question_label = f"Question {question_count}: Score = {score}/ 10"
-        question_labels.append(question_label)
-        question_count += 1
-        
-    return render(
-        request,
-        "interview/interview.html",
-        {"questions": question_list, "question_label": question_labels}
-    )
-=======
 
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
@@ -138,11 +103,23 @@ def create_pack(request):
 
     return render(request, "pre_interview/create_pack.html", {"form": form})
 
-
 def interview(request):
 
-    questions = QuestionTable.objects.all()
+    # SHOW ALL QUESTIONS IN DATABASE ORDER
+    questions = QuestionTable.objects.all().order_by("id")
 
-    return render(request, "interview/interview.html",
-        {"questions": questions})
->>>>>>> 77fbbb5ac5cde2d8481e03a35e53ee8f3cad4f8c
+
+    context = {
+
+        "questions": questions,
+
+        "question_count": questions.count(),
+
+    }
+
+
+    return render(
+        request,
+        "interview/interview.html",
+        context
+    )

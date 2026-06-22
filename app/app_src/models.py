@@ -23,10 +23,15 @@ class Note(models.Model):
     author = models.ForeignKey(DomainUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     body = models.TextField()
-    pub_date = models.DateTimeField('date_published', auto_now_add=True, blank=True)
+    pub_date = models.DateTimeField(
+        'date_published',
+        auto_now_add=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.title
+
 
 class Pack(models.Model):
     title = models.CharField(max_length=200)
@@ -35,9 +40,23 @@ class Pack(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class QuestionTable(models.Model):
+
+    CATEGORY_CHOICES = [
+        ("Category 1", "Category 1"),
+        ("Category 2", "Category 2"),
+        ("Category 3", "Category 3"),
+        ("Category 4", "Category 4"),
+    ]
+
     question = models.TextField()
-    
+
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default="Category 1"
+    )
+
     def __str__(self):
         return self.question

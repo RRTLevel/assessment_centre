@@ -18,14 +18,9 @@ urlpatterns = [
 
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
-<<<<<<< HEAD
-    
-    ]
-=======
 
 
     path('create-pack/', views.create_pack, name='create_pack'),
     path('applications/', views.applications, name='applications')
 
 ]
->>>>>>> 77fbbb5ac5cde2d8481e03a35e53ee8f3cad4f8c
