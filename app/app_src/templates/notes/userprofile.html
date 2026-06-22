@@ -4,7 +4,6 @@
 {% block content %}
 
 <section class="section">
-
     <div class="container">
         <div class="columns is-centered">
             <div class="column">
@@ -14,18 +13,33 @@
 
                             <div class="field my-4">
                                 <label class="label">Username</label>
-                                <div class="">
-                                    {{ user.username}}
+                                <div>
+                                    {{ user.username }}
                                 </div>
                             </div>
 
                             <div class="field">
                                 <label class="label">Email</label>
                                 <div class="control has-icons-left">
-                                    {{ user.email}}
+                                    {{ user.email }}
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="field">
+                                <label class="label">Account Type</label>
+                                <div class="control has-icons-left">
+                                    {{ AccountType }}
                                 </div>
                             </div>
                             <br>
+
+                            <div class="field mt-5">
+                                <button type="button" class="button is-danger" onclick="openDeleteModal()">
+                                    Delete Account
+                                </button>
+                            </div>
 
                         </div>
                     </div>
@@ -33,7 +47,54 @@
             </div>
         </div>
     </div>
-
 </section>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-background" onclick="closeDeleteModal()"></div>
+
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Delete Account</p>
+            <button class="delete" type="button" onclick="closeDeleteModal()"></button>
+        </header>
+
+        <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+
+            <section class="modal-card-body">
+                <p class="mb-4">
+                    Enter your password to permanently delete your account.
+                </p>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" name="password" required>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="modal-card-foot">
+                <button type="submit" class="button is-danger">
+                    Confirm Delete
+                </button>
+
+                <button type="button" class="button" onclick="closeDeleteModal()">
+                    Cancel
+                </button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal() {
+        document.getElementById("deleteModal").classList.add("is-active")
+    }
+
+    function closeDeleteModal() {
+        document.getElementById("deleteModal").classList.remove("is-active")
+    }
+</script>
 
 {% endblock %}

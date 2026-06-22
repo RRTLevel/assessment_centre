@@ -16,8 +16,30 @@ from .models import QuestionTable
 from .forms import ApplicantForm
 from .models import Application
 
+from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.views import View
+
 
 logger = logging.getLogger("")
+
+class DeleteAccountView(LoginRequiredMixin, View):
+    login_url = "/login"
+
+    def post(self, request):
+        password = request.POST.get("password")
+
+        if not request.user.check_password(password):
+            messages.error(request, "Incorrect password.")
+            return redirect("userprofile")
+
+        user = request.user
+        logout(request)
+        user.delete()
+
+        return redirect("/")
 
 class SignUpView(SuccessMessageMixin, CreateView):
 
@@ -37,6 +59,11 @@ class userprofileView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         context["page_title"] = settings.APPLICATION_NAME + ' - Profile'
+
+        user = self.request.user
+        group = self.request.user.groups.first()
+
+        context["AccountType"] = group
         
         return context
 
