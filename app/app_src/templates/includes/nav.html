@@ -16,14 +16,20 @@
         <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
             <div class='navbar-start'>
                 <a class='navbar-item rr-white {% if home %} is-active {% endif %}' href="{% url 'home' %}">
-                    Option 1
+                    Home
                 </a>
-                <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'
-                    href="{% url 'documentation' %}">
-                    Option 2
-                </a>
+<!--                <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'-->
+<!--                    href="{% url 'documentation' %}">-->
+<!--                    Option 2-->
+<!--                </a>-->
                 <a class='navbar-item rr-white {% if interview %} is-active {% endif %}' href="{% url 'interview' %}">
-                    interview Questions
+                    Interview Questions
+                </a>
+                <a class='navbar-item rr-white {% if applications %} is-active {% endif %}' href="{% url 'applications' %}">
+                    Applications
+                </a>
+                <a class='navbar-item rr-white {% if create_pack %} is-active {% endif %}' href="{% url 'create_pack' %}">
+                    Create Pack
                 </a>
             </div>
 

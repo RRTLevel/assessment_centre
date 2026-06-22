@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- HERO -->
 <section class="hero rr-primary">
   <div class="hero-body">
     <div class="container">
@@ -14,7 +13,6 @@
   </div>
 </section>
 
-<!-- GRID -->
 <section class="section">
   <div class="container">
 
@@ -23,30 +21,20 @@
       {% for pack in packs %}
 
       <div class="column is-one-third">
-
-        <!-- CARD / BOX -->
         <div class="box has-text-centered pack-card">
-
-          <!-- TITLE -->
           <h2 class="title is-5 rr-primary">
             {{ pack.title }}
           </h2>
-
-          <!-- DESCRIPTION -->
           <p class="mb-4">
             {{ pack.description }}
           </p>
-
-          <!-- DATE -->
           <small class="has-text-grey">
             Created: {{ pack.created_at|date:"d M Y" }}
           </small>
-
-          <!-- BUTTON -->
           <div class="mt-5">
             <a href="{% url 'applicant_form' pack.id %}">
-    Open Pre-Interview Form
-</a>
+                Open Pre-Interview Form
+            </a>#
           </div>
 
         </div>
