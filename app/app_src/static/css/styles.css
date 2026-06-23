@@ -163,7 +163,7 @@ footer {
 
 .submit-btn {
     background-color: #1800A8;
-    color: white;
+    color: #f7f0f0;
     border: none;
     border-radius: 6px;
     padding: 0.9rem 2rem;
@@ -177,50 +177,104 @@ footer {
     background-color: #12007d;
 }
 
-.score-value {
-    font-weight: 700;
-    color: #1800A8;
-}
-
-.score-slider {
+.Score-Box {
     width: 100%;
-    margin-top: 0.5rem;
-    cursor: pointer;
-    appearance: none;
-    height: 6px;
-    border-radius: 3px;
-    background: linear-gradient(to right, #1800A8 var(--fill, 0%), #ddd var(--fill, 0%));
-    outline: none;
+    margin: 20px 0;
 }
 
-.score-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #1800A8;
-    cursor: pointer;
-    transition: transform 0.1s ease;
+.table-container {
+    overflow-x: auto;
 }
 
-.score-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
+.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    text-align: center;
+
+    /* Change table background here */
+    background-color: #f7f0f0;
 }
 
-.score-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #1800A8;
+/* Borders for everything */
+.score-table th,
+.score-table td {
+    border: 1.5px solid #1800A8;
+    padding: 12px 16px;
+}
+
+
+/* ===== HEADER ROW ===== */
+
+/* Top row colour */
+.score-table thead th {
+    background-color: #1800A8; /* EDIT HEADER BACKGROUND */
+    color: #f7f0f0;            /* EDIT HEADER TEXT */
+    font-weight: bold;
+}
+
+
+/* ===== BODY ===== */
+
+/* Left-side labels (Score) */
+.score-table tbody th {
+    background-color: #e8e0e0; /* EDIT LABEL BACKGROUND */
+    color: #1800A8;            /* EDIT LABEL TEXT */
+    font-weight: bold;
+}
+
+
+/* Main table text cells */
+.score-table tbody td {
+    background-color: #f7f0f0; /* EDIT BODY BACKGROUND */
+    color: #000000;            /* EDIT BODY TEXT */
+}
+
+
+/* Optional hover effect */
+.score-table tbody tr:hover td,
+.score-table tbody tr:hover th {
+    background-color: #ddd6ff;
+}
+
+.score-input {
+    width: 50px;
+    padding: 8px;
+    text-align: center;
+
+    border: 1.5px solid #1800A8;
+    border-radius: 5px;
+
+    background-color: #f7f0f0;
+    color: #1800A8;
+
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* remove browser arrows if you want */
+.score-input::-webkit-inner-spin-button,
+.score-input::-webkit-outer-spin-button {
+    opacity: 1;
+}
+
+.add-row-btn {
+    margin-top: 10px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+
     border: none;
+    border-radius: 50%;
+
+    background-color: #1800A8;
+    color: #f7f0f0;
+
+    font-size: 24px;
     cursor: pointer;
 }
-
-.slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: #555;
-    margin-top: 0.25rem;
-    padding: 0 2px;
+.add-row-btn {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
