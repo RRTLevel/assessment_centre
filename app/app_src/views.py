@@ -1,7 +1,7 @@
 import logging
 from random import sample
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
@@ -81,6 +81,9 @@ class userprofileView(LoginRequiredMixin, TemplateView):
 
         messages.success(request, "Your password was successfully updated!", extra_tags="success")
         return redirect("userprofile")
+
+        
+        return context
 
 
 class homeView(LoginRequiredMixin, CreateView):
