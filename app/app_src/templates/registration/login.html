@@ -84,6 +84,61 @@
 
                         <!-- Redirect -->
 
+                                <div class="field my-4">
+                                    <label class="label">Username</label>
+                                    <div class="control has-icons-left">
+                                        <input class="input" name="username" id="id_username" type="text" maxlength="30"
+                                            required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {% if form.errors %}
+                                {% for field in form %}
+                                {% for error in field.errors %}
+                                <div class="help">
+                                    <p class="p-1 has-text-danger">{{ error|escape }}</p>
+                                </div>
+                                {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <div class="help">
+                                    <p class="p-1 has-text-danger">{{ error|escape }}</p>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+
+
+                                <div class="field my-4">
+                                    <label class="label">Password</label>
+                                    <div class="control has-icons-left has-icons-right">
+                                        <input class="input" name="password" id="id_password" type="password" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                        <span class="icon is-small is-right" id="toggle_password"
+                                            style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye" id="toggle_icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <br>
+                                <p class="help is-pulled-right">
+                                    Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <label class="checkbox">
+                            <input type="checkbox" name="remember_me">
+                            Remember me
+                        </label>
+
+                        <button class="button rr-primary rr-white" type="submit" value="login"><i
+                                class="fas fa-sign-in-alt mr-1"></i>Login</button>
                         <input type="hidden" name="next" value="{% url 'home' %}">
 
                     </form>
