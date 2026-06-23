@@ -1,25 +1,30 @@
 from django.urls import path
 from . import views
-from .views import interview, DeleteAccountView
-from .views import RememberMeLoginView
+from .views import interview, DeleteAccountView, RememberMeLoginView
 
 urlpatterns = [
     path('', views.homeView.as_view(), name='home'),
+    path('login/', RememberMeLoginView.as_view(), name='login'),
+    path('signup/', views.SignUpView.as_view(), name='signup'),
+
     path('userprofile/', views.userprofileView.as_view(), name='userprofile'),
     path('documentation/', views.documentationView, name='documentation'),
-    path('interview/', interview, name="interview"),
-    path("delete-account/", DeleteAccountView.as_view(), name="delete_account"),
-    path("signup/", views.SignUpView.as_view(), name="signup"),
-    path('404', views.Custom404View.as_view(), name='404'),
-    path('500', views.Custom500View.as_view(), name='500'),
+    path('interview/', interview, name='interview'),
+
     path('create-pack/', views.create_pack, name='create_pack'),
     path('applications/', views.applications, name='applications'),
-    path("applicant-form/<int:pack_id>/", views.applicant_form, name="applicant_form"),
-    path("application_review/", views.application_review, name="applications_review"),
+    path('application_review/', views.application_review, name='applications_review'),
 
-    path("categories/", views.create_category, name="categories"),
-    path("applications/<int:id>/approve/", views.approve_application, name="approve_application"),
-    path("applications/<int:id>/deny/", views.deny_application, name="deny_application"),
-    path("applications/<int:pk>/", views.application_detail, name="application_detail")
-    path("login/", RememberMeLoginView.as_view(), name="login"),
+    path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
+
+    path('categories/', views.create_category, name='categories'),
+
+    path('applications/<int:id>/approve/', views.approve_application, name='approve_application'),
+    path('applications/<int:id>/deny/', views.deny_application, name='deny_application'),
+    path('applications/<int:pk>/', views.application_detail, name='application_detail'),
+
+    path('delete-account/', DeleteAccountView.as_view(), name='delete_account'),
+
+    path('404', views.Custom404View.as_view(), name='404'),
+    path('500', views.Custom500View.as_view(), name='500'),
 ]
