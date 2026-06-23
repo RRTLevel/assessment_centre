@@ -62,26 +62,37 @@
                                             <i class="fas fa-key"></i>
                                         </span>
                                         <span class="icon is-small is-right" id="toggle_password"
-                                            style="pointer-events: all; cursor: pointer;">
+                                            style="pointer-events: all; pointer: cursor;">
                                             <i class="fas fa-eye" id="toggle_icon"></i>
                                         </span>
                                     </div>
                                 </div>
-                                <br>
-                                <p class="help is-pulled-right">
-                                    Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
-                                </p>
+                                
+                                <!-- Remember me checkbox on the left -->
+                                <div class="field my-4">
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="remember_me">
+                                        Remember me
+                                    </label>
+                                </div>
+
+                                <!-- Full width Login Button -->
+                                <div class="field my-4">
+                                    <button class="button rr-primary rr-white is-fullwidth" type="submit" value="login">
+                                        <i class="fas fa-sign-in-alt mr-1"></i>Login
+                                    </button>
+                                </div>
+
+                                <!-- Centered Sign Up Link at the bottom -->
+                                <div class="has-text-centered mt-4">
+                                    <p class="help">
+                                        Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
 
-
-                        <label class="checkbox">
-                            <input type="checkbox" name="remember_me">
-                            Remember me
-                        </label>
-
-                        <button class="button rr-primary rr-white" type="submit" value="login"><i
-                                class="fas fa-sign-in-alt mr-1"></i>Login</button>
                         <input type="hidden" name="next" value="{% url 'home' %}">
 
                     </form>
