@@ -14,6 +14,7 @@ urlpatterns = [
     path('userprofile/', views.userprofileView.as_view(), name='userprofile'),
     path('documentation/', views.documentationView, name='documentation'),
     path('interview/', interview, name = "interview"),
+    path('add_questions', add_questions , name = "add_questions"),
 
     path("signup/", views.SignUpView.as_view(), name="signup"),
 

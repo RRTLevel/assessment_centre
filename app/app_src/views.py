@@ -188,6 +188,8 @@ def applicant_form(request, pack_id):
         }
     )
 
+def add_questions(request):
+    return render(request, "add_questions/add_questions.html")
 
 @login_required(login_url='/login')
 def application_review(request):
@@ -229,3 +231,4 @@ def application_detail(request, pk):
     return render(request, "pre_interview/view_more.html", {
         "application": application
     })
+
