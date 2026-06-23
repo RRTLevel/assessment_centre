@@ -1,90 +1,147 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <title>Interview</title>
+<head>
+    <title>Interview</title>
 
-        {% load static %}
+    {% load static %}
 
-        <meta charset="utf-8">
+    <meta charset="utf-8">
 
-        <link rel="stylesheet"
-            href="{% static 'bulma/css/style.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
 
-        <link rel="stylesheet"
-            href="{% static 'css/styles.css' %}">
-    </head>
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
 
-    <body>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
 
-        <header>
-            {% include 'includes/title.html' %}
-            {% include 'includes/nav.html' %}
-        </header>
+<body>
 
-        {% block content %}
-        <div class="container">
-            <section class="hero rr-primary" style="border-radius: 4px;">
-              <div class="hero-body">
-                <h1 class="title rr-white">Interview Questions</h1>
-                <p class="rr-white">
-                  Total Questions Available: {{ questions|length }}
+    <!-- {% include 'includes/non_production_banner.html' %} -->
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container interview-container">
+
+            {% block content %}
+
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Interview Questions
+                </h1>
+                <p class="interview-count">
+                    Total Questions: {{ questions|length }}
                 </p>
-              </div>
-            </section>
-        </div>
+            </div>
 
-        <main class="section">
-            <div class="container interview-container">
+            <label for="category">category</label>
+            <select name="category" id="category">
+                <option value="technical">Technical</option>
+            </select>
 
-               {% for question in questions %}
-                <div class="question-row mb-4">
+            {% for question in questions %}
+            <div class="question-row">
 
-                    <div class="question-card" style="background-color: #838282; padding: 1.25rem; border-radius: 8px;">
-                        <p class="question-text rr-white" style="font-weight: 500;">
-                            {{ question.question }}
-                        </p>
+                <div class="question-card">
+                    <p class="question-text">
+                        {{ question.question }}
+                    </p>
+                </div>
+
+                <div class="Score-Box">
+                    <p>Score: <span class="score-value">1</span></p>
+                    <div style="display:flex;justify-content:space-between;width:100%;">
+                        <span>Negative</span>
+                        <span>Positive</span>
                     </div>
-
-                    <div class="Score-Box" style="background-color: #838282; border-radius: 8px; border: 1px solid #dcdcdc; border-left: 5px solid #1800A8;">
-                        <p class="rr-white mb-2" style="font-size: 0.9rem;">Score / 10</p>
-                        <div class="select is-small">
-                            <select name="Scores">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                                <option>6</option>
-                                <option>7</option>
-                                <option>8</option>
-                                <option>9</option>
-                                <option>10</option>
-                            </select>
-                        </div>
+                    <input class="score-slider" type="range" name="score_{{ forloop.counter }}" min="1" max="10" step="any" value="1">
+                    <div class="slider-labels">
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                        <span>6</span>
+                        <span>7</span>
+                        <span>8</span>
+                        <span>9</span>
+                        <span>10</span>
                     </div>
-
-                </div>
-
-                {% empty %}
-
-                <div class="has-text-centered py-6">
-                    <p class="has-text-grey">No interview questions available.</p>
-                </div>
-
-                {% endfor %}
-
-                <div class="submit-section mt-6">
-                    <button class="button rr-primary px-6 py-4" style="font-weight: 600; height: auto;">
-                        Submit Evaluation
-                    </button>
-                </div>
+            </div>
 
             </div>
-        </main>
-        {% endblock %}
 
-        {% include 'includes/footer.html' %}
+            {% empty %}
 
-    </body>
+            <div class="no-questions">
+                No interview questions available.
+            </div>
+
+            {% endfor %}
+
+            <div class="submit-section">
+                <button class="submit-btn">
+                    Submit
+                </button>
+            </div>
+
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+    <script>
+        document.querySelectorAll('.score-slider').forEach(function(slider) {
+            var counter = slider.closest('.Score-Box').querySelector('.score-value');
+
+            function setFill(val) {
+                var pct = (val - slider.min) / (slider.max - slider.min) * 100;
+                slider.style.setProperty('--fill', pct + '%');
+                counter.textContent = Math.round(val);
+            }
+
+            slider.addEventListener('input', function() {
+                setFill(parseFloat(slider.value));
+            });
+
+            slider.addEventListener('pointerup', function() {
+                var start = parseFloat(slider.value);
+                var target = Math.round(start);
+                var startTime = null;
+                var duration = 150;
+
+                function animate(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var progress = Math.min((timestamp - startTime) / duration, 1);
+                    var eased = 1 - Math.pow(1 - progress, 2);
+                    var current = start + (target - start) * eased;
+                    slider.value = current;
+                    setFill(current);
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        slider.value = target;
+                        setFill(target);
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            });
+
+            setFill(parseFloat(slider.value));
+        });
+    </script>
+
+</body>
+
 </html>
