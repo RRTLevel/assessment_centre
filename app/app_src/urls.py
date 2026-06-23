@@ -35,4 +35,6 @@ urlpatterns = [
 
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
+    path("questions/", views.question_list, name="question_list"),
+    path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
 ]
