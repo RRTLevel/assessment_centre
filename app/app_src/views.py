@@ -200,6 +200,8 @@ def applicant_form(request, pack_id):
         }
     )
 
+def add_questions(request):
+    return render(request, "add_questions/add_questions.html")
 
 @login_required(login_url='/login')
 def application_review(request):
