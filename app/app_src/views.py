@@ -1,7 +1,7 @@
 import logging
 from random import sample
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-<<<<<<< HEAD
 <<<<<<< Updated upstream
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
@@ -31,10 +30,6 @@ from django.contrib import messages
 from django.views import View
 
 >>>>>>> Stashed changes
-=======
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
->>>>>>> 09e359728c056be455e67a40e9a8cb4b44c2dca9
 
 logger = logging.getLogger("")
 
@@ -103,9 +98,6 @@ class userprofileView(LoginRequiredMixin, TemplateView):
         messages.success(request, "Your password was successfully updated!", extra_tags="success")
         return redirect("userprofile")
 
-        
-        return context
-
 
 class homeView(LoginRequiredMixin, CreateView):
     login_url = '/login'
@@ -170,15 +162,11 @@ def create_pack(request):
     })
 
 
-<<<<<<< HEAD
 <<<<<<< Updated upstream
 @login_required(login_url='/login')
 =======
 
 >>>>>>> Stashed changes
-=======
-@login_required(login_url='/login')
->>>>>>> 09e359728c056be455e67a40e9a8cb4b44c2dca9
 def interview(request):
     questions = QuestionTable.objects.all()
     return render(request, "interview/interview.html", {
@@ -186,7 +174,6 @@ def interview(request):
         "interview": True
     })
 
-<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     questions = QuestionTable.objects.all().order_by("id")
@@ -196,8 +183,6 @@ def interview(request):
         "question_count": questions.count(),
     })
 >>>>>>> Stashed changes
-=======
->>>>>>> 09e359728c056be455e67a40e9a8cb4b44c2dca9
 
 @login_required(login_url='/login')
 def applicant_form(request, pack_id):
