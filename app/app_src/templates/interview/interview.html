@@ -22,173 +22,68 @@
             {% include 'includes/nav.html' %}
         </header>
 
-        <main class="section">
+        {% block content %}
+        <div class="container">
+            <section class="hero rr-primary" style="border-radius: 4px;">
+              <div class="hero-body">
+                <h1 class="title rr-white">Interview Questions</h1>
+                <p class="rr-white">
+                  Total Questions Available: {{ questions|length }}
+                </p>
+              </div>
+            </section>
+        </div>
 
+        <main class="section">
             <div class="container interview-container">
 
-                <div class="interview-header">
+               {% for question in questions %}
+                <div class="question-row mb-4">
 
-                    <h1 class="title interview-title">
-                        Interview Questions
-                    </h1>
-
-                    <p class="interview-count">
-                        Total Questions: {{ question_count }}
-                    </p>
-
-                    <form method="get" id="categoryForm">
-
-                        <label for="category">
-                            Category:
-                        </label>
-
-                        <select name="category" id="category">
-
-                            <option value="all"
-                                {% if selected_category == "all" %}
-                                selected
-                                {% endif %}>
-                                All Categories
-                            </option>
-                        </select>
-
-                    </form>
-
-                </div>
-
-            {% for question in questions %}
-
-            <div class="question-row">
-
-                <div class="question-card">
-
-                    <p class="question-text">
-                        {{ question.question }}
-                    </p>
-
-                </div>
-
-
-                <div class="Score-Box">
-
-                    <p>
-                        Score:
-                        <span class="score-value">0</span>/10
-                    </p>
-
-
-                   <input
-                    type="range"
-                    class="score-slider"
-                    name="score_{{ forloop.counter }}"
-                    min="0"
-                    max="10"
-                    value="0"
-                    step="0.1">
-
-
-                    <div class="slider-dots">
-
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
-                        <span>5</span>
-                        <span>6</span>
-                        <span>7</span>
-                        <span>8</span>
-                        <span>9</span>
-                        <span>10</span>
-
+                    <div class="question-card" style="background-color: #838282; padding: 1.25rem; border-radius: 8px;">
+                        <p class="question-text rr-white" style="font-weight: 500;">
+                            {{ question.question }}
+                        </p>
                     </div>
 
+                    <div class="Score-Box" style="background-color: #838282; border-radius: 8px; border: 1px solid #dcdcdc; border-left: 5px solid #1800A8;">
+                        <p class="rr-white mb-2" style="font-size: 0.9rem;">Score / 10</p>
+                        <div class="select is-small">
+                            <select name="Scores">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                            </select>
+                        </div>
+                    </div>
 
                 </div>
 
-            </div>
+                {% empty %}
 
+                <div class="has-text-centered py-6">
+                    <p class="has-text-grey">No interview questions available.</p>
+                </div>
 
-            {% empty %}
+                {% endfor %}
 
-            <div class="no-questions">
-                No interview questions available.
-            </div>
-
-
-            {% endfor %}
-
-
-
-            <div class="submit-section">
-
-                <button class="submit-btn">
-                    Submit
-                </button>
+                <div class="submit-section mt-6">
+                    <button class="button rr-primary px-6 py-4" style="font-weight: 600; height: auto;">
+                        Submit Evaluation
+                    </button>
+                </div>
 
             </div>
-
         </main>
-        <script>
+        {% endblock %}
 
-document.querySelectorAll(".score-slider").forEach(slider => {
-
-    const box = slider.parentElement;
-
-    const score = box.querySelector(".score-value");
-
-    const dots = box.querySelectorAll(".slider-dots span");
-
-
-    function update(){
-
-
-        let value = parseFloat(slider.value);
-
-
-        // nearest whole number
-        let rounded = Math.round(value);
-
-
-        score.textContent = rounded;
-
-
-
-        dots.forEach((dot,index)=>{
-
-
-            dot.classList.toggle(
-                "active",
-                index < rounded
-            );
-
-
-        });
-
-
-
-        let percent = (value / 10) * 100;
-
-
-        slider.style.background =
-        `linear-gradient(
-            90deg,
-            #1800A8 ${percent}%,
-            #ddd ${percent}%
-        )`;
-
-    }
-
-
-
-    slider.addEventListener("input", update);
-
-
-    update();
-
-
-});
-
-</script>
         {% include 'includes/footer.html' %}
 
     </body>

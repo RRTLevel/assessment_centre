@@ -3,26 +3,20 @@ from random import sample
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
+from django.contrib import messages
+from django.contrib.auth import logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .forms import AddNoteForm, DomainUserCreationForm
-from .models import Note
-from .forms import PackForm
-from .models import Pack
-from .models import QuestionTable
-from .forms import ApplicantForm
-from .models import Application
-from .forms import CategoryForm
-
-from django.contrib.auth import logout, update_session_auth_hash  # Added update_session_auth_hash
-from django.contrib import messages
-from django.views import View
-
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
+from .models import Note, Pack, QuestionTable, Application
 
 logger = logging.getLogger("")
+
 
 class DeleteAccountView(LoginRequiredMixin, View):
     login_url = "/login"
@@ -40,8 +34,8 @@ class DeleteAccountView(LoginRequiredMixin, View):
 
         return redirect("/")
 
-class SignUpView(SuccessMessageMixin, CreateView):
 
+class SignUpView(SuccessMessageMixin, CreateView):
     form_class = DomainUserCreationForm
     success_url = reverse_lazy("login")
     success_message = "Your account has been created! Please login:"
@@ -49,125 +43,119 @@ class SignUpView(SuccessMessageMixin, CreateView):
 
 
 class userprofileView(LoginRequiredMixin, TemplateView):
-
     login_url = '/login'
     model = Note
     template_name = 'notes/userprofile.html'
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context["page_title"] = settings.APPLICATION_NAME + ' - Profile'
 
         user = self.request.user
         group = self.request.user.groups.first()
-
         context["AccountType"] = group
-        
+
         return context
 
-    # Added post method to handle the direct password change form submission securely
-    def post(self, request, *kwargs):
+    def post(self, request, **kwargs):
         user = request.user
         old_pass = request.POST.get("old_password")
         new_pass1 = request.POST.get("new_password1")
         new_pass2 = request.POST.get("new_password2")
 
-        # 1. Verify old password matches current database records
         if not user.check_password(old_pass):
             messages.error(request, "Your current password was entered incorrectly.", extra_tags="danger")
             return redirect("userprofile")
 
-        # 2. Confirm matching field confirmation values
         if new_pass1 != new_pass2:
             messages.error(request, "The two new password fields didn't match.", extra_tags="danger")
             return redirect("userprofile")
 
-        # 3. Check password complexity metrics (length requirement check)
         if len(new_pass1) < 8:
             messages.error(request, "Your new password must be at least 8 characters long.", extra_tags="danger")
             return redirect("userprofile")
 
-        # 4. Save new password safely and protect the active session authentication key hash
         user.set_password(new_pass1)
         user.save()
         update_session_auth_hash(request, user)
-        
+
         messages.success(request, "Your password was successfully updated!", extra_tags="success")
         return redirect("userprofile")
 
 
 class homeView(LoginRequiredMixin, CreateView):
-
     login_url = '/login'
     form_class = AddNoteForm
     model = Note
     template_name = 'notes/notes.html'
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context["home"] = True
         context["page_title"] = settings.APPLICATION_NAME + ' - Notes'
         context["notes"] = Note.objects.order_by('-pub_date')[:5]
-        
         return context
 
     def get_success_url(self):
-
         return reverse('home')
 
     def form_valid(self, form):
-
         form.instance.author = self.request.user
-
-        logger.info(f"{self.request.user} sucessfully posted a note.")
-
+        logger.info(f"{self.request.user} successfully posted a note.")
         return super(homeView, self).form_valid(form)
 
 
 def documentationView(request):
-
     context = {
-        'page_title' : settings.APPLICATION_NAME + ' - User Guide',
+        'page_title': settings.APPLICATION_NAME + ' - User Guide',
         'documentation': True,
     }
-
-    return render(request, 'notes/documentation.html',context)
+    return render(request, 'notes/documentation.html', context)
 
 
 class Custom404View(TemplateView):
-
     template_name = "404.html"
 
 
 class Custom500View(TemplateView):
-
     template_name = "500.html"
 
+
+@login_required(login_url='/login')
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
-    return render(request, "pre_interview/applications.html", {"packs": packs})
+    return render(request, "pre_interview/applications.html", {
+        "packs": packs,
+        "applications_active": True
+    })
 
+
+@login_required(login_url='/login')
 def create_pack(request):
     if request.method == "POST":
         form = PackForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('applications') 
+            return redirect('applications')
     else:
         form = PackForm()
 
-    return render(request, "pre_interview/create_pack.html", {"form": form})
+    return render(request, "pre_interview/create_pack.html", {
+        "form": form,
+        "create_pack_active": True
+    })
 
+
+@login_required(login_url='/login')
 def interview(request):
+    questions = QuestionTable.objects.all()
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "interview": True
+    })
 
-    # SHOW ALL QUESTIONS IN DATABASE ORDER
-    questions = QuestionTable.objects.all().order_by("id")
 
-    return render(request, "interview/interview.html",
-        {"questions": questions})
-
+@login_required(login_url='/login')
 def applicant_form(request, pack_id):
     pack = get_object_or_404(Pack, id=pack_id)
 
@@ -184,9 +172,7 @@ def applicant_form(request, pack_id):
                 answer_2=answers["answer_2"],
                 answer_3=answers["answer_3"],
             )
-
             return redirect("applications")
-
     else:
         form = ApplicantForm()
 
@@ -199,9 +185,10 @@ def applicant_form(request, pack_id):
         }
     )
 
+
+@login_required(login_url='/login')
 def application_review(request):
     applications = Application.objects.all().select_related('user', 'pack')
-
     return render(request, "pre_interview/application_review.html", {
         "applications": applications
     })
@@ -218,17 +205,20 @@ def create_category(request):
 
     return render(request, "pre_interview/create_category.html", {"form": form})
 
+
 def approve_application(request, id):
     app = Application.objects.get(id=id)
     app.status = "approved"
     app.save()
     return redirect("applications_review")
 
+
 def deny_application(request, id):
     if request.method == "POST":
         application = get_object_or_404(Application, id=id)
         application.delete()
     return redirect("applications_review")
+
 
 def application_detail(request, pk):
     application = get_object_or_404(Application, pk=pk)
