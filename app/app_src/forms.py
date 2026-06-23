@@ -159,3 +159,26 @@ class ApplicantForm(forms.ModelForm):
             }),
         }
 
+class QuestionForm(forms.Form):
+    question = forms.CharField(
+        label="Enter your Question:",
+        widget=forms.Textarea(
+            attrs={
+                "class": "textarea",
+                "rows": 5,
+            }
+        )
+    )
+
+    PACK_CHOICES = [
+        ("Pack 1", "Pack 1"),
+        ("Pack 2", "Pack 2"),
+        ("Pack 3", "Pack 3"),
+    ]
+
+    pack = forms.ChoiceField(
+        choices=PACK_CHOICES,
+        widget=forms.Select(attrs={"class": ""}),
+        label=""
+    )
+

@@ -16,29 +16,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
 
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
-
-
-from .forms import AddNoteForm, DomainUserCreationForm
-from .models import Note
-from .forms import PackForm
-from .models import Pack
-from .models import QuestionTable
-from .forms import ApplicantForm
-from .models import Application
-
-from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.views import View
 from django.contrib.auth.views import LoginView
 
-
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
-
+from .forms import QuestionForm
 
 
 logger = logging.getLogger("")
@@ -222,8 +202,17 @@ def applicant_form(request, pack_id):
         }
     )
 
-def add_questions(request):
-    return render(request, "add_questions/add_questions.html")
+def add_question(request):
+    form = QuestionForm()
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+
+        if form.is_valid():
+            question = form.cleaned_data["question"]
+            pack = form.cleaned_data["pack"]
+
+    return render(request, "add_questions/add_questions.html", {"form": form})
 
 @login_required(login_url='/login')
 def application_review(request):
