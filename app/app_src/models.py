@@ -113,3 +113,12 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.application_id}"
+    
+class Questions(models.Model):
+    text = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
+ 
+ 
+    def __str__(self):
+        return self. Text[:60]
+ 

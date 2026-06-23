@@ -203,16 +203,20 @@ def applicant_form(request, pack_id):
     )
 
 def add_question(request):
-    form = QuestionForm()
-
     if request.method == "POST":
         form = QuestionForm(request.POST)
 
         if form.is_valid():
-            question = form.cleaned_data["question"]
-            pack = form.cleaned_data["pack"]
+            form.save()
+            return redirect("add_question")
+    else:
+        form = QuestionForm()
 
-    return render(request, "add_questions/add_questions.html", {"form": form})
+    return render(
+        request,
+        "add_questions/add_questions.html",
+        {"form": form}
+    )
 
 @login_required(login_url='/login')
 def application_review(request):

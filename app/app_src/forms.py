@@ -8,7 +8,7 @@ from .models import Pack
 from .models import Category
 
 from .models import DomainUser, Note, Pack, Application
-
+from .models import Questions, Category
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -159,26 +159,22 @@ class ApplicantForm(forms.ModelForm):
             }),
         }
 
-class QuestionForm(forms.Form):
-    question = forms.CharField(
-        label="Enter your Question:",
-        widget=forms.Textarea(
-            attrs={
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Questions
+        fields = ["text", "category"]
+
+        widgets = {
+            "text": forms.Textarea(attrs={
                 "class": "textarea",
                 "rows": 5,
-            }
-        )
-    )
+            }),
+            "category": forms.Select(attrs={
+                "class": "select",
+            }),
+        }
 
-    PACK_CHOICES = [
-        ("Pack 1", "Pack 1"),
-        ("Pack 2", "Pack 2"),
-        ("Pack 3", "Pack 3"),
-    ]
-
-    pack = forms.ChoiceField(
-        choices=PACK_CHOICES,
-        widget=forms.Select(attrs={"class": ""}),
-        label=""
-    )
-
+        labels = {
+            "text": "Enter your Question:",
+            "category": "",
+        }
