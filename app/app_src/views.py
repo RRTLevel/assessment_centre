@@ -12,24 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-<<<<<<< Updated upstream
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
-=======
-from .forms import AddNoteForm, DomainUserCreationForm
-from .models import Note
-from .forms import PackForm
-from .models import Pack
-from .models import QuestionTable
-from .forms import ApplicantForm
-from .models import Application
-from .forms import ApplicantForm
-
-from django.contrib.auth import logout, update_session_auth_hash  # Added update_session_auth_hash
-from django.contrib import messages
-from django.views import View
-
->>>>>>> Stashed changes
 
 logger = logging.getLogger("")
 
@@ -162,11 +146,7 @@ def create_pack(request):
     })
 
 
-<<<<<<< Updated upstream
 @login_required(login_url='/login')
-=======
-
->>>>>>> Stashed changes
 def interview(request):
     questions = QuestionTable.objects.all()
     return render(request, "interview/interview.html", {
@@ -174,15 +154,6 @@ def interview(request):
         "interview": True
     })
 
-<<<<<<< Updated upstream
-=======
-    questions = QuestionTable.objects.all().order_by("id")
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_count": questions.count(),
-    })
->>>>>>> Stashed changes
 
 @login_required(login_url='/login')
 def applicant_form(request, pack_id):
