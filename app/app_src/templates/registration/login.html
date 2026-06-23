@@ -1,88 +1,31 @@
 {% extends 'base.html' %}
-
 {% block title %}{{ page_title }}{% endblock %}
-
 {% block content %}
 
 <section class="section">
+
     <div class="container">
 
         <div class="columns is-centered">
             <div class="column is-half">
-
                 <div class="box">
 
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Messages -->
-                        {% if messages %}
-                        <ul class="mb-4">
-                            {% for message in messages %}
-                            <li class="has-text-{{ message.tags }}">
-                                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                                    <strong>Important:</strong>
+                        <div class="columns is-centered mb-0">
+                            <div class="column px-4 pb-0">
+
+                                {% if messages %}
+                                <ul>
+                                    {% for message in messages %}
+                                    <li {% if message.tags %} class="has-text-{{ message.tags }}" {% endif %}>
+                                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                                        {{ message }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                                 {% endif %}
-                                {{ message }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-
-                        <!-- Username -->
-                        <div class="field">
-                            <label class="label">Username</label>
-                            <div class="control has-icons-left">
-                                <input class="input" name="username" id="id_username" type="text" required>
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="field">
-                            <label class="label">Password</label>
-                            <div class="control has-icons-left has-icons-right">
-                                <input class="input" name="password" id="id_password" type="password" required>
-
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-key"></i>
-                                </span>
-
-                                <span class="icon is-small is-right"
-                                      id="toggle_password"
-                                      style="cursor: pointer; pointer-events: all;">
-                                    <i class="fas fa-eye" id="toggle_icon"></i>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Remember me -->
-                        <div class="field">
-                            <label class="checkbox">
-                                <input type="checkbox" name="remember_me">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="field">
-                            <button class="button rr-primary rr-white is-fullwidth" type="submit">
-                                <i class="fas fa-sign-in-alt mr-1"></i>
-                                Login
-                            </button>
-                        </div>
-
-                        <!-- Signup -->
-                        <div class="has-text-centered mt-3">
-                            <p class="help">
-                                Don’t have an account?
-                                <a href="{% url 'signup' %}">Sign Up</a>
-                            </p>
-                        </div>
-
-                        <!-- Redirect -->
 
                                 <div class="field my-4">
                                     <label class="label">Username</label>
@@ -125,28 +68,10 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Remember me checkbox on the left -->
-                                <div class="field my-4">
-                                    <label class="checkbox">
-                                        <input type="checkbox" name="remember_me">
-                                        Remember me
-                                    </label>
-                                </div>
 
-                                <!-- Full width Login Button -->
-                                <div class="field my-4">
-                                    <button class="button rr-primary rr-white is-fullwidth" type="submit" value="login">
-                                        <i class="fas fa-sign-in-alt mr-1"></i>Login
-                                    </button>
-                                </div>
-
-                                <!-- Centered Sign Up Link at the bottom -->
-                                <div class="has-text-centered mt-4">
-                                    <p class="help">
-                                        Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
-                                    </p>
-                                </div>
-
+                                <p class="help is-pulled-right">
+                                    Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                                </p>
                             </div>
                         </div>
 
@@ -166,10 +91,10 @@
             </div>
         </div>
 
+
     </div>
 </section>
 
-<!-- Password toggle -->
 <script>
     const togglePassword = document.querySelector('#toggle_password');
     const passwordInput = document.querySelector('#id_password');
@@ -185,3 +110,4 @@
 </script>
 
 {% endblock %}
+ 
