@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import interview, DeleteAccountView
+from .views import RememberMeLoginView
 
 urlpatterns = [
     path('', views.homeView.as_view(), name='home'),
@@ -20,4 +21,5 @@ urlpatterns = [
     path("applications/<int:id>/approve/", views.approve_application, name="approve_application"),
     path("applications/<int:id>/deny/", views.deny_application, name="deny_application"),
     path("applications/<int:pk>/", views.application_detail, name="application_detail")
+    path("login/", RememberMeLoginView.as_view(), name="login"),
 ]

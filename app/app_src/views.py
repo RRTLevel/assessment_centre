@@ -14,6 +14,21 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
+from .forms import AddNoteForm, DomainUserCreationForm
+from .models import Note
+from .forms import PackForm
+from .models import Pack
+from .models import QuestionTable
+from .forms import ApplicantForm
+from .models import Application
+
+from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.views import View
+from django.contrib.auth.views import LoginView
+
 
 logger = logging.getLogger("")
 
@@ -226,3 +241,16 @@ def application_detail(request, pk):
     return render(request, "pre_interview/view_more.html", {
         "application": application
     })
+
+class RememberMeLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def form_valid(self, form):
+        remember_me = self.request.POST.get("remember_me")
+
+        if remember_me:
+            self.request.session.set_expiry(60 * 60 * 24 * 30)
+        else:
+            self.request.session.set_expiry(0)
+
+        return super().form_valid(form)
