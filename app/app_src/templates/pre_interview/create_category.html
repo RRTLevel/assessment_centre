@@ -2,65 +2,124 @@
 
 {% block content %}
 
-<div class="category-page">
+<div class="container mt-6">
 
-    <div class="page-header">
-        <h1>Create Category</h1>
-        <p>Create interview question categories</p>
+    <!-- Header -->
+    <div class="interview-header mb-5">
+        <h1 class="title is-3 interview-title">Create New Pack</h1>
+        <p class="subtitle is-6 interview-count">
+            Create and manage your interview question packs
+        </p>
     </div>
 
-    <div class="form-card">
+    <div class="columns">
 
-        <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
+        <!-- FORM -->
+        <div class="column is-5">
 
-    <button type="submit" class="submit-btn">
-        Create Category
-    </button>
-</form>
+            <div class="card">
+                <div class="card-content">
 
-    </div>
+                    <h2 class="title is-5 text-rr-primary mb-4">
+                        Pack Details
+                    </h2>
 
-    <div class="table-card">
+                    <form method="POST">
+                        {% csrf_token %}
 
-        <h2>Existing Categories</h2>
+                        <!-- Name -->
+                        <div class="field">
+                            <label class="label">Pack Name</label>
+                            <div class="control">
+                                <input
+                                    class="input"
+                                    type="text"
+                                    name="name"
+                                    placeholder="e.g. Python Basics"
+                                >
+                            </div>
+                        </div>
 
-        <table class="data-table">
+                        <!-- Description -->
+                        <div class="field">
+                            <label class="label">Description</label>
+                            <div class="control">
+                                <textarea
+                                    class="textarea"
+                                    name="description"
+                                    placeholder="Describe this pack..."
+                                ></textarea>
+                            </div>
+                        </div>
 
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Questions</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+                        <!-- Submit -->
+                        <div class="field mt-5">
+                            <div class="control">
+                                <button type="submit" class="button submit-btn is-fullwidth">
+                                    Create Pack
+                                </button>
+                            </div>
+                        </div>
 
-            <tbody>
+                    </form>
 
-                {% for category in categories %}
+                </div>
+            </div>
 
-                    <tr>
-                        <td>{{ category.name }}</td>
-                        <td>{{ category.description }}</td>
-                        <td>{{ category.q_count }}</td>
+        </div>
 
-                        <td>
-                            <a
-                                href="{% url 'delete_category' category.id %}"
-                                class="delete-btn"
-                                onclick="return confirm('Delete this category?')"
-                            >
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
+        <!-- TABLE -->
+        <div class="column is-7">
 
-            </tbody>
+            <div class="card">
+                <div class="card-content">
 
-        </table>
+                    <h2 class="title is-5 text-rr-primary mb-4">
+                        Existing Packs
+                    </h2>
+
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-striped is-hoverable">
+
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Questions</th>
+                                    <th class="has-text-right">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td><strong>{{ category.name }}</strong></td>
+                                    <td>{{ category.description }}</td>
+                                    <td>
+                                        <span class="tag is-info is-light">
+                                            {{ category.q_count }}
+                                        </span>
+                                    </td>
+                                    <td class="has-text-right">
+                                        <a
+                                            href="{% url 'delete_category' category.id %}"
+                                            class="button is-small is-danger is-light"
+                                            onclick="return confirm('Delete this pack?')"
+                                        >
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
 
     </div>
 

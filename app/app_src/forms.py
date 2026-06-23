@@ -7,6 +7,9 @@ from .models import DomainUser, Note
 from .models import Pack
 from .models import Category
 
+from .models import DomainUser, Note, Pack, Application
+
+
 
 ACCOUNT_TYPE_CHOICES = [
     ("Admin", "Admin"),
@@ -89,6 +92,7 @@ class AddNoteForm(forms.ModelForm):
 class PackForm(forms.ModelForm):
     class Meta:
         model = Pack
+
         fields = [
             "title",
             "description",
@@ -106,6 +110,10 @@ class ApplicantForm(forms.Form):
             'placeholder': 'Your answer to question 1...'
         })
     )
+
+    fields = ['title', 'description']
+
+
 
     answer_2 = forms.CharField(
         required=False,
@@ -127,4 +135,27 @@ class ApplicantForm(forms.Form):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
+
         fields = ["name", "description"]
+
+class ApplicantForm(forms.ModelForm):
+
+    class Meta:
+        model = Application
+        fields = ["answer_1", "answer_2", "answer_3"]
+
+        widgets = {
+            "answer_1": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 1"
+            }),
+            "answer_2": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 2"
+            }),
+            "answer_3": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 3"
+            }),
+        }
+

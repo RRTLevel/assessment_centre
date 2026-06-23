@@ -12,8 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
+
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
+
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
+from .models import Note, Pack, QuestionTable, Application
+
+
 from .forms import AddNoteForm, DomainUserCreationForm
 from .models import Note
 from .forms import PackForm
@@ -28,6 +34,11 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.views import View
 from django.contrib.auth.views import LoginView
+
+
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
+from .models import Note, Pack, QuestionTable, Application
+
 
 
 logger = logging.getLogger("")
@@ -161,12 +172,23 @@ def create_pack(request):
     })
 
 
+
 @login_required(login_url='/login')
+
+
 def interview(request):
     questions = QuestionTable.objects.all()
     return render(request, "interview/interview.html", {
         "questions": questions,
         "interview": True
+    })
+
+
+    questions = QuestionTable.objects.all().order_by("id")
+
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "question_count": questions.count(),
     })
 
 
