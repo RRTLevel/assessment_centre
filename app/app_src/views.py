@@ -19,6 +19,7 @@ from .models import Note, Pack, QuestionTable, Application
 from django.contrib.auth.views import LoginView
 
 from .forms import QuestionForm
+from .models import Questions
 
 
 logger = logging.getLogger("")
@@ -203,14 +204,14 @@ def applicant_form(request, pack_id):
     )
 
 def add_question(request):
-    form = QuestionForm()
-
     if request.method == "POST":
         form = QuestionForm(request.POST)
-
         if form.is_valid():
-            question = form.cleaned_data["question"]
-            pack = form.cleaned_data["pack"]
+            form.save()
+            return redirect("question_list")  
+
+    else:
+        form = QuestionForm()
 
     return render(request, "add_questions/add_questions.html", {"form": form})
 
@@ -267,3 +268,19 @@ class RememberMeLoginView(LoginView):
             self.request.session.set_expiry(0)
 
         return super().form_valid(form)
+
+def question_list(request):
+    questions = Questions.objects.all().order_by("-id")
+
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions
+    })
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+
+    if request.method == "POST":
+        question.delete()
+        return redirect("question_list")
+
+    return redirect("question_list")
