@@ -290,6 +290,14 @@ footer {
     padding: 1.25rem;
 }
 
+.help-box .menu-list li {
+    margin-bottom: 0.75rem;
+}
+
+.help-box .menu-list li:last-child {
+    margin-bottom: 0;
+}
+
 /* Add Questions Page */
 
 .question-container {
