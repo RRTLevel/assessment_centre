@@ -2,17 +2,54 @@
 
 {% block content %}
 
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Add Questions</h1>
+      <p class="rr-white">
+        Create up to five assessment questions and assign them to a category.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section class="section">
     <div class="container">
+        <!-- UPDATED: GREEN SUCCESS TOAST DESIGN WITH CHECKMARK & CLOSE BUTTON -->
+        {% if messages %}
+        <div id="django-messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: 350px; background-color: #5cb85c; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 16px; transition: all 0.4s ease; opacity: 0; transform: translateY(-20px); display: flex; align-items: flex-start; gap: 14px;">
+            {% for message in messages %}
+            
+            <!-- Left Side: White Checkmark Icon -->
+            <div style="display: flex; align-items: center; justify-content: center; min-width: 24px; height: 24px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
 
-        <div class="interview-header">
-            <h1 class="title interview-title text-rr-primary">
-                Application Review Dashboard
-            </h1>
-            <p class="interview-count">
-                Review incoming applications and approve or reject them.
-            </p>
+            <!-- Center Content: Title and Message -->
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+                <div style="font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.2;">
+                    Success
+                </div>
+                <div style="font-size: 13px; font-weight: 400; color: #ffffff; line-height: 1.3; opacity: 0.95;">
+                    {{ message }}
+                </div>
+            </div>
+
+            <!-- Right Side: Close Button -->
+            <div style="font-size: 16px; font-weight: 700; color: #ffffff; cursor: pointer; line-height: 1; opacity: 0.8; user-select: none; transition: opacity 0.2s;" 
+                 onclick="document.getElementById('django-messages-container').remove();"
+                 onmouseover="this.style.opacity='1'" 
+                 onmouseout="this.style.opacity='0.8'">
+                X
+            </div>
+
+            {% endfor %}
         </div>
+        {% endif %}
 
         {% if applications %}
         <div class="table-container">
@@ -21,7 +58,7 @@
                     <tr>
                         <th>User</th>
                         <th>ID</th>
-                        <th>Category</th>
+                        <th>Status / Interview Date</th>
                         <th>Answers</th>
                         <th>Created</th>
                         <th style="width: 200px;">Actions</th>
@@ -42,9 +79,19 @@
                         </td>
 
                         <td>
-                            <span class="tag is-info">
-                                {{ application.pack.category }}
-                            </span>
+                            <!-- VISUAL STATUS & CALENDAR DATE TRACKER -->
+                            {% if application.status == 'Accepted' %}
+                                <span class="tag is-success mb-1">Accepted</span>
+                                {% if application.interview_date %}
+                                    <div class="is-size-7 has-text-weight-semibold">
+                                        🗓️ {{ application.interview_date|date:"M d, Y g:i a" }}
+                                    </div>
+                                {% endif %}
+                            {% elif application.status == 'Denied' %}
+                                <span class="tag is-danger">Denied</span>
+                            {% else %}
+                                <span class="tag is-warning">Pending</span>
+                            {% endif %}
                         </td>
 
                         <td>
@@ -62,24 +109,22 @@
                         <td>
                             <div class="buttons are-small">
 
-                                <!-- ACCEPT -->
-                                <form method="post" action="{% url 'approve_application' application.id %}">
-                                    {% csrf_token %}
-                                    <button class="button is-success is-outlined">
-                                        Accept
-                                    </button>
-                                </form>
+                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW (FIXED) -->
+                                <a href="{% url 'approve_application' application.application_id %}" class="button is-success is-outlined">
+                                    Accept
+                                </a>
 
-                                <!-- DENY -->
-                                <form method="post" action="{% url 'deny_application' application.id %}">
+                                <!-- DENY (FIXED) -->
+                                <form method="post" action="{% url 'deny_application' application.application_id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button class="button is-danger is-outlined">
                                         Deny
                                     </button>
                                 </form>
 
+                                <!-- VIEW MORE BUTTON (FIXED) -->
                                 <a class="button is-link is-light is-small"
-                                    href="{% url 'application_detail' application.id %}">
+                                    href="{% url 'application_detail' application.application_id %}">
                                     View More
                                 </a>
 
@@ -100,5 +145,28 @@
 
     </div>
 </section>
+
+<!-- SMOOTH ENTRY AND EXIT FADE/SLIDE TIMING ANIMATION -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toast = document.getElementById("django-messages-container");
+        if (toast) {
+            // Smoothly slide down / fade into view slightly after page render
+            setTimeout(() => {
+                toast.style.opacity = "1";
+                toast.style.transform = "translateY(0)";
+            }, 100);
+
+            // Wait 4 seconds, then slide back up and clean up
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(-20px)";
+                setTimeout(() => {
+                    toast.remove();
+                }, 400); 
+            }, 4000);
+        }
+    });
+</script>
 
 {% endblock %}
