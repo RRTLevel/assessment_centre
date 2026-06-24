@@ -207,7 +207,7 @@ class QuestionForm(forms.Form):
             "class": "select",
         })
     )
-        labels = {
+    labels = {
             "text": "Enter your Question:",
             "category": "",
         }
