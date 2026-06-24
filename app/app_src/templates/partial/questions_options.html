@@ -1,0 +1,5 @@
+<option value="">Select questions</option>
+
+{% for q in questions %}
+  <option value="{{ q.id }}">{{ q.text }}</option>
+{% endfor %}
