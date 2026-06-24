@@ -13,8 +13,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm
+from .models import Note, Pack, QuestionTable, Application, InterviewResponse
 
 from django.contrib.auth.views import LoginView
 
@@ -159,10 +159,34 @@ def create_pack(request):
 
 def interview(request):
     questions = QuestionTable.objects.all()
+    saved = {
+        r.question_id: r
+        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
+    }
+    question_forms = [
+        (question, InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id)))
+        for question in questions
+    ]
     return render(request, "interview/interview.html", {
         "questions": questions,
+        "question_forms": question_forms,
         "interview": True
     })
+
+
+@login_required(login_url='/login')
+def interview_save(request):
+    if request.method == 'POST':
+        questions = QuestionTable.objects.all()
+        for question in questions:
+            existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
+            form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
+            if form.is_valid():
+                response = form.save(commit=False)
+                response.user = request.user
+                response.question = question
+                response.save()
+    return redirect('interview')
 
 
     questions = QuestionTable.objects.all().order_by("id")
