@@ -70,6 +70,47 @@
 
         </div>
 
+        <hr>
+
+        <h2 class="title is-5">Existing Questions</h2>
+
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Category</th>
+                    <th class="has-text-right">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td>{{ q.text }}</td>
+                    <td>
+                        <span class="tag is-info is-light">
+                            {{ q.category.name }}
+                        </span>
+                    </td>
+                    <td class="has-text-right">
+
+                        <form method="post"
+                            action="{% url 'delete_question' q.id %}"
+                            style="display:inline;">
+                            {% csrf_token %}
+
+                            <button class="button is-small is-danger is-light"
+                                    onclick="return confirm('Delete this question?')">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     </div>
 </main>
 
