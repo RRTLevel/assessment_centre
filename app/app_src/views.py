@@ -280,8 +280,9 @@ def application_review(request):
 
 @login_required(login_url='/login')
 def application_detail(request, application_id):
+    # FIXED: Re-targeted template file path string from application_detail.html to view_more.html
     application = get_object_or_404(Application, application_id=application_id)
-    return render(request, "pre_interview/application_detail.html", {"application": application})
+    return render(request, "pre_interview/view_more.html", {"application": application})
 
 
 @login_required(login_url='/login')
