@@ -602,50 +602,47 @@ html[data-theme="dark"] .interview-container .question-text {
 
 }
 
-/* =========================
+/* ===================================
    NAVBAR
+=================================== */
 
 .navbar.rr-secondary {
-    background: linear-gradient(90deg, #10069f, #271EA8);
-    min-height: 70px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #10069f, #271EA8);
+    min-height: 72px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
 }
 
-/* Main navbar layout */
+/* Main layout */
 .navbar-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+}
+
+/* Navigation links */
+.navbar-start {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    min-height: 70px;
-}
-
-/* Centre navigation */
-.navbar-start {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-
-    display: flex;
-    align-items: center;
+    flex: 1;
     gap: 0.5rem;
 }
 
-/* Right side buttons */
+/* User section */
 .navbar-end {
-    margin-left: auto;
     display: flex;
     align-items: center;
 }
 
-/* Navigation items */
+/* Links */
 .navbar-item,
 .navbar-link {
-    color: #ffffff !important;
+    color: rgba(255,255,255,0.85) !important;
     font-weight: 600;
-    border-radius: 8px;
-    padding: 0.75rem 1.1rem;
+    border-radius: 10px;
     transition: all 0.25s ease;
+    padding: 0.75rem 1rem;
 }
 
 /* Hover */
@@ -657,31 +654,36 @@ html[data-theme="dark"] .interview-container .question-text {
 
 /* Active page */
 .navbar-item.is-active {
+    color: #ffffff !important;
     background: rgba(255,255,255,0.15) !important;
-    border-bottom: 3px solid #fc4191;
+    box-shadow: inset 0 -3px 0 #fc4191;
 }
 
-/* =========================
+/* ===================================
    DROPDOWN
+=================================== */
 
 .navbar-dropdown {
     border: none !important;
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    min-width: 230px;
+    min-width: 240px;
+    margin-top: 8px;
+
+    background: #ffffff;
 
     box-shadow:
-        0 12px 25px rgba(0,0,0,0.15),
-        0 2px 8px rgba(0,0,0,0.08);
+        0 12px 30px rgba(0,0,0,0.15),
+        0 4px 12px rgba(0,0,0,0.08);
 }
 
 .navbar-dropdown .navbar-item {
     color: #333 !important;
-    background: white;
+    padding: 0.9rem 1rem;
 }
 
 .navbar-dropdown .navbar-item:hover {
-    background: #f5f6ff !important;
+    background: #f4f6ff !important;
     color: #10069f !important;
 }
 
@@ -689,11 +691,12 @@ html[data-theme="dark"] .interview-container .question-text {
     border-color: white !important;
 }
 
-/* =========================
+/* ===================================
    BUTTONS
+=================================== */
 
 .navbar-end .button {
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -702,27 +705,24 @@ html[data-theme="dark"] .interview-container .question-text {
     transform: translateY(-2px);
 }
 
-/* =========================
+/* ===================================
    MOBILE
+=================================== */
 
-@media screen and (max-width: 1215px) {
+@media screen and (max-width: 1024px) {
 
     .navbar-menu {
         flex-direction: column;
-        justify-content: center;
         padding: 1rem;
     }
 
     .navbar-start {
-        position: static;
-        transform: none;
         flex-wrap: wrap;
         justify-content: center;
         margin-bottom: 1rem;
     }
 
     .navbar-end {
-        margin-left: 0;
         justify-content: center;
     }
 }
