@@ -21,6 +21,8 @@ from django.contrib.auth.views import LoginView
 from .forms import QuestionForm
 from .models import Questions
 
+from .models import Category
+
 
 logger = logging.getLogger("")
 
@@ -242,11 +244,31 @@ def create_category(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('applications')
+            return redirect('categories')  
     else:
         form = CategoryForm()
 
-    return render(request, "pre_interview/create_category.html", {"form": form})
+    categories = Category.objects.all()
+
+    return render(
+        request,
+        "pre_interview/create_category.html",
+        {
+            "form": form,
+            "categories": categories
+        }
+    )
+
+
+def delete_category(request, pk):
+    category = get_object_or_404(Category, id=pk)
+
+    if request.method == "POST":
+        category.delete()
+        return redirect("categories")  
+
+    return redirect("categories")
+
 
 
 def approve_application(request, id):
