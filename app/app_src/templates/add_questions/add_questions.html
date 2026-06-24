@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="section">
+    <div class="container question-container">
+
+        <div class="question-card">
+
+            <div class="question-header">
+                <h1 class="title is-3">
+                    Add Questions
+                </h1>
+                <p class="subtitle is-6">
+                    Create up to five assessment questions and assign them to a category.
+                </p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label class="label">Question 1</label>
+                    {{ form.question_1 }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Question 2</label>
+                    {{ form.question_2 }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Question 3</label>
+                    {{ form.question_3 }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Question 4</label>
+                    {{ form.question_4 }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Question 5</label>
+                    {{ form.question_5 }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Category</label>
+                    {{ form.category }}
+                </div>
+
+                <button type="submit" class="button is-primary save-btn">
+                    Save Questions
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+</main>
+
+{% endblock %}

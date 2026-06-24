@@ -6,7 +6,7 @@
   <div class="hero-body">
     <div class="container">
       <h1 class="title rr-white">Create Application Pack</h1>
-      <p class="rr-white">
+      <p class="subtitle rr-white is-size-6">
         Add a new evaluation track to the dashboard
       </p>
     </div>
@@ -14,33 +14,54 @@
 </section>
 
 <section class="section">
-  <div class="container" style="max-width: 600px;">
+  <div class="container is-max-desktop">
 
-    <div class="box p-5" style="background-color: #838282; border-left: 5px solid #1800A8; border-radius: 8px;">
+    <div class="card form-card">
 
-      <form method="POST">
-        {% csrf_token %}
+      <header class="card-header">
+        <p class="card-header-title">
+          Application Details
+        </p>
+      </header>
 
-        {% for field in form %}
-          <div class="field mb-4">
-            <label class="label rr-white" style="text-align: left;">{{ field.label }}</label>
-            <div class="control">
-              {{ field }}
+      <div class="card-content">
+
+        <form method="POST">
+          {% csrf_token %}
+
+          {% for field in form %}
+            <div class="field">
+              <label class="label">{{ field.label }}</label>
+
+              <div class="control">
+                {{ field }}
+              </div>
+
+              {% if field.errors %}
+                <p class="help is-danger">
+                  {{ field.errors|striptags }}
+                </p>
+              {% endif %}
             </div>
+          {% endfor %}
+
+          <div class="field is-grouped is-justify-content-flex-end mt-5">
+            <p class="control">
+              <a href="{% url 'applications' %}" class="button is-light">
+                Cancel
+              </a>
+            </p>
+
+            <p class="control">
+              <button type="submit" class="button rr-primary is-medium">
+                Save Pack
+              </button>
+            </p>
           </div>
-        {% endfor %}
 
-        <div class="is-flex is-justify-content-space-between mt-5 pt-2">
-          <a href="{% url 'applications' %}" class="button is-light">
-            Cancel
-          </a>
-          <button type="submit" class="button rr-primary px-5">
-            <strong>Save Pack</strong>
-          </button>
-        </div>
+        </form>
 
-      </form>
-
+      </div>
     </div>
 
   </div>

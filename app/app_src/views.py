@@ -12,22 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
+
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
-from .forms import AddNoteForm, DomainUserCreationForm
-from .models import Note
-from .forms import PackForm
-from .models import Pack
-from .models import QuestionTable
-from .forms import ApplicantForm
-from .models import Application
 
-from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.views import View
 from django.contrib.auth.views import LoginView
+
+from .forms import QuestionForm
+from .models import Questions
 
 
 logger = logging.getLogger("")
@@ -161,12 +153,23 @@ def create_pack(request):
     })
 
 
+
 @login_required(login_url='/login')
+
+
 def interview(request):
     questions = QuestionTable.objects.all()
     return render(request, "interview/interview.html", {
         "questions": questions,
         "interview": True
+    })
+
+
+    questions = QuestionTable.objects.all().order_by("id")
+
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "question_count": questions.count(),
     })
 
 
@@ -200,6 +203,31 @@ def applicant_form(request, pack_id):
         }
     )
 
+
+
+
+def add_question(request):
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+
+            category = form.cleaned_data["category"]
+
+            for i in range(1, 6):
+                question_text = form.cleaned_data[f"question_{i}"]
+
+                if question_text.strip():
+                    Questions.objects.create(
+                        text=question_text,
+                        category=category
+                    )
+
+            return redirect("home")
+
+    else:
+        form = QuestionForm()
+
+    return render(request, "add_questions/add_questions.html", {"form": form})
 
 @login_required(login_url='/login')
 def application_review(request):
@@ -254,3 +282,19 @@ class RememberMeLoginView(LoginView):
             self.request.session.set_expiry(0)
 
         return super().form_valid(form)
+
+def question_list(request):
+    questions = Questions.objects.all().order_by("-id")
+
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions
+    })
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+
+    if request.method == "POST":
+        question.delete()
+        return redirect("question_list")
+
+    return redirect("question_list")

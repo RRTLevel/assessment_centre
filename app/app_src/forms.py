@@ -7,6 +7,9 @@ from .models import DomainUser, Note
 from .models import Pack
 from .models import Category
 
+from .models import DomainUser, Note, Pack, Application
+from .models import Questions, Category
+
 
 ACCOUNT_TYPE_CHOICES = [
     ("Admin", "Admin"),
@@ -89,6 +92,7 @@ class AddNoteForm(forms.ModelForm):
 class PackForm(forms.ModelForm):
     class Meta:
         model = Pack
+
         fields = [
             "title",
             "description",
@@ -106,6 +110,10 @@ class ApplicantForm(forms.Form):
             'placeholder': 'Your answer to question 1...'
         })
     )
+
+    fields = ['title', 'description']
+
+
 
     answer_2 = forms.CharField(
         required=False,
@@ -127,4 +135,74 @@ class ApplicantForm(forms.Form):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
+
         fields = ["name", "description"]
+
+class ApplicantForm(forms.ModelForm):
+
+    class Meta:
+        model = Application
+        fields = ["answer_1", "answer_2", "answer_3"]
+
+        widgets = {
+            "answer_1": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 1"
+            }),
+            "answer_2": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 2"
+            }),
+            "answer_3": forms.Textarea(attrs={
+                "class": "input",
+                "placeholder": "Answer 3"
+            }),
+        }
+
+class QuestionForm(forms.Form):
+    question_1 = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_2 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_3 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_4 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_5 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    category = forms.ModelChoiceField(
+        required=False,
+        queryset=Category.objects.all(),
+        widget=forms.Select(attrs={
+            "class": "select",
+        })
+    )

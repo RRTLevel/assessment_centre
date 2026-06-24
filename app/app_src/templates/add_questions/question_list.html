@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="section">
+    <div class="container interview-container">
+
+        <div class="interview-header">
+            <h1 class="title interview-title">
+                All Questions
+            </h1>
+        </div>
+
+        {% if questions %}
+{% for q in questions %}
+    <div class="box" style="margin-bottom: 10px;">
+        <p>{{ q.text }}</p>
+        <small>Category: {{ q.category.name }}</small>
+
+        <form method="post" action="{% url 'delete_question' q.pk %}" style="margin-top:10px;">
+            {% csrf_token %}
+            <button type="submit" class="button is-danger is-small">
+                Delete
+            </button>
+        </form>
+    </div>
+{% endfor %}
+        {% else %}
+            <p>No questions yet.</p>
+        {% endif %}
+
+    </div>
+</main>
+
+{% endblock %}
