@@ -14,6 +14,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
 
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('siteTheme') || 'system';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
+
+            document.documentElement.dataset.theme = activeTheme;
+            document.documentElement.dataset.themePreference = savedTheme;
+        })();
+    </script>
+
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
     <title>{{ page_title }}</title>
