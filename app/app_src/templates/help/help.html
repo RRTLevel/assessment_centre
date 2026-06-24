@@ -1,108 +1,121 @@
-{% extends 'base.html' %}
-{% load bulma_tags %}
+<!DOCTYPE html>
+<html>
 
-{% block content %}
+<head>
+    <title>Help</title>
 
-<div class="container mt-5">
-    <div class="content is-medium">
+    {% load static %}
 
-        <h3 class="title is-3 mb-4">Help &amp; Documentation</h3>
+    <meta charset="utf-8">
 
-        <div class="box mb-4">
-            <h4 class="title is-4">Getting Started</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    To access the system, you will need an account. If you do not have one, click
-                    <strong>Sign Up</strong> on the login page and complete the registration form.
-                </p>
-                <br>
-                <p>
-                    Once registered, log in with your username and password. You can check
-                    <strong>Remember Me</strong> to stay logged in between sessions.
-                </p>
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container">
+
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Help &amp; Documentation
+                </h1>
             </div>
+
+            <div class="box mb-4">
+                <h4 class="title is-4">Getting Started</h4>
+                <div class="my-3 is-size-6">
+                    <p>
+                        To use the system you will need an account. If you do not have one, click
+                        <strong>Sign Up</strong> on the login page. You will be asked to provide:
+                    </p>
+                    <br>
+                    <ul>
+                        <li>A username</li>
+                        <li>An email address</li>
+                        <li>An account type</li>
+                        <li>A password</li>
+                    </ul>
+                    <br>
+                    <p>
+                        Once registered, return to the login page and enter your username and password.
+                        Tick <strong>Remember Me</strong> if you want to stay logged in between sessions.
+                    </p>
+                </div>
+            </div>
+
+            <div class="box mb-4">
+                <h4 class="title is-4">Your Account</h4>
+                <div class="my-3 is-size-6">
+                    <p>
+                        Your account page shows your username, email address, and account type.
+                    </p>
+                    <br>
+                    <p>
+                        To change your password, enter your current password followed by your new password
+                        twice, then click <strong>Update Password</strong>.
+                    </p>
+                    <br>
+                    <p>
+                        To delete your account, click <strong>Delete Account</strong> and confirm by
+                        entering your password in the prompt. This action is permanent and cannot be undone.
+                    </p>
+                </div>
+            </div>
+
+            <div class="box mb-4">
+                <h4 class="title is-4">Interview Page</h4>
+                <div class="my-3 is-size-6">
+                    <p>
+                        The interview page shows all active interview questions. For each question,
+                        enter scores, notes, and feedback, then click <strong>Submit</strong> to save.
+                    </p>
+                </div>
+            </div>
+
+            <div class="box mb-4">
+                <h4 class="title is-4">Applications</h4>
+                <div class="my-3 is-size-6">
+                    <p>
+                        The applications page shows all available packs. Each pack represents a role
+                        and contains a set of pre-interview questions. Click
+                        <strong>Open Pre-Interview Form</strong> on a pack to answer its questions
+                        and submit.
+                    </p>
+                </div>
+            </div>
+
+            <div class="box mb-4">
+                <h4 class="title is-4">Adding Questions</h4>
+                <div class="my-3 is-size-6">
+                    <p>
+                        Navigate to <strong>Add Question</strong> in the navigation bar. You can add
+                        up to five questions at a time and assign them to a category. Click
+                        <strong>Save Questions</strong> to submit. Added questions will appear on
+                        the interview page.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
-        <div class="box mb-4">
-            <h4 class="title is-4">Interview Page</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    The interview page displays a list of interview questions. For each question you can:
-                </p>
-                <br>
-                <ul>
-                    <li>View the question and its scoring indicators</li>
-                    <li>Enter a score between 1 and 6 for each indicator</li>
-                    <li>Write notes in the <strong>Notes</strong> box</li>
-                    <li>Write overall <strong>Feedback</strong> for the candidate's response</li>
-                </ul>
-                <br>
-                <p>
-                    When you are finished, click <strong>Submit</strong> to save your responses.
-                    Your notes and feedback will be saved against each question.
-                </p>
-            </div>
-        </div>
+    </main>
 
-        <div class="box mb-4">
-            <h4 class="title is-4">Applications</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    The applications section allows you to view and manage candidate applications.
-                    Each application is linked to a pack and contains the candidate's answers to
-                    the pre-interview questions.
-                </p>
-                <br>
-                <p>
-                    To submit an application on behalf of a candidate, select a pack from the
-                    applications page and complete the form.
-                </p>
-            </div>
-        </div>
+    {% include 'includes/footer.html' %}
 
-        <div class="box mb-4">
-            <h4 class="title is-4">Adding Questions</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    To add interview questions, navigate to <strong>Add Questions</strong> from the
-                    navigation bar. Select a category and fill in up to five questions at a time,
-                    then submit. Questions will appear on the interview page once added.
-                </p>
-                <br>
-                <p>
-                    To manage existing questions, visit the <strong>Question List</strong> page where
-                    you can view and delete questions.
-                </p>
-            </div>
-        </div>
+</body>
 
-        <div class="box mb-4">
-            <h4 class="title is-4">Notes</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    The home page allows you to create and view general notes. Notes are visible to
-                    all users and display the five most recent entries. To add a note, fill in the
-                    title and body fields and submit.
-                </p>
-            </div>
-        </div>
-
-        <div class="box mb-4">
-            <h4 class="title is-4">Your Account</h4>
-            <div class="my-3 is-size-6">
-                <p>
-                    You can manage your account from the <strong>Profile</strong> page. From here you can:
-                </p>
-                <br>
-                <ul>
-                    <li>Change your password</li>
-                    <li>View your account type</li>
-                    <li>Delete your account</li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-{% endblock %}
+</html>
