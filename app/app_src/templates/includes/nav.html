@@ -34,6 +34,9 @@
                 <a class='navbar-item rr-white {% if add_question %} is-active {% endif %}' href="{% url 'add_questions' %}">
                     Add Question
                 </a>
+                <a class='navbar-item rr-white {% if categories %} is-active {% endif %}' href="{% url 'categories' %}">
+                    Create Category
+                </a>
             </div>
 
             <div class="navbar-end">
