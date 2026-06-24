@@ -12,71 +12,69 @@
     </div>
 
     <div class='navbar-menu'>
+        <div class="navbar-start">
 
-        <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
-            <div class='navbar-start'>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "home" %} is-active {% endif %}' href="{% url 'home' %}">
-                    Home
+            <a class="navbar-item" href="{% url 'home' %}">Home</a>
+
+            <a class="navbar-item" href="{% url 'interview' %}">Interview Questions</a>
+
+            <a class="navbar-item" href="{% url 'applications' %}">Applications</a>
+
+            <!-- DROPDOWN -->
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    More
                 </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "interview" %} is-active {% endif %}' href="{% url 'interview' %}">
-                    Interview Questions
-                </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "applications" or request.resolver_match.url_name == "application_detail" %} is-active {% endif %}' href="{% url 'applications' %}">
-                    Applications
-                </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "create_pack" %} is-active {% endif %}' href="{% url 'create_pack' %}">
-                    Create Pack
-                </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "add_questions" %} is-active {% endif %}' href="{% url 'add_questions' %}">
-                    Add Question
-                </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "categories" %} is-active {% endif %}' href="{% url 'categories' %}">
-                    Create Category
-                </a>
-                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "applications_review" %} is-active {% endif %}' href="{% url 'applications_review' %}">
-                    Application Review
-                </a>
+
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="{% url 'create_pack' %}">Create Pack</a>
+                    <a class="navbar-item" href="{% url 'add_questions' %}">Add Questions</a>
+                    <a class="navbar-item" href="{% url 'categories' %}">Create Category</a>
+                    <a class="navbar-item" href="{% url 'application_review' %}">Application Review</a>
+                </div>
             </div>
 
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    {% if user.is_authenticated %}
-                    {% if user.is_superuser %}
-                    <a class="button is-warning mr-2" href="{% url 'admin:index' %}">
-                        <i class="fas fa-tools mr-1"></i>
-                        <strong>&nbsp;Admin Interface
-                        </strong>
+        </div>
+        
+        
+        <div class="navbar-end">
+            <div class="navbar-item">
+                {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                <a class="button is-warning mr-2" href="{% url 'admin:index' %}">
+                    <i class="fas fa-tools mr-1"></i>
+                    <strong>&nbsp;Admin Interface
+                    </strong>
+                </a>
+                {% endif %}
+
+                <a class="button is-light mr-2" href="{% url 'userprofile' %}">
+                    <i class="fas fa-user-alt mr-1"></i>
+                    <strong>&nbsp;{{ user }} </strong>
+                </a>
+
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="button is-danger is-light" value="Submit Query">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        <strong>Logout</strong>
+                    </button>
+                </form>
+
+                {% else %}
+                <div class="buttons">
+                    <a class="button is-light" href="{% url 'login' %}">
+                        <i class="fas fa-sign-in-alt mr-1"></i>
+                        <strong>Login</strong>
                     </a>
-                    {% endif %}
-
-                    <a class="button is-light mr-2" href="{% url 'userprofile' %}">
-                        <i class="fas fa-user-alt mr-1"></i>
-                        <strong>&nbsp;{{ user }} </strong>
-                    </a>
-
-                    <form action="{% url 'logout' %}" method="post">
-                        {% csrf_token %}
-                        <button class="button is-danger is-light" value="Submit Query">
-                            <i class="fas fa-sign-out-alt mr-1"></i>
-                            <strong>Logout</strong>
-                        </button>
-                    </form>
-
-                    {% else %}
-                    <div class="buttons">
-                        <a class="button is-light" href="{% url 'login' %}">
-                            <i class="fas fa-sign-in-alt mr-1"></i>
-                            <strong>Login</strong>
-                        </a>
-                    </div>
-                    <div class="buttons">
-                        <a class="button is-light" href="{% url 'signup' %}">
-                            <i class="fas fa-user-plus mr-1"></i>
-                            <strong>Sign Up</strong>
-                        </a>
-                    </div>
-                    {% endif %}
                 </div>
+                <div class="buttons">
+                    <a class="button is-light" href="{% url 'signup' %}">
+                        <i class="fas fa-user-plus mr-1"></i>
+                        <strong>Sign Up</strong>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
