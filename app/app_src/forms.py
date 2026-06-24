@@ -128,6 +128,11 @@ class QuestionForm(forms.Form):
         widget=forms.Select(attrs={"class": "select"})
     )
 
+    labels = {
+        "text": "Enter your Question:",
+        "category": "",
+    }
+
 
 class InterviewResponseForm(forms.ModelForm):
     class Meta:
