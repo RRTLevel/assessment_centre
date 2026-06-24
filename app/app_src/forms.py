@@ -159,22 +159,50 @@ class ApplicantForm(forms.ModelForm):
             }),
         }
 
-class QuestionForm(forms.ModelForm):
-    class Meta:
-        model = Questions
-        fields = ["text", "category"]
+class QuestionForm(forms.Form):
+    question_1 = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
 
-        widgets = {
-            "text": forms.Textarea(attrs={
-                "class": "textarea",
-                "rows": 5,
-            }),
-            "category": forms.Select(attrs={
-                "class": "select",
-            }),
-        }
+    question_2 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
 
-        labels = {
-            "text": "Enter your Question:",
-            "category": "",
-        }
+    question_3 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_4 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_5 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    category = forms.ModelChoiceField(
+        required=False,
+        queryset=Category.objects.all(),
+        widget=forms.Select(attrs={
+            "class": "select",
+        })
+    )
