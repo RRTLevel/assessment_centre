@@ -9,6 +9,7 @@ from .models import Category
 
 from .models import DomainUser, Note, Pack, Application
 from .models import Questions, Category
+from .models import InterviewResponse
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -206,3 +207,23 @@ class QuestionForm(forms.Form):
             "class": "select",
         })
     )
+        labels = {
+            "text": "Enter your Question:",
+            "category": "",
+        }
+
+
+class InterviewResponseForm(forms.ModelForm):
+    class Meta:
+        model = InterviewResponse
+        fields = ['notes', 'feedback']
+        widgets = {
+            'notes': forms.Textarea(attrs={
+                'class': 'notes-textarea',
+                'placeholder': 'Enter interview notes here...',
+            }),
+            'feedback': forms.Textarea(attrs={
+                'class': 'feedback-textarea',
+                'placeholder': 'Enter feedback here...',
+            }),
+        }
