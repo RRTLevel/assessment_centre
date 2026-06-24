@@ -2,19 +2,32 @@
 
 {% block content %}
 
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Add Questions</h1>
+      <p class="rr-white">
+        Create up to five assessment questions and assign them to a category.
+      </p>
+    </div>
+  </div>
+</section>
+
 <main class="section">
     <div class="container question-container">
 
         <div class="question-card">
 
-            <div class="question-header">
-                <h1 class="title is-3">
-                    Add Questions
-                </h1>
-                <p class="subtitle is-6">
-                    Create up to five assessment questions and assign them to a category.
-                </p>
-            </div>
+<!--            <div class="question-header">-->
+<!--                <h1 class="title is-3">-->
+<!--                    Add Questions-->
+<!--                </h1>-->
+<!--                <p class="subtitle is-6">-->
+<!--                    Create up to five assessment questions and assign them to a category.-->
+<!--                </p>-->
+<!--            </div>-->
 
             <form method="post">
                 {% csrf_token %}
@@ -49,9 +62,9 @@
                     {{ form.category }}
                 </div>
 
-                <button type="submit" class="button is-primary save-btn">
-                    Save Questions
-                </button>
+            <button type="submit" class="button rr-primary save-btn">
+                Save Questions
+            </button>
 
             </form>
 
