@@ -10,8 +10,9 @@ class DomainUser(User):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Safely assign validator adjustments dynamically
-        self._meta.get_field('username').validators = [DomainUnicodeUsernameValidator()]
+        self._meta.get_field('username').validators = [
+            DomainUnicodeUsernameValidator()
+        ]
 
 
 class Note(models.Model):
@@ -63,6 +64,9 @@ class Pack(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.title
+
 
 class QuestionTable(models.Model):
     CATEGORY_CHOICES = [
@@ -71,6 +75,7 @@ class QuestionTable(models.Model):
         ("Category 3", "Category 3"),
         ("Category 4", "Category 4"),
     ]
+
     question = models.TextField()
     category = models.CharField(
         max_length=50,
@@ -83,50 +88,71 @@ class QuestionTable(models.Model):
 
 
 class Application(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    application_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    pack = models.ForeignKey("Pack", on_delete=models.CASCADE)
-    answer_1 = models.TextField()
-    answer_2 = models.TextField()
-    answer_3 = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    # NEW TRACKING AND TIMING STATUSES FOR INTERVIEWERS
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Accepted', 'Accepted'),
         ('Denied', 'Denied'),
     ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    application_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False
+    )
+    pack = models.ForeignKey("Pack", on_delete=models.CASCADE)
+
+    answer_1 = models.TextField()
+    answer_2 = models.TextField()
+    answer_3 = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
     status = models.CharField(
-        max_length=10, 
-        choices=STATUS_CHOICES, 
+        max_length=10,
+        choices=STATUS_CHOICES,
         default='Pending'
     )
-    interview_date = models.DateTimeField(null=True, blank=True)
+
+    interview_date = models.DateTimeField(
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.application_id}"
-    
+
+
 class Questions(models.Model):
     text = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
-
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='questions'
+    )
 
     def __str__(self):
-        return self. Text[:60]
+        return self.text[:60]
 
 
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(QuestionTable, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        QuestionTable,
+        on_delete=models.CASCADE
+    )
+
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
+
     notes = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'question')
- 
-        return f"{self.user.username} - {self.application_id} ({self.status})"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.question}"

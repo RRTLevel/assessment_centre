@@ -3,13 +3,7 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
-from .models import DomainUser, Note
-from .models import Pack
-from .models import Category
-
-from .models import DomainUser, Note, Pack, Application
-from .models import Questions, Category
-from .models import InterviewResponse
+from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -23,16 +17,13 @@ ACCOUNT_TYPE_CHOICES = [
 class DomainUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={
-            "class": "form-control input",
-        }),
+        widget=forms.EmailInput(attrs={"class": "form-control input"}),
     )
+
     account_type = forms.ChoiceField(
         choices=[("", "Select account type"), *ACCOUNT_TYPE_CHOICES],
         required=True,
-        widget=forms.Select(attrs={
-            "class": "form-control input",
-        }),
+        widget=forms.Select(attrs={"class": "form-control input"}),
     )
 
     class Meta:
@@ -54,46 +45,40 @@ class DomainUserCreationForm(UserCreationForm):
 
         if commit:
             user.save()
-            account_type, _ = Group.objects.get_or_create(name=account_type_name)
-            user.groups.add(account_type)
+            group, _ = Group.objects.get_or_create(name=account_type_name)
+            user.groups.add(group)
 
         return user
-    
+
+
 class DomainUserChangeForm(UserChangeForm):
-
     class Meta(UserChangeForm.Meta):
-
         model = DomainUser
         help_texts = {
-            'username': _('Required. 150 characters or fewer. Letters, digits and \/@/./+/-/_ only.'),
+            "username": _("Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."),
         }
 
 
 class AddNoteForm(forms.ModelForm):
-
     class Meta:
         model = Note
-
-        fields = ('title', 'body')
-
+        fields = ("title", "body")
         widgets = {
-            'title': forms.TextInput(attrs={
-                'required': True,
-                'class': "form-control input",
-                'placeholder': 'Title'
+            "title": forms.TextInput(attrs={
+                "class": "form-control input",
+                "placeholder": "Title"
             }),
-            'body': forms.Textarea(attrs={
-                'required': True,
-                'class': "form-control input textarea pt-1",
-                'placeholder': 'Description...',
-                'rows': 4
+            "body": forms.Textarea(attrs={
+                "class": "form-control input textarea pt-1",
+                "placeholder": "Description...",
+                "rows": 4
             }),
         }
+
 
 class PackForm(forms.ModelForm):
     class Meta:
         model = Pack
-
         fields = [
             "title",
             "description",
@@ -102,49 +87,12 @@ class PackForm(forms.ModelForm):
             "pre_interview_question_2",
             "pre_interview_question_3",
         ]
-        
-class ApplicantForm(forms.Form):
-    answer_1 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'textarea',
-            'placeholder': 'Your answer to question 1...'
-        })
-    )
 
-    fields = ['title', 'description']
-
-
-
-    answer_2 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'textarea',
-            'placeholder': 'Your answer to question 2...'
-        })
-    )
-
-    answer_3 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'textarea',
-            'placeholder': 'Your answer to question 3...'
-        })
-    )
-
-
-class CategoryForm(forms.ModelForm):
-    class Meta:
-        model = Category
-
-        fields = ["name", "description"]
 
 class ApplicantForm(forms.ModelForm):
-
     class Meta:
         model = Application
         fields = ["answer_1", "answer_2", "answer_3"]
-
         widgets = {
             "answer_1": forms.Textarea(attrs={
                 "class": "input",
@@ -160,73 +108,38 @@ class ApplicantForm(forms.ModelForm):
             }),
         }
 
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name", "description"]
+
+
 class QuestionForm(forms.Form):
-    question_1 = forms.CharField(
-        widget=forms.Textarea(attrs={
-            "class": "textarea",
-            "rows": 3,
-        })
-    )
-
-    question_2 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            "class": "textarea",
-            "rows": 3,
-        })
-    )
-
-    question_3 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            "class": "textarea",
-            "rows": 3,
-        })
-    )
-
-    question_4 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            "class": "textarea",
-            "rows": 3,
-        })
-    )
-
-    question_5 = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            "class": "textarea",
-            "rows": 3,
-        })
-    )
+    question_1 = forms.CharField(widget=forms.Textarea(attrs={"class": "textarea", "rows": 3}))
+    question_2 = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "textarea", "rows": 3}))
+    question_3 = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "textarea", "rows": 3}))
+    question_4 = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "textarea", "rows": 3}))
+    question_5 = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "textarea", "rows": 3}))
 
     category = forms.ModelChoiceField(
         required=False,
         queryset=Category.objects.all(),
-        widget=forms.Select(attrs={
-            "class": "select",
-        })
+        widget=forms.Select(attrs={"class": "select"})
     )
-    labels = {
-        "text": "Enter your Question:",
-        "category": "",
-    }
-            "text": "Enter your Question:",
-            "category": "",
-        }
 
 
 class InterviewResponseForm(forms.ModelForm):
     class Meta:
         model = InterviewResponse
-        fields = ['notes', 'feedback']
+        fields = ["notes", "feedback"]
         widgets = {
-            'notes': forms.Textarea(attrs={
-                'class': 'notes-textarea',
-                'placeholder': 'Enter interview notes here...',
+            "notes": forms.Textarea(attrs={
+                "class": "notes-textarea",
+                "placeholder": "Enter interview notes here...",
             }),
-            'feedback': forms.Textarea(attrs={
-                'class': 'feedback-textarea',
-                'placeholder': 'Enter feedback here...',
+            "feedback": forms.Textarea(attrs={
+                "class": "feedback-textarea",
+                "placeholder": "Enter feedback here...",
             }),
         }
