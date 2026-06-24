@@ -38,4 +38,5 @@ urlpatterns = [
     path('500', views.Custom500View.as_view(), name='500'),
     path("questions/", views.question_list, name="question_list"),
     path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
+    path('interview/save/', views.interview_save, name='interview_save'),
 ]
