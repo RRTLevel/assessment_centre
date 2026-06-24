@@ -122,6 +122,12 @@ def documentationView(request):
     return render(request, 'notes/documentation.html', context)
 
 
+def helpView(request):
+    return render(request, 'help/help.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Help',
+    })
+
+
 class Custom404View(TemplateView):
     template_name = "404.html"
 

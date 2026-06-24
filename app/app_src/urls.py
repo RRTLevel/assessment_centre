@@ -12,6 +12,7 @@ urlpatterns = [
 
     # Pages
     path('documentation/', views.documentationView, name='documentation'),
+    path('help/', views.helpView, name='help'),
     path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
     path('add_questions/', views.add_question, name="add_questions"),
