@@ -44,11 +44,11 @@ urlpatterns = [
     # Applications
     path('applications/', views.applications, name='applications'),
     path('applications/<uuid:application_id>/', views.application_detail, name='application_detail'),
-    path('application_review/', views.application_review, name='applications_review'),
+    path("application-review/", views.application_review, name="application_review"),
     path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
     path('applications/<int:pk>/', views.application_detail, name='application_detail'),
-    path('applications/<int:id>/approve/', views.approve_application, name='approve_application'),
-    path('applications/<int:id>/deny/', views.deny_application, name='deny_application'),
+    path("applications/<uuid:pk>/approve/", views.approve_application, name="approve_application"),
+    path("applications/<uuid:pk>/deny/", views.deny_application, name="deny_application"),
 
     # Questions
     path('questions/', views.question_list, name="question_list"),

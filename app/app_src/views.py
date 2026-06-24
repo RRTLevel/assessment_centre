@@ -293,23 +293,24 @@ def application_detail(request, application_id):
 
 
 @login_required(login_url='/login')
-def approve_application(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
-    
+def approve_application(request, pk):
+    application = get_object_or_404(Application, application_id=pk)
+
     if request.method == "POST":
         interview_date = request.POST.get("interview_date")
-        application.status = 'Accepted'
+        application.status = "Accepted"
         application.interview_date = interview_date
         application.save()
         messages.success(request, f"Application for {application.user.username} approved successfully!")
-        return redirect('application_review')
-        
+
+        return redirect("application_review")
+
     return render(request, "pre_interview/schedule_interview.html", {"application": application})
 
 
 @login_required(login_url='/login')
-def deny_application(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
+def deny_application(request, pk):
+    application = get_object_or_404(Application, application_id=pk)
     
     if request.method == "POST":
         application.status = 'Denied'
@@ -317,8 +318,6 @@ def deny_application(request, application_id):
         messages.error(request, f"Application for {application.user.username} was denied.")
         
     return redirect('application_review')
-
-
 @login_required(login_url='/login')
 def question_list(request):
     questions_list = Questions.objects.all().select_related('category').order_by('-id')
@@ -347,22 +346,6 @@ def delete_category(request, pk):
         return redirect("categories")  
 
     return redirect("categories")
-
-
-
-def approve_application(request, id):
-    app = Application.objects.get(id=id)
-    app.status = "approved"
-    app.save()
-    return redirect("applications_review")
-
-
-def deny_application(request, id):
-    if request.method == "POST":
-        application = get_object_or_404(Application, id=id)
-        application.delete()
-    return redirect("applications_review")
-
 
 def application_detail(request, pk):
     application = get_object_or_404(Application, pk=pk)
