@@ -12,6 +12,9 @@
                         <div class="column px-4 pb-0">
 
                             <!-- User Info Section -->
+
+                            <header class="header title is-4"> User Profile </header>
+
                             <div class="field my-4">
                                 <label class="label">Username</label>
                                 <div>
@@ -41,7 +44,9 @@
 
                             <!-- Change Password Form -->
                             <h3 class="title is-4">Change Password</h3>
-                            
+
+                            <br>
+
                             <!-- Display Django success/error messages if available -->
                             {% if messages %}
                                 {% for message in messages %}
@@ -53,7 +58,7 @@
 
                             <form method="POST" action="">
                                 {% csrf_token %}
-                                
+
                                 <!-- Old Password Field -->
                                 <div class="field">
                                     <label class="label">Old Password</label>
@@ -68,6 +73,8 @@
                                     </div>
                                 </div>
 
+
+
                                 <!-- New Password Field -->
                                 <div class="field">
                                     <label class="label">New Password</label>
@@ -81,6 +88,8 @@
                                         </span>
                                     </div>
                                 </div>
+
+
 
                                 <!-- Confirm New Password Field -->
                                 <div class="field">
@@ -102,7 +111,6 @@
                                     </div>
                                 </div>
                             </form>
-                            <br>
 
                             <!-- Teammate Added Feature: Danger Zone Delete Button -->
                             <div class="field mt-5">
