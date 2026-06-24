@@ -232,25 +232,44 @@ def applicant_form(request, pack_id):
 def add_question(request):
     if request.method == "POST":
         form = QuestionForm(request.POST)
-        if form.is_valid():
 
+        if form.is_valid():
             category = form.cleaned_data["category"]
 
             for i in range(1, 6):
                 question_text = form.cleaned_data[f"question_{i}"]
 
-                if question_text.strip():
+                if question_text and question_text.strip():
                     Questions.objects.create(
                         text=question_text,
                         category=category
                     )
 
-            return redirect("home")
+            return redirect("add_questions")  
 
     else:
         form = QuestionForm()
 
-    return render(request, "add_questions/add_questions.html", {"form": form})
+    questions = Questions.objects.select_related("category").all().order_by("-id")
+
+    return render(
+        request,
+        "add_questions/add_questions.html",
+        {
+            "form": form,
+            "questions": questions
+        }
+    )
+
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, id=pk)
+
+    if request.method == "POST":
+        question.delete()
+
+    return redirect("add_questions")
+
 
 
 @login_required(login_url='/login')

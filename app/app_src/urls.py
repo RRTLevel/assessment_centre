@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 from .views import DeleteAccountView, RememberMeLoginView
 
@@ -19,7 +19,7 @@ urlpatterns = [
     path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
 
-    # Questions (FIXED HERE)
+    # Questions
     path('add_questions/', views.add_question, name='add_questions'),
     path('questions/', views.question_list, name='question_list'),
     path('questions/delete/<int:pk>/', views.delete_question, name='delete_question'),
