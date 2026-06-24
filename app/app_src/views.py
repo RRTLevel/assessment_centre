@@ -12,19 +12,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm
 from .models import Note, Pack, QuestionTable, Application, InterviewResponse
 
 from django.contrib.auth.views import LoginView
-
 from .forms import QuestionForm
 from .models import Questions
-
 from .models import Category
 
-
 logger = logging.getLogger("")
+
+
+# FIXED: Added the missing RememberMeLoginView expected by urls.py
+class RememberMeLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def form_valid(self, form):
+        remember_me = self.request.POST.get('remember_me')
+        if remember_me:
+            self.request.session.set_expiry(1209600)  # Keep logged in for 2 weeks
+        else:
+            self.request.session.set_expiry(0)        # Browser session close expiry
+        return super().form_valid(form)
 
 
 class DeleteAccountView(LoginRequiredMixin, View):
@@ -122,14 +131,18 @@ def documentationView(request):
     return render(request, 'notes/documentation.html', context)
 
 
+def helpView(request):
+    return render(request, 'help/help.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Help',
+    })
+
+
 class Custom404View(TemplateView):
     template_name = "404.html"
 
 
 class Custom500View(TemplateView):
     template_name = "500.html"
-
-
 @login_required(login_url='/login')
 def applications(request):
     packs = Pack.objects.all().order_by('-created_at')
@@ -155,12 +168,9 @@ def create_pack(request):
     })
 
 
-
 @login_required(login_url='/login')
-
-
 def interview(request):
-    questions = QuestionTable.objects.all()
+    questions = Questions.objects.all()
     saved = {
         r.question_id: r
         for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
@@ -179,7 +189,7 @@ def interview(request):
 @login_required(login_url='/login')
 def interview_save(request):
     if request.method == 'POST':
-        questions = QuestionTable.objects.all()
+        questions = Questions.objects.all()
         for question in questions:
             existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
             form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
@@ -189,14 +199,6 @@ def interview_save(request):
                 response.question = question
                 response.save()
     return redirect('interview')
-
-
-    questions = QuestionTable.objects.all().order_by("id")
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_count": questions.count(),
-    })
 
 
 @login_required(login_url='/login')
@@ -228,8 +230,6 @@ def applicant_form(request, pack_id):
             "form": form,
         }
     )
-
-
 
 
 def add_question(request):
@@ -276,90 +276,70 @@ def delete_question(request, pk):
 
 @login_required(login_url='/login')
 def application_review(request):
-    applications = Application.objects.all().select_related('user', 'pack')
-    return render(request, "pre_interview/application_review.html", {
-        "applications": applications
-    })
+    applications_list = Application.objects.all().select_related('user', 'pack')
+    return render(
+        request, 
+        "pre_interview/application_review.html", 
+        {"applications": applications_list}
+    )
 
 
+@login_required(login_url='/login')
+def application_detail(request, application_id):
+    application = get_object_or_404(Application, application_id=application_id)
+    return render(request, "pre_interview/application_detail.html", {"application": application})
+
+
+@login_required(login_url='/login')
+def approve_application(request, application_id):
+    application = get_object_or_404(Application, application_id=application_id)
+    
+    if request.method == "POST":
+        interview_date = request.POST.get("interview_date")
+        application.status = 'Accepted'
+        application.interview_date = interview_date
+        application.save()
+        messages.success(request, f"Application for {application.user.username} approved successfully!")
+        return redirect('application_review')
+        
+    return render(request, "pre_interview/schedule_interview.html", {"application": application})
+
+
+@login_required(login_url='/login')
+def deny_application(request, application_id):
+    application = get_object_or_404(Application, application_id=application_id)
+    
+    if request.method == "POST":
+        application.status = 'Denied'
+        application.save()
+        messages.error(request, f"Application for {application.user.username} was denied.")
+        
+    return redirect('application_review')
+
+
+@login_required(login_url='/login')
+def question_list(request):
+    questions_list = Questions.objects.all().select_related('category').order_by('-id')
+    return render(request, "add_questions/question_list.html", {"questions": questions_list})
+
+
+@login_required(login_url='/login')
 def create_category(request):
     if request.method == "POST":
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('categories')  
+            return redirect('categories')
     else:
         form = CategoryForm()
-
-    categories = Category.objects.all()
-
-    return render(
-        request,
-        "pre_interview/create_category.html",
-        {
-            "form": form,
-            "categories": categories
-        }
-    )
+    
+    categories_list = Category.objects.all()
+    return render(request, "pre_interview/create_category.html", {"form": form, "categories": categories_list})
 
 
+@login_required(login_url='/login')
 def delete_category(request, pk):
     category = get_object_or_404(Category, id=pk)
-
     if request.method == "POST":
         category.delete()
-        return redirect("categories")  
-
-    return redirect("categories")
-
-
-
-def approve_application(request, id):
-    app = Application.objects.get(id=id)
-    app.status = "approved"
-    app.save()
-    return redirect("applications_review")
-
-
-def deny_application(request, id):
-    if request.method == "POST":
-        application = get_object_or_404(Application, id=id)
-        application.delete()
-    return redirect("applications_review")
-
-
-def application_detail(request, pk):
-    application = get_object_or_404(Application, pk=pk)
-
-    return render(request, "pre_interview/view_more.html", {
-        "application": application
-    })
-
-class RememberMeLoginView(LoginView):
-    template_name = "registration/login.html"
-
-    def form_valid(self, form):
-        remember_me = self.request.POST.get("remember_me")
-
-        if remember_me:
-            self.request.session.set_expiry(60 * 60 * 24 * 30)
-        else:
-            self.request.session.set_expiry(0)
-
-        return super().form_valid(form)
-
-def question_list(request):
-    questions = Questions.objects.all().order_by("-id")
-
-    return render(request, "add_questions/question_list.html", {
-        "questions": questions
-    })
-
-def delete_question(request, pk):
-    question = get_object_or_404(Questions, pk=pk)
-
-    if request.method == "POST":
-        question.delete()
-        return redirect("question_list")
-
-    return redirect("question_list")
+    return redirect('categories')
