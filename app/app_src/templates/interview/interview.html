@@ -108,6 +108,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        
 
                         <!--<button class="add-row-btn" onclick="addRow()">+</button>-->
 
@@ -136,11 +137,29 @@
                         }
                         </script>
                     </div>
+                    <div class="notes_box">
+                        <label for="notes-{{ forloop.counter }}" class="notes-label">
+                            Notes
+                        </label>
 
-                <div>
-                    
+                        <textarea
+                            id="notes-{{ forloop.counter }}"
+                            class="notes-textarea"
+                            placeholder="Enter interview notes here..."
+                        ></textarea>
+                    </div>
+                    <div class="feedback_box">
+                        <label for="feedback-{{ forloop.counter }}" class="feedback-label">
+                            Feedback
+                        </label>
+
+                        <textarea
+                            id="feedback-{{ forloop.counter }}"
+                            class="feedback-textarea"
+                            placeholder="Enter feedback here..."
+                        ></textarea>
+                    </div>
                 </div>
-            </div>
 
             {% empty %}
 

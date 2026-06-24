@@ -209,8 +209,8 @@ def applicant_form(request, pack_id):
 def add_question(request):
     if request.method == "POST":
         form = QuestionForm(request.POST)
-
         if form.is_valid():
+
             category = form.cleaned_data["category"]
 
             for i in range(1, 6):
@@ -227,11 +227,7 @@ def add_question(request):
     else:
         form = QuestionForm()
 
-    return render(
-        request,
-        "add_questions/add_questions.html",
-        {"form": form}
-    )
+    return render(request, "add_questions/add_questions.html", {"form": form})
 
 @login_required(login_url='/login')
 def application_review(request):
@@ -286,3 +282,19 @@ class RememberMeLoginView(LoginView):
             self.request.session.set_expiry(0)
 
         return super().form_valid(form)
+
+def question_list(request):
+    questions = Questions.objects.all().order_by("-id")
+
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions
+    })
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+
+    if request.method == "POST":
+        question.delete()
+        return redirect("question_list")
+
+    return redirect("question_list")

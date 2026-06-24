@@ -279,6 +279,7 @@ footer {
     margin-right: auto;
 }
 
+
 /* Add Questions Page */
 
 .question-container {
@@ -397,4 +398,82 @@ select:focus {
     .question-card {
         padding: 1.25rem;
     }
+=======
+/* Notes Box */
+
+.notes_box {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.notes-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #1800A8;
+    font-size: 1rem;
+}
+
+.notes-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+
+    border: 1.5px solid #1800A8;
+    border-radius: 8px;
+
+    background-color: #f7f0f0;
+    color: #000000;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: #12007d;
+    box-shadow: 0 0 0 2px rgba(24, 0, 168, 0.15);
+}
+
+/* Feedback Box */
+
+.feedback_box {
+    margin-top: 15px;
+    width: 100%;
+}
+
+.feedback-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #1800A8;
+    font-size: 1rem;
+}
+
+.feedback-textarea {
+    width: 100%;
+    min-height: 80px; /* Smaller than notes box */
+    padding: 12px;
+
+    border: 1.5px solid #1800A8;
+    border-radius: 8px;
+
+    background-color: #f7f0f0;
+    color: #000000;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.feedback-textarea:focus {
+    outline: none;
+    border-color: #12007d;
+    box-shadow: 0 0 0 2px rgba(24, 0, 168, 0.15);
+
 }
