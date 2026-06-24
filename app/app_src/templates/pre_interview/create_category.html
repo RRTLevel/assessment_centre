@@ -6,9 +6,9 @@
 
     <!-- Header -->
     <div class="interview-header mb-5">
-        <h1 class="title is-3 interview-title">Create New Pack</h1>
+        <h1 class="title is-3 interview-title">Categories</h1>
         <p class="subtitle is-6 interview-count">
-            Create and manage your interview question packs
+            Create and manage your categories for packs
         </p>
     </div>
 
@@ -21,7 +21,7 @@
                 <div class="card-content">
 
                     <h2 class="title is-5 text-rr-primary mb-4">
-                        Pack Details
+                        category Details
                     </h2>
 
                     <form method="POST">
@@ -29,7 +29,7 @@
 
                         <!-- Name -->
                         <div class="field">
-                            <label class="label">Pack Name</label>
+                            <label class="label">category Name</label>
                             <div class="control">
                                 <input
                                     class="input"
@@ -47,7 +47,7 @@
                                 <textarea
                                     class="textarea"
                                     name="description"
-                                    placeholder="Describe this pack..."
+                                    placeholder="Describe this category..."
                                 ></textarea>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                         <div class="field mt-5">
                             <div class="control">
                                 <button type="submit" class="button submit-btn is-fullwidth">
-                                    Create Pack
+                                    Create category
                                 </button>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                 <div class="card-content">
 
                     <h2 class="title is-5 text-rr-primary mb-4">
-                        Existing Packs
+                        Existing Categories
                     </h2>
 
                     <div class="table-container">
@@ -105,7 +105,7 @@
                                             {% csrf_token %}
                                             <button type="submit"
                                                     class="button is-small is-danger is-light"
-                                                    onclick="return confirm('Delete this pack?')">
+                                                    onclick="return confirm('Delete this category?')">
                                                 Delete
                                             </button>
                                         </form>
