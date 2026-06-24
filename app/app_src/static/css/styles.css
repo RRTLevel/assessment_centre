@@ -51,37 +51,7 @@ a.has-text-rr-secondary {
     color: #fff;
 }
 
-/* Navbar */
 
-.navbar.rr-secondary {
-    font-size: 1.1em;
-    background-color: #271EA8;
-    color: #fff;
-}
-
-a.navbar-item:hover {
-    color: #fff;
-    background-color: #271EA8;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 5px;
-}
-
-a.navbar-item.is-active {
-    color: #fff;
-    background-color: #271EA8;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 5px;
-    text-decoration-color: #fc4191;
-}
-
-.rr-underlined {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 5px;
-    text-decoration-color: #fc4191;
-}
 
 /* Spacing */
 
@@ -478,4 +448,133 @@ select:focus {
 
 }
 
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar.rr-secondary {
+    background: linear-gradient(90deg, #10069f, #271EA8);
+    min-height: 70px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+}
+
+/* Main navbar layout */
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 70px;
+}
+
+/* Centre navigation */
+.navbar-start {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Right side buttons */
+.navbar-end {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+/* Navigation items */
+.navbar-item,
+.navbar-link {
+    color: #ffffff !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 1.1rem;
+    transition: all 0.25s ease;
+}
+
+/* Hover */
+.navbar-item:hover,
+.navbar-link:hover {
+    background: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+}
+
+/* Active page */
+.navbar-item.is-active {
+    background: rgba(255,255,255,0.15) !important;
+    border-bottom: 3px solid #fc4191;
+}
+
+/* =========================
+   DROPDOWN
+========================= */
+
+.navbar-dropdown {
+    border: none !important;
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 230px;
+
+    box-shadow:
+        0 12px 25px rgba(0,0,0,0.15),
+        0 2px 8px rgba(0,0,0,0.08);
+}
+
+.navbar-dropdown .navbar-item {
+    color: #333 !important;
+    background: white;
+}
+
+.navbar-dropdown .navbar-item:hover {
+    background: #f5f6ff !important;
+    color: #10069f !important;
+}
+
+.navbar-link::after {
+    border-color: white !important;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.navbar-end .button {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.navbar-end .button:hover {
+    transform: translateY(-2px);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media screen and (max-width: 1215px) {
+
+    .navbar-menu {
+        flex-direction: column;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .navbar-start {
+        position: static;
+        transform: none;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .navbar-end {
+        margin-left: 0;
+        justify-content: center;
+    }
 }
