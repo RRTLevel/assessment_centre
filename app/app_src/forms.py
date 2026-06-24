@@ -207,10 +207,10 @@ class QuestionForm(forms.Form):
             "class": "select",
         })
     )
-        labels = {
-            "text": "Enter your Question:",
-            "category": "",
-        }
+    labels = {
+        "text": "Enter your Question:",
+        "category": "",
+    }
 
 
 class InterviewResponseForm(forms.ModelForm):
