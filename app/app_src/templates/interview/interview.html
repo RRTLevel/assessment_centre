@@ -14,6 +14,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
 
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('siteTheme') || 'system';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
+
+            document.documentElement.dataset.theme = activeTheme;
+            document.documentElement.dataset.themePreference = savedTheme;
+        })();
+    </script>
+
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
@@ -42,10 +53,8 @@
             </div>
 
 
-            <form method="POST" action="{% url 'interview_save' %}">
-            {% csrf_token %}
-            {% for question, form in question_forms %}
-            <div class="question-row" data-question-id="{{ question.id }}">
+            {% for question in questions %}
+            <div class="question-row">
 
                 <div class="question-card">
                     <p class="question-text">
@@ -140,12 +149,26 @@
                         </script>
                     </div>
                     <div class="notes_box">
-                        <label class="notes-label">Notes</label>
-                        {{ form.notes }}
+                        <label for="notes-{{ forloop.counter }}" class="notes-label">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes-{{ forloop.counter }}"
+                            class="notes-textarea"
+                            placeholder="Enter interview notes here..."
+                        ></textarea>
                     </div>
                     <div class="feedback_box">
-                        <label class="feedback-label">Feedback</label>
-                        {{ form.feedback }}
+                        <label for="feedback-{{ forloop.counter }}" class="feedback-label">
+                            Feedback
+                        </label>
+
+                        <textarea
+                            id="feedback-{{ forloop.counter }}"
+                            class="feedback-textarea"
+                            placeholder="Enter feedback here..."
+                        ></textarea>
                     </div>
                 </div>
 
@@ -158,20 +181,40 @@
             {% endfor %}
 
             <div class="submit-section">
-                <button type="submit" class="submit-btn">
+                <button class="submit-btn">
                     Submit
                 </button>
             </div>
-            </form>
 
             {% endblock %}
 
         </div>
+        
+        <div class="feedback_box">
+            <label for="feedback-{{ forloop.counter }}" class="feedback-label">
+                Feedback
+            </label>
+            <textarea
+                id="feedback-{{ forloop.counter }}"
+                class="feedback-textarea"
+                placeholder="Enter feedback here..."
+            ></textarea>
+        </div>
+    </div>
+</div>
 
-    </main>
+{% empty %}
 
-    {% include 'includes/footer.html' %}
+<div class="no-questions">
+    No interview questions available.
+</div>
 
-</body>
+{% endfor %}
 
-</html>
+<div class="submit-section">
+    <button class="submit-btn">
+        Submit
+    </button>
+</div>
+
+{% endblock %}
