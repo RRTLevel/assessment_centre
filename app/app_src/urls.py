@@ -8,6 +8,16 @@ urlpatterns = [
     path('login/', RememberMeLoginView.as_view(), name='login'),
     path('signup/', views.SignUpView.as_view(), name='signup'),
     path('userprofile/', views.userprofileView.as_view(), name='userprofile'),
+    path('documentation/', views.documentationView, name='documentation'),
+    path('interview/', interview, name = "interview"),
+    path('add_questions/', views.add_question, name="add_questions"),
+
+    path("signup/", views.SignUpView.as_view(), name="signup"),
+
+    path('404', views.Custom404View.as_view(), name='404'),
+    path('500', views.Custom500View.as_view(), name='500'),
+
+    path('interview/', interview, name='interview'),
     path('delete-account/', DeleteAccountView.as_view(), name='delete_account'),
 
     # Knowledge and question administration
@@ -27,7 +37,8 @@ urlpatterns = [
     path('applications/<int:id>/approve/', views.approve_application, name='approve_application'),
     path('applications/<int:id>/deny/', views.deny_application, name='deny_application'),
 
-    # Custom system error views
-    path('404/', views.Custom404View.as_view(), name='404'),
-    path('500/', views.Custom500View.as_view(), name='500'),
+    path('404', views.Custom404View.as_view(), name='404'),
+    path('500', views.Custom500View.as_view(), name='500'),
+    path("questions/", views.question_list, name="question_list"),
+    path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
 ]

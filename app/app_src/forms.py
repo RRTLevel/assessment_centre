@@ -8,7 +8,7 @@ from .models import Pack
 from .models import Category
 
 from .models import DomainUser, Note, Pack, Application
-
+from .models import Questions, Category
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -159,3 +159,50 @@ class ApplicantForm(forms.ModelForm):
             }),
         }
 
+class QuestionForm(forms.Form):
+    question_1 = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_2 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_3 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_4 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    question_5 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+        })
+    )
+
+    category = forms.ModelChoiceField(
+        required=False,
+        queryset=Category.objects.all(),
+        widget=forms.Select(attrs={
+            "class": "select",
+        })
+    )

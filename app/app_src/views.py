@@ -11,10 +11,16 @@ from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.views import LoginView
+
 
 from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
 from .models import Note, Pack, QuestionTable, Application
+
+from django.contrib.auth.views import LoginView
+
+from .forms import QuestionForm
+from .models import Questions
+
 
 logger = logging.getLogger("")
 
@@ -188,8 +194,30 @@ def applicant_form(request, pack_id):
     )
 
 
-def add_questions(request):
-    return render(request, "add_questions/add_questions.html")
+
+
+def add_question(request):
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+
+            category = form.cleaned_data["category"]
+
+            for i in range(1, 6):
+                question_text = form.cleaned_data[f"question_{i}"]
+
+                if question_text.strip():
+                    Questions.objects.create(
+                        text=question_text,
+                        category=category
+                    )
+
+            return redirect("home")
+
+    else:
+        form = QuestionForm()
+
+    return render(request, "add_questions/add_questions.html", {"form": form})
 
 
 @login_required(login_url='/login')
@@ -260,3 +288,19 @@ class RememberMeLoginView(LoginView):
             self.request.session.set_expiry(60 * 60 * 24 * 30)
             
         return super().form_valid(form)
+
+def question_list(request):
+    questions = Questions.objects.all().order_by("-id")
+
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions
+    })
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+
+    if request.method == "POST":
+        question.delete()
+        return redirect("question_list")
+
+    return redirect("question_list")

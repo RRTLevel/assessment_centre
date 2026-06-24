@@ -41,10 +41,6 @@
                 </p>
             </div>
 
-            <label for="category">category</label>
-            <select name="category" id="category">
-                <option value="technical">Technical</option>
-            </select>
 
             {% for question in questions %}
             <div class="question-row">
@@ -56,27 +52,114 @@
                 </div>
 
                 <div class="Score-Box">
-                    <p>Score: <span class="score-value">1</span></p>
-                    <div style="display:flex;justify-content:space-between;width:100%;">
-                        <span>Negative</span>
-                        <span>Positive</span>
-                    </div>
-                    <input class="score-slider" type="range" name="score_{{ forloop.counter }}" min="1" max="10" step="any" value="1">
-                    <div class="slider-labels">
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
-                        <span>5</span>
-                        <span>6</span>
-                        <span>7</span>
-                        <span>8</span>
-                        <span>9</span>
-                        <span>10</span>
-                    </div>
-            </div>
+                    <div class="table-container">
+                        <table class="score-table" id="scoreTable">
+                            <thead>
+                                <tr>
+                                    <th>indicators</th>
+                                    <th>positive</th>
+                                    <th>negative</th>
+                                    <th>score</th>
+                                </tr>
+                            </thead>
 
-            </div>
+                            <tbody>
+                                <tr>
+                                    <th></th>
+                                    <td>this is a positive</td>
+                                    <td>this is a negative</td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            min="1" 
+                                            max="6" 
+                                            step="1"
+                                            class="score-input"
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>this is a positive</td>
+                                    <td>this is a negative</td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            min="1" 
+                                            max="6" 
+                                            step="1"
+                                            class="score-input"
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>this is a positive</td>
+                                    <td>this is a negative</td>
+                                    <td>
+                                        <input 
+                                            type="number" 
+                                            min="1" 
+                                            max="6" 
+                                            step="1"
+                                            class="score-input"
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+
+                        <!--<button class="add-row-btn" onclick="addRow()">+</button>-->
+
+                        <script>
+                        function addRow() {
+                            const table = document
+                                .getElementById("scoreTable")
+                                .getElementsByTagName("tbody")[0];
+
+                            const newRow = table.insertRow();
+
+                            newRow.innerHTML = `
+                                <th></th>
+                                <td>this is a positive</td>
+                                <td>this is a negative</td>
+                                <td>
+                                    <input 
+                                        type="number" 
+                                        min="1" 
+                                        max="6" 
+                                        step="1"
+                                        class="score-input"
+                                    >
+                                </td>
+                            `;
+                        }
+                        </script>
+                    </div>
+                    <div class="notes_box">
+                        <label for="notes-{{ forloop.counter }}" class="notes-label">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes-{{ forloop.counter }}"
+                            class="notes-textarea"
+                            placeholder="Enter interview notes here..."
+                        ></textarea>
+                    </div>
+                    <div class="feedback_box">
+                        <label for="feedback-{{ forloop.counter }}" class="feedback-label">
+                            Feedback
+                        </label>
+
+                        <textarea
+                            id="feedback-{{ forloop.counter }}"
+                            class="feedback-textarea"
+                            placeholder="Enter feedback here..."
+                        ></textarea>
+                    </div>
+                </div>
 
             {% empty %}
 
@@ -99,48 +182,6 @@
     </main>
 
     {% include 'includes/footer.html' %}
-
-    <script>
-        document.querySelectorAll('.score-slider').forEach(function(slider) {
-            var counter = slider.closest('.Score-Box').querySelector('.score-value');
-
-            function setFill(val) {
-                var pct = (val - slider.min) / (slider.max - slider.min) * 100;
-                slider.style.setProperty('--fill', pct + '%');
-                counter.textContent = Math.round(val);
-            }
-
-            slider.addEventListener('input', function() {
-                setFill(parseFloat(slider.value));
-            });
-
-            slider.addEventListener('pointerup', function() {
-                var start = parseFloat(slider.value);
-                var target = Math.round(start);
-                var startTime = null;
-                var duration = 150;
-
-                function animate(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    var progress = Math.min((timestamp - startTime) / duration, 1);
-                    var eased = 1 - Math.pow(1 - progress, 2);
-                    var current = start + (target - start) * eased;
-                    slider.value = current;
-                    setFill(current);
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        slider.value = target;
-                        setFill(target);
-                    }
-                }
-
-                requestAnimationFrame(animate);
-            });
-
-            setFill(parseFloat(slider.value));
-        });
-    </script>
 
 </body>
 
