@@ -42,8 +42,10 @@
             </div>
 
 
-            {% for question in questions %}
-            <div class="question-row">
+            <form method="POST" action="{% url 'interview_save' %}">
+            {% csrf_token %}
+            {% for question, form in question_forms %}
+            <div class="question-row" data-question-id="{{ question.id }}">
 
                 <div class="question-card">
                     <p class="question-text">
@@ -138,26 +140,12 @@
                         </script>
                     </div>
                     <div class="notes_box">
-                        <label for="notes-{{ forloop.counter }}" class="notes-label">
-                            Notes
-                        </label>
-
-                        <textarea
-                            id="notes-{{ forloop.counter }}"
-                            class="notes-textarea"
-                            placeholder="Enter interview notes here..."
-                        ></textarea>
+                        <label class="notes-label">Notes</label>
+                        {{ form.notes }}
                     </div>
                     <div class="feedback_box">
-                        <label for="feedback-{{ forloop.counter }}" class="feedback-label">
-                            Feedback
-                        </label>
-
-                        <textarea
-                            id="feedback-{{ forloop.counter }}"
-                            class="feedback-textarea"
-                            placeholder="Enter feedback here..."
-                        ></textarea>
+                        <label class="feedback-label">Feedback</label>
+                        {{ form.feedback }}
                     </div>
                 </div>
 
@@ -170,10 +158,11 @@
             {% endfor %}
 
             <div class="submit-section">
-                <button class="submit-btn">
+                <button type="submit" class="submit-btn">
                     Submit
                 </button>
             </div>
+            </form>
 
             {% endblock %}
 
