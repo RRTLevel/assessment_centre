@@ -106,21 +106,22 @@
                         <td>
                             <div class="buttons are-small">
 
-                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW -->
-                                <a href="{% url 'approve_application' application.id %}" class="button is-success is-outlined">
+                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW (FIXED) -->
+                                <a href="{% url 'approve_application' application.application_id %}" class="button is-success is-outlined">
                                     Accept
                                 </a>
 
-                                <!-- DENY -->
-                                <form method="post" action="{% url 'deny_application' application.id %}" style="display: inline;">
+                                <!-- DENY (FIXED) -->
+                                <form method="post" action="{% url 'deny_application' application.application_id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button class="button is-danger is-outlined">
                                         Deny
                                     </button>
                                 </form>
 
+                                <!-- VIEW MORE BUTTON (FIXED) -->
                                 <a class="button is-link is-light is-small"
-                                    href="{% url 'application_detail' application.id %}">
+                                    href="{% url 'application_detail' application.application_id %}">
                                     View More
                                 </a>
 

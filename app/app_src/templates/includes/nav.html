@@ -37,7 +37,8 @@
                 <a class='navbar-item rr-white {% if categories %} is-active {% endif %}' href="{% url 'categories' %}">
                     Create Category
                 </a>
-                <a class='navbar-item rr-white {% if applications_review %} is-active {% endif %}' href="{% url 'applications_review' %}">
+                <!-- FIXED: Changed 'applications_review' to 'application_review' -->
+                <a class='navbar-item rr-white {% if applications_review %} is-active {% endif %}' href="{% url 'application_review' %}">
                     Application Review
                 </a>
             </div>
