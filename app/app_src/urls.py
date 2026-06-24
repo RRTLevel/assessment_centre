@@ -48,3 +48,6 @@ urlpatterns = [
     path('interview/save/', views.interview_save, name='interview_save'),
 ]
 ]
+
+    path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
+]

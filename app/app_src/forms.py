@@ -211,6 +211,9 @@ class QuestionForm(forms.Form):
         "text": "Enter your Question:",
         "category": "",
     }
+            "text": "Enter your Question:",
+            "category": "",
+        }
 
 
 class InterviewResponseForm(forms.ModelForm):
