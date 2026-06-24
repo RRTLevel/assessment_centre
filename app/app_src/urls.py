@@ -31,6 +31,10 @@ urlpatterns = [
     path('applications/', views.applications, name='applications'),
     path('application_review/', views.application_review, name='applications_review'),
     path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
+
+    path('categories/', views.create_category, name='categories'),
+    path("category/delete/<int:pk>/",views.delete_category,name="delete_category"),
+
     path('applications/<int:pk>/', views.application_detail, name='application_detail'),
     
     # Accept/Deny dynamic endpoints
@@ -41,4 +45,6 @@ urlpatterns = [
     path('500', views.Custom500View.as_view(), name='500'),
     path("questions/", views.question_list, name="question_list"),
     path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
+    path('interview/save/', views.interview_save, name='interview_save'),
+]
 ]

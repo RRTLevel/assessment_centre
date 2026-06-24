@@ -110,9 +110,23 @@ class Application(models.Model):
 class Questions(models.Model):
     text = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
- 
- 
+
+
     def __str__(self):
         return self. Text[:60]
+
+
+class InterviewResponse(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(QuestionTable, on_delete=models.CASCADE)
+    score_1 = models.IntegerField(null=True, blank=True)
+    score_2 = models.IntegerField(null=True, blank=True)
+    score_3 = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(blank=True, default='')
+    feedback = models.TextField(blank=True, default='')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'question')
  
         return f"{self.user.username} - {self.application_id} ({self.status})"

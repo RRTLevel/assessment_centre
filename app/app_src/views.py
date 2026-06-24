@@ -13,13 +13,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm
+from .models import Note, Pack, QuestionTable, Application, InterviewResponse
 
 from django.contrib.auth.views import LoginView
 
 from .forms import QuestionForm
 from .models import Questions
+
+from .models import Category
 
 
 logger = logging.getLogger("")
@@ -155,6 +157,37 @@ def create_pack(request):
 
 @login_required(login_url='/login')
 def interview(request):
+    questions = QuestionTable.objects.all()
+    saved = {
+        r.question_id: r
+        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
+    }
+    question_forms = [
+        (question, InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id)))
+        for question in questions
+    ]
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "question_forms": question_forms,
+        "interview": True
+    })
+
+
+@login_required(login_url='/login')
+def interview_save(request):
+    if request.method == 'POST':
+        questions = QuestionTable.objects.all()
+        for question in questions:
+            existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
+            form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
+            if form.is_valid():
+                response = form.save(commit=False)
+                response.user = request.user
+                response.question = question
+                response.save()
+    return redirect('interview')
+
+
     questions = QuestionTable.objects.all().order_by("id")
 
     return render(request, "interview/interview.html", {
@@ -233,11 +266,31 @@ def create_category(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('applications')
+            return redirect('categories')  
     else:
         form = CategoryForm()
 
-    return render(request, "pre_interview/create_category.html", {"form": form})
+    categories = Category.objects.all()
+
+    return render(
+        request,
+        "pre_interview/create_category.html",
+        {
+            "form": form,
+            "categories": categories
+        }
+    )
+
+
+def delete_category(request, pk):
+    category = get_object_or_404(Category, id=pk)
+
+    if request.method == "POST":
+        category.delete()
+        return redirect("categories")  
+
+    return redirect("categories")
+
 
 
 # UPDATED: HANDLES GET REQUESTS (SHOW CALENDAR) AND POST REQUESTS (SAVE SELECTED DATE)
