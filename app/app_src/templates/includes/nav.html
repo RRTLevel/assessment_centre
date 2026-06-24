@@ -15,30 +15,25 @@
 
         <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
             <div class='navbar-start'>
-                <a class='navbar-item rr-white {% if home %} is-active {% endif %}' href="{% url 'home' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "home" %} is-active {% endif %}' href="{% url 'home' %}">
                     Home
                 </a>
-<!--                <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'-->
-<!--                    href="{% url 'documentation' %}">-->
-<!--                    Option 2-->
-<!--                </a>-->
-                <a class='navbar-item rr-white {% if interview %} is-active {% endif %}' href="{% url 'interview' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "interview" %} is-active {% endif %}' href="{% url 'interview' %}">
                     Interview Questions
                 </a>
-                <a class='navbar-item rr-white {% if applications %} is-active {% endif %}' href="{% url 'applications' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "applications" or request.resolver_match.url_name == "application_detail" %} is-active {% endif %}' href="{% url 'applications' %}">
                     Applications
                 </a>
-                <a class='navbar-item rr-white {% if create_pack %} is-active {% endif %}' href="{% url 'create_pack' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "create_pack" %} is-active {% endif %}' href="{% url 'create_pack' %}">
                     Create Pack
                 </a>
-                <a class='navbar-item rr-white {% if add_question %} is-active {% endif %}' href="{% url 'add_questions' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "add_questions" %} is-active {% endif %}' href="{% url 'add_questions' %}">
                     Add Question
                 </a>
-                <a class='navbar-item rr-white {% if categories %} is-active {% endif %}' href="{% url 'categories' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "categories" %} is-active {% endif %}' href="{% url 'categories' %}">
                     Create Category
                 </a>
-                <!-- FIXED: Changed 'applications_review' to 'application_review' -->
-                <a class='navbar-item rr-white {% if applications_review %} is-active {% endif %}' href="{% url 'application_review' %}">
+                <a class='navbar-item rr-white {% if request.resolver_match.url_name == "applications_review" %} is-active {% endif %}' href="{% url 'applications_review' %}">
                     Application Review
                 </a>
             </div>
