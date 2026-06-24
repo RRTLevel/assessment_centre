@@ -188,14 +188,6 @@ def interview_save(request):
     return redirect('interview')
 
 
-    questions = QuestionTable.objects.all().order_by("id")
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_count": questions.count(),
-    })
-
-
 @login_required(login_url='/login')
 def applicant_form(request, pack_id):
     pack = get_object_or_404(Pack, id=pack_id)
