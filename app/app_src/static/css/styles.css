@@ -1,7 +1,115 @@
 /* Typograpghy */
 
+:root {
+    --rr-page-bg: #fff;
+    --rr-surface-bg: #fff;
+    --rr-text: #363636;
+    --rr-muted-text: #666;
+    --rr-border: #dbdbdb;
+    --rr-input-bg: #fff;
+    --rr-input-border: #dbdbdb;
+    --rr-input-text: #363636;
+}
+
+html[data-theme="dark"] {
+    --rr-page-bg: #111318;
+    --rr-surface-bg: #1b1f2a;
+    --rr-text: #f2f4f8;
+    --rr-muted-text: #b8c0cc;
+    --rr-border: #3a4050;
+    --rr-input-bg: #121722;
+    --rr-input-border: #4a5366;
+    --rr-input-text: #f2f4f8;
+}
+ 
 body {
     font-family: "Verdana", sans-serif;
+    background-color: var(--rr-page-bg);
+    color: var(--rr-text);
+}
+
+.box,
+.modal-card-head,
+.modal-card-body,
+.modal-card-foot {
+    background-color: var(--rr-surface-bg);
+    color: var(--rr-text);
+}
+
+.label,
+.title,
+.subtitle,
+.modal-card-title,
+.content,
+.table,
+.table td,
+.table th,
+.navbar-item,
+.menu-label,
+.menu-list a {
+    color: var(--rr-text);
+}
+
+.input,
+.textarea,
+.select select {
+    background-color: var(--rr-input-bg);
+    border-color: var(--rr-input-border);
+    color: var(--rr-input-text);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: var(--rr-muted-text);
+}
+
+hr {
+    background-color: var(--rr-border);
+}
+
+html[data-theme="dark"] .button.is-light {
+    background-color: #2b3242;
+    color: #f2f4f8;
+}
+
+html[data-theme="dark"] .button {
+    border-color: var(--rr-border);
+}
+
+html[data-theme="dark"] .notification,
+html[data-theme="dark"] .message,
+html[data-theme="dark"] .message-body {
+    background-color: #242b3a;
+    color: var(--rr-text);
+}
+
+.theme-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.theme-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.theme-option span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--rr-border);
+    border-radius: 6px;
+    background-color: var(--rr-surface-bg);
+    color: var(--rr-text);
+    cursor: pointer;
+}
+
+.theme-option input:checked + span {
+    border-color: #10069f;
+    background-color: #10069f;
+    color: #fff;
 }
 
 /* Colours */
@@ -123,8 +231,7 @@ footer {
 }
 
 .interview-count {
-    color: #666;
-    font-size: 0.95rem;
+    color: var(--rr-muted-text);
 }
 
 .question-row {
@@ -138,18 +245,25 @@ footer {
 }
 
 .question-card {
-    flex: 1;
-    background-color: #f7f0f0;
-    border: 1px solid #1800A8;
-    border-left: 5px solid #1800A8;
-    border-radius: 8px;
-    padding: 1.25rem;
+
+    background:var(--rr-surface-bg);
+
+    border:1px solid #1800A8;
+
+    border-left:5px solid #1800A8;
+
+    border-radius:8px;
+
+    padding:1.25rem;
+
+    margin-bottom:15px;
+
 }
 
 .Score-Box {
     min-width: 120px;
     text-align: left;
-    background-color: #f7f0f0;
+    background-color: var(--rr-surface-bg);
     border: 1px solid #1800A8;
     border-left: 5px solid #1800A8;
     border-radius: 8px;
@@ -192,8 +306,7 @@ footer {
     font-family: Arial, sans-serif;
     text-align: center;
 
-    /* Change table background here */
-    background-color: #f7f0f0;
+    background-color: var(--rr-surface-bg);
 }
 
 /* Borders for everything */
@@ -218,7 +331,7 @@ footer {
 
 /* Left-side labels (Score) */
 .score-table tbody th {
-    background-color: #e8e0e0; /* EDIT LABEL BACKGROUND */
+    background-color: var(--rr-page-bg);
     color: #1800A8;            /* EDIT LABEL TEXT */
     font-weight: bold;
 }
@@ -226,15 +339,15 @@ footer {
 
 /* Main table text cells */
 .score-table tbody td {
-    background-color: #f7f0f0; /* EDIT BODY BACKGROUND */
-    color: #000000;            /* EDIT BODY TEXT */
+    background-color: var(--rr-surface-bg);
+    color: var(--rr-text);
 }
 
 
 /* Optional hover effect */
 .score-table tbody tr:hover td,
 .score-table tbody tr:hover th {
-    background-color: #ddd6ff;
+    background-color: rgba(24, 0, 168, 0.14);
 }
 
 .score-input {
@@ -245,7 +358,7 @@ footer {
     border: 1.5px solid #1800A8;
     border-radius: 5px;
 
-    background-color: #f7f0f0;
+    background-color: var(--rr-input-bg);
     color: #1800A8;
 
     font-weight: bold;
@@ -422,8 +535,8 @@ select:focus {
     border: 1.5px solid #1800A8;
     border-radius: 8px;
 
-    background-color: #f7f0f0;
-    color: #000000;
+    background-color: var(--rr-input-bg);
+    color: var(--rr-input-text);
 
     font-family: inherit;
     font-size: 14px;
@@ -461,14 +574,35 @@ select:focus {
     border: 1.5px solid #1800A8;
     border-radius: 8px;
 
-    background-color: #f7f0f0;
-    color: #000000;
+    background-color: var(--rr-input-bg);
+    color: var(--rr-input-text);
 
     font-family: inherit;
     font-size: 14px;
 
     resize: vertical;
     box-sizing: border-box;
+}
+
+html[data-theme="dark"] .interview-container .question-card,
+html[data-theme="dark"] .interview-container .Score-Box,
+html[data-theme="dark"] .interview-container .score-table,
+html[data-theme="dark"] .interview-container .score-table tbody td,
+html[data-theme="dark"] .interview-container .score-input,
+html[data-theme="dark"] .interview-container .notes-textarea,
+html[data-theme="dark"] .interview-container .feedback-textarea {
+    background-color: var(--rr-surface-bg);
+    color: var(--rr-text);
+}
+
+html[data-theme="dark"] .interview-container .score-table tbody th {
+    background-color: var(--rr-page-bg);
+}
+
+html[data-theme="dark"] .interview-container .notes-label,
+html[data-theme="dark"] .interview-container .feedback-label,
+html[data-theme="dark"] .interview-container .question-text {
+    color: var(--rr-text);
 }
 
 .feedback-textarea:focus {
