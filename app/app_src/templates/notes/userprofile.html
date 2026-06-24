@@ -39,6 +39,28 @@
 
                             <hr> <!-- Visual separator -->
 
+                            <h3 class="title is-4">Appearance</h3>
+
+                            <div class="field my-4">
+                                <label class="label">Theme</label>
+                                <div class="theme-options" role="radiogroup" aria-label="Theme">
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="system">
+                                        <span>System</span>
+                                    </label>
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="light">
+                                        <span>Light</span>
+                                    </label>
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="dark">
+                                        <span>Dark</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr>
+
                             <!-- Change Password Form -->
                             <h3 class="title is-4">Change Password</h3>
                             
@@ -182,6 +204,45 @@
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.remove('is-active');
     }
+
+    const themeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function activeThemeForPreference(preference) {
+        if (preference === 'system') {
+            return themeQuery.matches ? 'dark' : 'light';
+        }
+
+        return preference;
+    }
+
+    function applyThemePreference(preference) {
+        const activeTheme = activeThemeForPreference(preference);
+
+        localStorage.setItem('siteTheme', preference);
+        document.documentElement.dataset.theme = activeTheme;
+        document.documentElement.dataset.themePreference = preference;
+    }
+
+    const savedTheme = localStorage.getItem('siteTheme') || 'system';
+    const selectedTheme = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+
+    if (selectedTheme) {
+        selectedTheme.checked = true;
+    }
+
+    document.querySelectorAll('input[name="theme"]').forEach(input => {
+        input.addEventListener('change', function () {
+            applyThemePreference(this.value);
+        });
+    });
+
+    themeQuery.addEventListener('change', function () {
+        const preference = localStorage.getItem('siteTheme') || 'system';
+
+        if (preference === 'system') {
+            applyThemePreference(preference);
+        }
+    });
 </script>
 
 {% endblock %}
