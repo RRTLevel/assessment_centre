@@ -137,6 +137,7 @@ class Questions(models.Model):
 
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
     question = models.ForeignKey(
         QuestionTable,
         on_delete=models.CASCADE
