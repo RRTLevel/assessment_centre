@@ -280,6 +280,16 @@ footer {
 }
 
 
+/* Help Page */
+
+.help-box {
+    background-color: #f7f0f0;
+    border: 1px solid #1800A8;
+    border-left: 5px solid #1800A8;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
 /* Add Questions Page */
 
 .question-container {
