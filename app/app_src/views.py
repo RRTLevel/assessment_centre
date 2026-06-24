@@ -153,18 +153,8 @@ def create_pack(request):
     })
 
 
-
 @login_required(login_url='/login')
-
-
 def interview(request):
-    questions = QuestionTable.objects.all()
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "interview": True
-    })
-
-
     questions = QuestionTable.objects.all().order_by("id")
 
     return render(request, "interview/interview.html", {
@@ -229,6 +219,7 @@ def add_question(request):
 
     return render(request, "add_questions/add_questions.html", {"form": form})
 
+
 @login_required(login_url='/login')
 def application_review(request):
     applications = Application.objects.all().select_related('user', 'pack')
@@ -249,17 +240,33 @@ def create_category(request):
     return render(request, "pre_interview/create_category.html", {"form": form})
 
 
+# UPDATED: HANDLES GET REQUESTS (SHOW CALENDAR) AND POST REQUESTS (SAVE SELECTED DATE)
+@login_required(login_url='/login')
 def approve_application(request, id):
-    app = Application.objects.get(id=id)
-    app.status = "approved"
-    app.save()
-    return redirect("applications_review")
+    application = get_object_or_404(Application, id=id)
+    
+    if request.method == "POST":
+        interview_date = request.POST.get("interview_date")
+        if interview_date:
+            application.interview_date = interview_date
+            application.status = "Accepted"
+            application.save()
+            messages.success(request, f"Successfully scheduled interview for {application.user.username}!")
+            return redirect("applications_review")
+            
+    return render(request, "pre_interview/schedule_interview.html", {
+        "application": application
+    })
 
 
+# UPDATED: SWAPPED DELETE BEHAVIOR TO UPDATE STATUS FIELD TO DENIED INSTEAD
+@login_required(login_url='/login')
 def deny_application(request, id):
     if request.method == "POST":
         application = get_object_or_404(Application, id=id)
-        application.delete()
+        application.status = "Denied"
+        application.save()
+        messages.warning(request, f"Application for {application.user.username} has been denied.")
     return redirect("applications_review")
 
 
@@ -270,6 +277,7 @@ def application_detail(request, pk):
         "application": application
     })
 
+
 class RememberMeLoginView(LoginView):
     template_name = "registration/login.html"
 
@@ -278,9 +286,7 @@ class RememberMeLoginView(LoginView):
 
         if remember_me:
             self.request.session.set_expiry(60 * 60 * 24 * 30)
-        else:
-            self.request.session.set_expiry(0)
-
+            
         return super().form_valid(form)
 
 def question_list(request):
