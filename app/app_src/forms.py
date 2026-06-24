@@ -208,6 +208,9 @@ class QuestionForm(forms.Form):
         })
     )
     labels = {
+        "text": "Enter your Question:",
+        "category": "",
+    }
             "text": "Enter your Question:",
             "category": "",
         }

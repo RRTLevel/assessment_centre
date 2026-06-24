@@ -1,26 +1,20 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
-
 from .validators import DomainUnicodeUsernameValidator
-import uuid
 
 
 class DomainUser(User):
-
     class Meta:
         proxy = True
 
     def __init__(self, *args, **kwargs):
-
-        self._meta.get_field(
-            'username'
-        ).validators[0] = DomainUnicodeUsernameValidator()
-
         super().__init__(*args, **kwargs)
+        # Safely assign validator adjustments dynamically
+        self._meta.get_field('username').validators = [DomainUnicodeUsernameValidator()]
 
 
 class Note(models.Model):
-
     author = models.ForeignKey(DomainUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     body = models.TextField()
@@ -33,8 +27,6 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
-#where the system will gather the data for the form and be able to save it to a database
-from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -43,10 +35,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Pack(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-
     category = models.ForeignKey(
         "Category",
         on_delete=models.CASCADE,
@@ -54,38 +46,32 @@ class Pack(models.Model):
         null=True,
         blank=True
     )
-
     pre_interview_question_1 = models.CharField(
         max_length=255,
         blank=True,
         null=True
     )
-
     pre_interview_question_2 = models.CharField(
         max_length=255,
         blank=True,
         null=True
     )
-
     pre_interview_question_3 = models.CharField(
         max_length=255,
         blank=True,
         null=True
     )
-
     created_at = models.DateTimeField(auto_now_add=True)
-    
-class QuestionTable(models.Model):
 
+
+class QuestionTable(models.Model):
     CATEGORY_CHOICES = [
         ("Category 1", "Category 1"),
         ("Category 2", "Category 2"),
         ("Category 3", "Category 3"),
         ("Category 4", "Category 4"),
     ]
-
     question = models.TextField()
-
     category = models.CharField(
         max_length=50,
         choices=CATEGORY_CHOICES,
@@ -94,22 +80,29 @@ class QuestionTable(models.Model):
 
     def __str__(self):
         return self.question
-    
+
+
 class Application(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
     application_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-
-    pack = models.ForeignKey(
-        "Pack",
-        on_delete=models.CASCADE
-    )
-
+    pack = models.ForeignKey("Pack", on_delete=models.CASCADE)
     answer_1 = models.TextField()
     answer_2 = models.TextField()
     answer_3 = models.TextField()
-
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # NEW TRACKING AND TIMING STATUSES FOR INTERVIEWERS
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Denied', 'Denied'),
+    ]
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='Pending'
+    )
+    interview_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.application_id}"
@@ -135,3 +128,5 @@ class InterviewResponse(models.Model):
 
     class Meta:
         unique_together = ('user', 'question')
+ 
+        return f"{self.user.username} - {self.application_id} ({self.status})"
