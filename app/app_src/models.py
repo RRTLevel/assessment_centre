@@ -125,7 +125,7 @@ class Questions(models.Model):
 
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(QuestionTable, on_delete=models.CASCADE)
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
