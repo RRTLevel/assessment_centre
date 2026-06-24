@@ -398,7 +398,7 @@ select:focus {
     .question-card {
         padding: 1.25rem;
     }
-=======
+
 /* Notes Box */
 
 .notes_box {
@@ -475,5 +475,7 @@ select:focus {
     outline: none;
     border-color: #12007d;
     box-shadow: 0 0 0 2px rgba(24, 0, 168, 0.15);
+
+}
 
 }
