@@ -157,7 +157,7 @@ def create_pack(request):
 
 @login_required(login_url='/login')
 def interview(request):
-    questions = QuestionTable.objects.all()
+    questions = Questions.objects.all()
     saved = {
         r.question_id: r
         for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
@@ -176,7 +176,7 @@ def interview(request):
 @login_required(login_url='/login')
 def interview_save(request):
     if request.method == 'POST':
-        questions = QuestionTable.objects.all()
+        questions = Questions.objects.all()
         for question in questions:
             existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
             form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
