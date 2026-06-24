@@ -13,13 +13,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm
-from .models import Note, Pack, QuestionTable, Application
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm
+from .models import Note, Pack, QuestionTable, Application, InterviewResponse
 
 from django.contrib.auth.views import LoginView
 
 from .forms import QuestionForm
 from .models import Questions
+
+from .models import Category
 
 
 logger = logging.getLogger("")
@@ -159,10 +161,34 @@ def create_pack(request):
 
 def interview(request):
     questions = QuestionTable.objects.all()
+    saved = {
+        r.question_id: r
+        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
+    }
+    question_forms = [
+        (question, InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id)))
+        for question in questions
+    ]
     return render(request, "interview/interview.html", {
         "questions": questions,
+        "question_forms": question_forms,
         "interview": True
     })
+
+
+@login_required(login_url='/login')
+def interview_save(request):
+    if request.method == 'POST':
+        questions = QuestionTable.objects.all()
+        for question in questions:
+            existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
+            form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
+            if form.is_valid():
+                response = form.save(commit=False)
+                response.user = request.user
+                response.question = question
+                response.save()
+    return redirect('interview')
 
 
     questions = QuestionTable.objects.all().order_by("id")
@@ -209,25 +235,44 @@ def applicant_form(request, pack_id):
 def add_question(request):
     if request.method == "POST":
         form = QuestionForm(request.POST)
-        if form.is_valid():
 
+        if form.is_valid():
             category = form.cleaned_data["category"]
 
             for i in range(1, 6):
                 question_text = form.cleaned_data[f"question_{i}"]
 
-                if question_text.strip():
+                if question_text and question_text.strip():
                     Questions.objects.create(
                         text=question_text,
                         category=category
                     )
 
-            return redirect("home")
+            return redirect("add_questions")  
 
     else:
         form = QuestionForm()
 
-    return render(request, "add_questions/add_questions.html", {"form": form})
+    questions = Questions.objects.select_related("category").all().order_by("-id")
+
+    return render(
+        request,
+        "add_questions/add_questions.html",
+        {
+            "form": form,
+            "questions": questions
+        }
+    )
+
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, id=pk)
+
+    if request.method == "POST":
+        question.delete()
+
+    return redirect("add_questions")
+
 
 @login_required(login_url='/login')
 def application_review(request):
@@ -242,11 +287,31 @@ def create_category(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('applications')
+            return redirect('categories')  
     else:
         form = CategoryForm()
 
-    return render(request, "pre_interview/create_category.html", {"form": form})
+    categories = Category.objects.all()
+
+    return render(
+        request,
+        "pre_interview/create_category.html",
+        {
+            "form": form,
+            "categories": categories
+        }
+    )
+
+
+def delete_category(request, pk):
+    category = get_object_or_404(Category, id=pk)
+
+    if request.method == "POST":
+        category.delete()
+        return redirect("categories")  
+
+    return redirect("categories")
+
 
 
 def approve_application(request, id):
