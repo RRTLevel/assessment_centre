@@ -52,9 +52,10 @@
                 </p>
             </div>
 
-
-            {% for question in questions %}
-            <div class="question-row">
+            <form method="POST" action="{% url 'interview_save' %}">
+            {% csrf_token %}
+            {% for question, form in question_forms %}
+            <div class="question-row" data-question-id="{{ question.id }}">
 
                 <div class="question-card">
                     <p class="question-text">
@@ -79,47 +80,22 @@
                                     <th></th>
                                     <td>this is a positive</td>
                                     <td>this is a negative</td>
-                                    <td>
-                                        <input 
-                                            type="number" 
-                                            min="1" 
-                                            max="6" 
-                                            step="1"
-                                            class="score-input"
-                                        >
-                                    </td>
+                                    <td>{{ form.score_1 }}</td>
                                 </tr>
                                 <tr>
                                     <th></th>
                                     <td>this is a positive</td>
                                     <td>this is a negative</td>
-                                    <td>
-                                        <input 
-                                            type="number" 
-                                            min="1" 
-                                            max="6" 
-                                            step="1"
-                                            class="score-input"
-                                        >
-                                    </td>
+                                    <td>{{ form.score_2 }}</td>
                                 </tr>
                                 <tr>
                                     <th></th>
                                     <td>this is a positive</td>
                                     <td>this is a negative</td>
-                                    <td>
-                                        <input 
-                                            type="number" 
-                                            min="1" 
-                                            max="6" 
-                                            step="1"
-                                            class="score-input"
-                                        >
-                                    </td>
+                                    <td>{{ form.score_3 }}</td>
                                 </tr>
                             </tbody>
                         </table>
-                        
 
                         <!--<button class="add-row-btn" onclick="addRow()">+</button>-->
 
@@ -136,10 +112,10 @@
                                 <td>this is a positive</td>
                                 <td>this is a negative</td>
                                 <td>
-                                    <input 
-                                        type="number" 
-                                        min="1" 
-                                        max="6" 
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="6"
                                         step="1"
                                         class="score-input"
                                     >
@@ -149,26 +125,12 @@
                         </script>
                     </div>
                     <div class="notes_box">
-                        <label for="notes-{{ forloop.counter }}" class="notes-label">
-                            Notes
-                        </label>
-
-                        <textarea
-                            id="notes-{{ forloop.counter }}"
-                            class="notes-textarea"
-                            placeholder="Enter interview notes here..."
-                        ></textarea>
+                        <label class="notes-label">Notes</label>
+                        {{ form.notes }}
                     </div>
                     <div class="feedback_box">
-                        <label for="feedback-{{ forloop.counter }}" class="feedback-label">
-                            Feedback
-                        </label>
-
-                        <textarea
-                            id="feedback-{{ forloop.counter }}"
-                            class="feedback-textarea"
-                            placeholder="Enter feedback here..."
-                        ></textarea>
+                        <label class="feedback-label">Feedback</label>
+                        {{ form.feedback }}
                     </div>
                 </div>
 
@@ -181,40 +143,20 @@
             {% endfor %}
 
             <div class="submit-section">
-                <button class="submit-btn">
+                <button type="submit" class="submit-btn">
                     Submit
                 </button>
             </div>
+            </form>
 
             {% endblock %}
 
         </div>
-        
-        <div class="feedback_box">
-            <label for="feedback-{{ forloop.counter }}" class="feedback-label">
-                Feedback
-            </label>
-            <textarea
-                id="feedback-{{ forloop.counter }}"
-                class="feedback-textarea"
-                placeholder="Enter feedback here..."
-            ></textarea>
-        </div>
-    </div>
-</div>
 
-{% empty %}
+    </main>
 
-<div class="no-questions">
-    No interview questions available.
-</div>
+    {% include 'includes/footer.html' %}
 
-{% endfor %}
+</body>
 
-<div class="submit-section">
-    <button class="submit-btn">
-        Submit
-    </button>
-</div>
-
-{% endblock %}
+</html>

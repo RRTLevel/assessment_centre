@@ -137,8 +137,11 @@ class QuestionForm(forms.Form):
 class InterviewResponseForm(forms.ModelForm):
     class Meta:
         model = InterviewResponse
-        fields = ["notes", "feedback"]
+        fields = ["score_1", "score_2", "score_3", "notes", "feedback"]
         widgets = {
+            "score_1": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
+            "score_2": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
+            "score_3": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
             "notes": forms.Textarea(attrs={
                 "class": "notes-textarea",
                 "placeholder": "Enter interview notes here...",
