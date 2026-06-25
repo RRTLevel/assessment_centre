@@ -137,6 +137,21 @@ def helpView(request):
     })
 
 
+@login_required(login_url='/login')
+def resultsView(request):
+    questions = Questions.objects.all()
+    questions_with_responses = [
+        (question, InterviewResponse.objects.filter(question=question).select_related('user'))
+        for question in questions
+    ]
+    total_responses = InterviewResponse.objects.count()
+    return render(request, 'results/results.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Results',
+        'questions_with_responses': questions_with_responses,
+        'total_responses': total_responses,
+    })
+
+
 class Custom404View(TemplateView):
     template_name = "404.html"
 
