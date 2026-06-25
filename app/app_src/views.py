@@ -318,6 +318,33 @@ def deny_application(request, pk):
         messages.error(request, f"Application for {application.user.username} was denied.")
         
     return redirect('application_review')
+
+
+@login_required(login_url='/login')
+def accepted_applicants(request):
+    
+    applicants = Application.objects.filter(status="Accepted")
+
+    context = {
+        "applicants": applicants
+    }
+
+    return render(request, "pre_interview/accepted_applicants.html", context)
+
+@login_required(login_url='/login')
+def start_interview(request, pk):
+    application = Application.objects.get(application_id=pk)
+
+    questions = Questions.objects.filter(
+        category=application.pack.category
+    )
+
+    return render(request, "pre_interview/start_interview.html", {
+        "application": application,
+        "questions": questions
+    })
+
+
 @login_required(login_url='/login')
 def question_list(request):
     questions_list = Questions.objects.all().select_related('category').order_by('-id')
