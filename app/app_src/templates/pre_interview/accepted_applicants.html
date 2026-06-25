@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<table class="accepted-applicant-table">
+    
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Pack</th>
+            <th>Interview Date</th>
+            <th>Start Interview</th>
+        </tr>
+    </thead>
+
+    {% for applicant in applicants %}
+
+    <tbody>
+
+
+
+        <tr>
+            <td>{{applicant.user.username}}</td>
+            <td>{{applicant.status}}</td>
+            <td>{{applicant.pack}}</td>
+            <td>{{applicant.interview_date}}</td>
+            <td>
+                <a class="button is-small is-link"
+                href="{% url 'start_interview' applicant.application_id %}">
+                    Start
+                </a>
+            </td>
+        </tr>
+    </tbody>
+
+    {% endfor %}
+
+</table>
+
+
+
+
+{% endblock %}

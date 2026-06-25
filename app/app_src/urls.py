@@ -49,6 +49,8 @@ urlpatterns = [
     path('applications/<int:pk>/', views.application_detail, name='application_detail'),
     path("applications/<uuid:pk>/approve/", views.approve_application, name="approve_application"),
     path("applications/<uuid:pk>/deny/", views.deny_application, name="deny_application"),
+    path("applications/accepted_applicants/", views.accepted_applicants, name="accepted_applicants"),
+    path("applications/start_interview//<uuid:pk>/", views.start_interview, name="start_interview"),
 
     # Questions
     path('questions/', views.question_list, name="question_list"),
