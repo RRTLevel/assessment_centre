@@ -1,6 +1,5 @@
 {% load static %}
 
-
 <nav class='navbar rr-secondary py-1' role='navigation' aria-label='main navigation'>
 
     <div class="navbar-brand">
@@ -37,9 +36,8 @@
 
         </div>
         
-        
         <div class="navbar-end">
-            <div class="navbar-item">
+            <div class="navbar-item" style="display: flex; align-items: center;">
                 {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                 <a class="button is-warning mr-2" href="{% url 'admin:index' %}">
@@ -48,6 +46,11 @@
                     </strong>
                 </a>
                 {% endif %}
+
+                <!-- NEW INBOX BUTTON INSERTED HERE -->
+                <a class="button is-light mr-2" href="{% url 'inbox' %}" title="Inbox">
+                    <i class="fas fa-inbox text-rr-primary"></i>
+                </a>
 
                 <a class="button is-light mr-2" href="{% url 'userprofile' %}">
                     <i class="fas fa-user-alt mr-1"></i>

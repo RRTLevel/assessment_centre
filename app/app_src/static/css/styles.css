@@ -1,4 +1,6 @@
-/* Typograpghy */
+/* =========================================================
+   TYPOGRAPHY + THEME VARIABLES
+   ========================================================= */
 
 :root {
     --rr-page-bg: #fff;
@@ -21,12 +23,19 @@ html[data-theme="dark"] {
     --rr-input-border: #4a5366;
     --rr-input-text: #f2f4f8;
 }
- 
+
 body {
     font-family: "Verdana", sans-serif;
     background-color: var(--rr-page-bg);
     color: var(--rr-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
+
+/* =========================================================
+   GLOBAL UI ELEMENTS
+   ========================================================= */
 
 .box,
 .modal-card-head,
@@ -67,21 +76,9 @@ hr {
     background-color: var(--rr-border);
 }
 
-html[data-theme="dark"] .button.is-light {
-    background-color: #2b3242;
-    color: #f2f4f8;
-}
-
-html[data-theme="dark"] .button {
-    border-color: var(--rr-border);
-}
-
-html[data-theme="dark"] .notification,
-html[data-theme="dark"] .message,
-html[data-theme="dark"] .message-body {
-    background-color: #242b3a;
-    color: var(--rr-text);
-}
+/* =========================================================
+   THEME OPTIONS
+   ========================================================= */
 
 .theme-options {
     display: flex;
@@ -112,7 +109,9 @@ html[data-theme="dark"] .message-body {
     color: #fff;
 }
 
-/* Colours */
+/* =========================================================
+   COLORS
+   ========================================================= */
 
 .rr-primary {
     background-color: #10069f;
@@ -148,30 +147,9 @@ a.has-text-rr-secondary {
     color: #271EA8;
 }
 
-.control.has-icons-left .input:focus~.icon, .control.has-icons-left .select:focus~.icon, .control.has-icons-right .input:focus~.icon, .control.has-icons-right .select:focus~.icon {
-    color: #10069f;
-}
-
-/* Hero */
-
-.hero.rr-primary {
-    background-color: #10069f;
-    color: #fff;
-}
-
-
-
-/* Spacing */
-
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-footer {
-    margin-top: auto;
-}
+/* =========================================================
+   LAYOUT
+   ========================================================= */
 
 .container {
     padding: 0 1rem;
@@ -183,7 +161,13 @@ footer {
     }
 }
 
-/* Interview Page */
+footer {
+    margin-top: auto;
+}
+
+/* =========================================================
+   INTERVIEW PAGE
+   ========================================================= */
 
 .interview-container {
     max-width: 900px;
@@ -204,33 +188,18 @@ footer {
     color: var(--rr-muted-text);
 }
 
-.question-row {
-    min-width : 80%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: left;
-    gap: 20px;
-    margin-bottom: 1rem;
-}
-
 .question-card {
-
-    background:var(--rr-surface-bg);
-
-    border:1px solid #1800A8;
-
-    border-left:5px solid #1800A8;
-
-    border-radius:8px;
-
-    padding:1.25rem;
-
-    margin-bottom:15px;
-
+    background: var(--rr-surface-bg);
+    border: 1px solid #1800A8;
+    border-left: 5px solid #1800A8;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 15px;
 }
 
 .Score-Box {
+    width: 100%;
+    margin: 20px 0;
     min-width: 120px;
     text-align: left;
     background-color: var(--rr-surface-bg);
@@ -254,17 +223,15 @@ footer {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
 .submit-btn:hover {
     background-color: #12007d;
 }
 
-.Score-Box {
-    width: 100%;
-    margin: 20px 0;
-}
+/* =========================================================
+   TABLE (SCORES)
+   ========================================================= */
 
 .table-container {
     overflow-x: auto;
@@ -273,48 +240,31 @@ footer {
 .score-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: Arial, sans-serif;
     text-align: center;
-
     background-color: var(--rr-surface-bg);
 }
 
-/* Borders for everything */
 .score-table th,
 .score-table td {
     border: 1.5px solid #1800A8;
     padding: 12px 16px;
 }
 
-
-/* ===== HEADER ROW ===== */
-
-/* Top row colour */
 .score-table thead th {
-    background-color: #1800A8; /* EDIT HEADER BACKGROUND */
-    color: #f7f0f0;            /* EDIT HEADER TEXT */
-    font-weight: bold;
+    background-color: #1800A8;
+    color: #fff;
 }
 
-
-/* ===== BODY ===== */
-
-/* Left-side labels (Score) */
 .score-table tbody th {
     background-color: var(--rr-page-bg);
-    color: #1800A8;            /* EDIT LABEL TEXT */
-    font-weight: bold;
+    color: #1800A8;
 }
 
-
-/* Main table text cells */
 .score-table tbody td {
     background-color: var(--rr-surface-bg);
     color: var(--rr-text);
 }
 
-
-/* Optional hover effect */
 .score-table tbody tr:hover td,
 .score-table tbody tr:hover th {
     background-color: rgba(24, 0, 168, 0.14);
@@ -324,46 +274,16 @@ footer {
     width: 50px;
     padding: 8px;
     text-align: center;
-
     border: 1.5px solid #1800A8;
     border-radius: 5px;
-
     background-color: var(--rr-input-bg);
     color: #1800A8;
-
     font-weight: bold;
-    font-size: 16px;
 }
 
-/* remove browser arrows if you want */
-.score-input::-webkit-inner-spin-button,
-.score-input::-webkit-outer-spin-button {
-    opacity: 1;
-}
-
-.add-row-btn {
-    margin-top: 10px;
-    width: 40px;
-    height: 40px;
-    text-align: center;
-
-    border: none;
-    border-radius: 50%;
-
-    background-color: #1800A8;
-    color: #f7f0f0;
-
-    font-size: 24px;
-    cursor: pointer;
-}
-.add-row-btn {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-/* Help Page */
+/* =========================================================
+   HELP PAGE
+   ========================================================= */
 
 .help-box {
     background-color: #f7f0f0;
@@ -373,285 +293,92 @@ footer {
     padding: 1.25rem;
 }
 
-.help-box .menu-list li {
-    margin-bottom: 0.75rem;
-}
-
-.help-box .menu-list li:last-child {
-    margin-bottom: 0;
-}
-
-/* Add Questions Page */
+/* =========================================================
+   ADD QUESTIONS PAGE
+   (FIXED: removed broken dark contrast issues)
+   ========================================================= */
 
 .question-container {
     max-width: 900px;
 }
 
 .question-card {
-    background: #f7f0f0;
-    border: 1px solid #000000;
+    background: var(--rr-surface-bg);
+    border: 1px solid #000;
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
-.question-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #2b2b2b;
+textarea,
+select {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: var(--rr-input-bg);
+    color: var(--rr-input-text);
 }
 
-.question-header .title {
-    color: #f7f0f0 !important;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+/* =========================================================
+   CALENDAR (INBOX)
+   ========================================================= */
+
+.calendar-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: var(--rr-surface-bg);
+    border: 1px solid var(--rr-border);
+    border-radius: 12px;
 }
 
-.question-header .subtitle {
-    color: #a0a0a0 !important;
-}
-
-.field {
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
 }
 
-.label {
-    display: block;
-    color: #000000;
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.calendar-day-label {
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--rr-muted-text);
 }
 
-/* Question boxes */
-textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 1rem;
-
-    background: #f7f0f0;
-    color: #000000;
-
-    border: 1px solid #333;
-    border-radius: 10px;
-
-    resize: vertical;
-    transition: all 0.2s ease;
-}
-
-textarea:focus {
-    outline: none;
-    border-color: #4f8cff;
-    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.2);
-}
-
-textarea::placeholder {
-    color: #888;
-}
-
-/* Category dropdown */
-select {
-    width: 100%;
-    height: 50px;
-
-    background: #f7f0f0;
-    color: #000000;
-
-    border: 1px solid #333;
-    border-radius: 10px;
-
-    padding: 0 12px;
-}
-
-select:focus {
-    outline: none;
-    border-color: #4f8cff;
-}
-
-/* Save button */
-.save-btn {
-    width: 100%;
-    height: 52px;
-    margin-top: 1rem;
-
-    border: none;
-    border-radius: 10px;
-
-    background: linear-gradient(135deg, #4f8cff, #2962ff);
-    color: #f7f0f0;
-
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
-.save-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(79, 140, 255, 0.35);
-}
-
-.save-btn:active {
-    transform: translateY(0);
-}
-
-@media (max-width: 768px) {
-    .question-card {
-        padding: 1.25rem;
-    }
-
-/* Notes Box */
-
-.notes_box {
-    margin-top: 20px;
-    width: 100%;
-}
-
-.notes-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #1800A8;
-    font-size: 1rem;
-}
-
-.notes-textarea {
-    width: 100%;
-    min-height: 150px;
-    padding: 12px;
-
-    border: 1.5px solid #1800A8;
-    border-radius: 8px;
-
-    background-color: var(--rr-input-bg);
-    color: var(--rr-input-text);
-
-    font-family: inherit;
-    font-size: 14px;
-
-    resize: vertical;
-    box-sizing: border-box;
-}
-
-.notes-textarea:focus {
-    outline: none;
-    border-color: #12007d;
-    box-shadow: 0 0 0 2px rgba(24, 0, 168, 0.15);
-}
-
-/* Feedback Box */
-
-.feedback_box {
-    margin-top: 15px;
-    width: 100%;
-}
-
-.feedback-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #1800A8;
-    font-size: 1rem;
-}
-
-.feedback-textarea {
-    width: 100%;
-    min-height: 80px; /* Smaller than notes box */
-    padding: 12px;
-
-    border: 1.5px solid #1800A8;
-    border-radius: 8px;
-
-    background-color: var(--rr-input-bg);
-    color: var(--rr-input-text);
-
-    font-family: inherit;
-    font-size: 14px;
-
-    resize: vertical;
-    box-sizing: border-box;
-}
-
-html[data-theme="dark"] .interview-container .question-card,
-html[data-theme="dark"] .interview-container .Score-Box,
-html[data-theme="dark"] .interview-container .score-table,
-html[data-theme="dark"] .interview-container .score-table tbody td,
-html[data-theme="dark"] .interview-container .score-input,
-html[data-theme="dark"] .interview-container .notes-textarea,
-html[data-theme="dark"] .interview-container .feedback-textarea {
-    background-color: var(--rr-surface-bg);
-    color: var(--rr-text);
-}
-
-html[data-theme="dark"] .interview-container .score-table tbody th {
-    background-color: var(--rr-page-bg);
-}
-
-html[data-theme="dark"] .interview-container .notes-label,
-html[data-theme="dark"] .interview-container .feedback-label,
-html[data-theme="dark"] .interview-container .question-text {
-    color: var(--rr-text);
-}
-
-.feedback-textarea:focus {
-    outline: none;
-    border-color: #12007d;
-    box-shadow: 0 0 0 2px rgba(24, 0, 168, 0.15);
-
-}
-
-}
-
-/* ===================================
-   NAVBAR
-=================================== */
-
-.navbar.rr-secondary {
-    background: linear-gradient(135deg, #10069f, #271EA8);
-    min-height: 72px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-}
-
-/* Main layout */
-.navbar-menu {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1.5rem;
-}
-
-/* Navigation links */
-.navbar-start {
+.calendar-day {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
-    gap: 0.5rem;
+    height: 40px;
+    width: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
 }
 
-/* User section */
-.navbar-end {
-    display: flex;
-    align-items: center;
+.calendar-day.is-today {
+    background-color: #271EA8;
+    color: #fff !important;
 }
 
-/* Links */
-.navbar-item,
-.navbar-link {
-    color: rgba(255,255,255,0.85) !important;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: all 0.25s ease;
-    padding: 0.75rem 1rem;
+.calendar-day.has-interview {
+    border: 2px solid #fc4191;
+    font-weight: bold;
 }
 
-/* Hover */
-.navbar-item:hover,
-.navbar-link:hover {
-    background: rgba(255,255,255,0.12) !important;
-    color: #ffffff !important;
+.calendar-day.is-today.has-interview {
+    background-color: #271EA8;
+    border: 2px solid #fc4191;
+    color: #fff !important;
 }
 
+<<<<<<< Updated upstream
 /* Active page */
 .navbar-item.is-active {
     color: #ffffff !important;
@@ -773,3 +500,9 @@ html[data-theme="dark"] .interview-container .question-text {
     font-weight: 600;
 }
 
+=======
+.calendar-empty {
+    height: 40px;
+    width: 40px;
+}
+>>>>>>> Stashed changes

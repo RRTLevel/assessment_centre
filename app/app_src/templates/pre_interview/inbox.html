@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+    <div class="container interview-container">
+
+        <!-- Header -->
+        <div class="interview-header">
+            <h1 class="title interview-title">Inbox</h1>
+            <p class="subtitle interview-count">
+                Overview of upcoming and past interviews
+            </p>
+        </div>
+
+        <div class="columns">
+
+            <!-- LEFT: Calendar -->
+            <div class="column is-5">
+
+                <div class="calendar-container box">
+
+                    <div class="calendar-header">
+                        <span class="title is-5 mb-0">{{ month_name }} {{ year }}</span>
+
+                        <div>
+                            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="button is-small is-light">&lt;</a>
+                            <a href="?month={{ next_month }}&year={{ next_year }}" class="button is-small is-light">&gt;</a>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+
+                        <!-- Week Labels -->
+                        <div class="calendar-day-label">S</div>
+                        <div class="calendar-day-label">M</div>
+                        <div class="calendar-day-label">T</div>
+                        <div class="calendar-day-label">W</div>
+                        <div class="calendar-day-label">T</div>
+                        <div class="calendar-day-label">F</div>
+                        <div class="calendar-day-label">S</div>
+
+                        <!-- Calendar Days -->
+                        {% for week in month_days %}
+                            {% for day in week %}
+                                {% if day == 0 %}
+                                    <div class="calendar-empty"></div>
+                                {% else %}
+                                    <div class="calendar-day
+                                        {% if day == today_day %}is-today{% endif %}
+                                        {% if day in marked_days %}has-interview{% endif %}">
+                                        {{ day }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Inbox Lists -->
+            <div class="column is-7">
+
+                <!-- UPCOMING -->
+                <h3 class="title is-5 mb-3">Upcoming Interviews</h3>
+
+                {% if interviews %}
+                    {% for app in interviews %}
+                        {% if app.interview_date|date:"Y-m-d H:i" >= "now"|date:"Y-m-d H:i" %}
+                            <div class="question-card mb-3">
+
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+
+                                    <div>
+                                        <h4 class="title is-6 mb-1 text-rr-primary">
+                                            {{ app.pack.title }}
+                                        </h4>
+
+                                        <p class="is-size-7">
+                                            <strong>Applicant:</strong> {{ app.user.username }}
+                                        </p>
+                                    </div>
+
+                                    <div class="has-text-right">
+
+                                        <span class="tag is-success is-light">
+                                            Upcoming
+                                        </span>
+
+                                        <p class="is-size-7 has-text-grey mt-1">
+                                            {{ app.interview_date|date:"M d, Y - H:i" }}
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="notification is-light">
+                        No upcoming interviews.
+                    </div>
+                {% endif %}
+
+                <hr>
+
+                <!-- PAST -->
+                <h3 class="title is-5 mb-3">Past Interviews</h3>
+
+                {% if interviews %}
+                    {% for app in interviews %}
+                        {% if app.interview_date|date:"Y-m-d H:i" < "now"|date:"Y-m-d H:i" %}
+                            <div class="question-card mb-3">
+
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+
+                                    <div>
+                                        <h4 class="title is-6 mb-1">
+                                            {{ app.pack.title }}
+                                        </h4>
+
+                                        <p class="is-size-7">
+                                            <strong>Applicant:</strong> {{ app.user.username }}
+                                        </p>
+                                    </div>
+
+                                    <div class="has-text-right">
+
+                                        <span class="tag is-light">
+                                            Completed
+                                        </span>
+
+                                        <p class="is-size-7 has-text-grey mt-1">
+                                            {{ app.interview_date|date:"M d, Y - H:i" }}
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
