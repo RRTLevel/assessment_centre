@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
-from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse
+from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse, Indicator
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -150,4 +150,15 @@ class InterviewResponseForm(forms.ModelForm):
                 "class": "feedback-textarea",
                 "placeholder": "Enter feedback here...",
             }),
+        }
+
+
+class IndicatorForm(forms.ModelForm):
+    class Meta:
+        model = Indicator
+        fields = ["question", "text", "category"]
+        widgets = {
+            "question": forms.Select(attrs={"class": "input"}),
+            "text": forms.TextInput(attrs={"class": "input", "placeholder": "Enter indicator..."}),
+            "category": forms.Select(attrs={"class": "input"}),
         }

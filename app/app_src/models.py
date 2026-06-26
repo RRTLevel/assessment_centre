@@ -135,6 +135,19 @@ class Questions(models.Model):
         return self.text[:60]
 
 
+class Indicator(models.Model):
+    CATEGORY_CHOICES = [
+        ('positive', 'Positive'),
+        ('negative', 'Negative'),
+    ]
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE, related_name='indicators')
+    text = models.TextField()
+    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
+
+    def __str__(self):
+        return f"[{self.category}] {self.text[:50]}"
+
+
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE)

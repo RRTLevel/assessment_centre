@@ -12,8 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm
-from .models import Note, Pack, QuestionTable, Application, InterviewResponse
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm, IndicatorForm
+from .models import Note, Pack, QuestionTable, Application, InterviewResponse, Indicator
 
 from django.contrib.auth.views import LoginView
 from .forms import QuestionForm
@@ -134,6 +134,24 @@ def documentationView(request):
 def helpView(request):
     return render(request, 'help/help.html', {
         'page_title': settings.APPLICATION_NAME + ' - Help',
+    })
+
+
+@login_required(login_url='/login')
+def add_indicators(request):
+    if request.method == 'POST':
+        form = IndicatorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_indicators')
+    else:
+        form = IndicatorForm()
+
+    questions = Questions.objects.prefetch_related('indicators').all()
+    return render(request, 'indicators/add_indicators.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Add Indicators',
+        'form': form,
+        'questions': questions,
     })
 
 

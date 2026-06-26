@@ -393,6 +393,18 @@ footer {
 }
 
 
+/* Indicators */
+
+.indicator-positive {
+    color: #1a7a1a !important;
+    font-weight: 500;
+}
+
+.indicator-negative {
+    color: #a01010 !important;
+    font-weight: 500;
+}
+
 /* Help Page */
 
 .help-box {
