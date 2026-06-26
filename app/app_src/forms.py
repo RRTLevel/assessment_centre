@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
-from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse
+from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse, Questions
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -77,6 +77,25 @@ class AddNoteForm(forms.ModelForm):
 
 
 class PackForm(forms.ModelForm):
+
+    question_1 = forms.ModelChoiceField(
+        queryset=Questions.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"id": "id_question_1"})
+    )
+
+    question_2 = forms.ModelChoiceField(
+        queryset=Questions.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"id": "id_question_2"})
+    )
+
+    question_3 = forms.ModelChoiceField(
+        queryset=Questions.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"id": "id_question_3"})
+    )
+
     class Meta:
         model = Pack
         fields = [
@@ -86,7 +105,39 @@ class PackForm(forms.ModelForm):
             "pre_interview_question_1",
             "pre_interview_question_2",
             "pre_interview_question_3",
+            "question_1",
+            "question_2",
+            "question_3",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        category_id = None
+
+        if "category" in self.data:
+            try:
+                category_id = int(self.data.get("category"))
+            except (TypeError, ValueError):
+                category_id = None
+
+        if category_id:
+            qs = Questions.objects.filter(category_id=category_id)
+        else:
+            qs = Questions.objects.all()
+
+        self.fields["question_1"].queryset = qs
+        self.fields["question_2"].queryset = qs
+        self.fields["question_3"].queryset = qs
+
+class ApplicantForm(forms.Form):
+    answer_1 = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'textarea',
+            'placeholder': 'Your answer to question 1...'
+        })
+    )
 
 
 class ApplicantForm(forms.ModelForm):
@@ -127,11 +178,10 @@ class QuestionForm(forms.Form):
         queryset=Category.objects.all(),
         widget=forms.Select(attrs={"class": "select"})
     )
-
     labels = {
-        "text": "Enter your Question:",
-        "category": "",
-    }
+            "text": "Enter your Question:",
+            "category": "",
+        }
 
 
 class InterviewResponseForm(forms.ModelForm):

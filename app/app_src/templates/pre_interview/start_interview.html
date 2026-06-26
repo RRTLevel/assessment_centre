@@ -1,18 +1,28 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Interview</title>
-    {% load static %}
-    <meta charset="utf-8">
+{% block content %}
 
-    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
-    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+<table class="accepted-applicant-table">
+    
+    <thead>
+        <tr>
+            <th>Applicant name</th>
+            <th>Applicant's pack</th>
+        </tr>
+    </thead>
 
-    <script>
+    <tbody>
+        <tr>
+            <td>{{applicant.user.username}}</td>
+            <td>{{applicant.pack}}</td>
+        </tr>
+    </tbody>
+    
+</table>
+
+
+<script>
         (function () {
             const savedTheme = localStorage.getItem('siteTheme') || 'system';
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -21,17 +31,8 @@
             document.documentElement.dataset.theme = activeTheme;
             document.documentElement.dataset.themePreference = savedTheme;
         })();
-    </script>
+</script>
 
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-
-<body>
-
-<header>
-    {% include 'includes/title.html' %}
-    {% include 'includes/nav.html' %}
-</header>
 
 <main class="section">
 <div class="container interview-container">
@@ -104,4 +105,6 @@
 </main>
 
 </body>
-</html>
+
+
+{% endblock %}

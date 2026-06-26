@@ -726,3 +726,50 @@ html[data-theme="dark"] .interview-container .question-text {
         justify-content: center;
     }
 }
+
+
+
+/* =========================
+   APPLICANTS TABLE (LIGHT MODE)
+========================= */
+
+.accepted-applicant-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* Header */
+.accepted-applicant-table thead {
+    background: #10069f;
+    color: rgb(255, 255, 255);
+}
+
+.accepted-applicant-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Body rows */
+.accepted-applicant-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    color: #000000;
+}
+
+/* Hover effect */
+.accepted-applicant-table tbody tr:hover {
+    background: #f5f7ff;
+}
+
+/* Status styling */
+.accepted-applicant-table td:nth-child(2) {
+    font-weight: 600;
+}
+

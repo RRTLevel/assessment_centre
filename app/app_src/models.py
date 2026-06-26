@@ -28,6 +28,8 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
+#where the system will gather the data for the form and be able to save it to a database
+from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -62,30 +64,11 @@ class Pack(models.Model):
         blank=True,
         null=True
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
-
-
-class QuestionTable(models.Model):
-    CATEGORY_CHOICES = [
-        ("Category 1", "Category 1"),
-        ("Category 2", "Category 2"),
-        ("Category 3", "Category 3"),
-        ("Category 4", "Category 4"),
-    ]
-
-    question = models.TextField()
-    category = models.CharField(
-        max_length=50,
-        choices=CATEGORY_CHOICES,
-        default="Category 1"
-    )
-
-    def __str__(self):
-        return self.question
-
 
 class Application(models.Model):
     STATUS_CHOICES = [
@@ -125,11 +108,8 @@ class Application(models.Model):
 
 class Questions(models.Model):
     text = models.TextField()
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='questions'
-    )
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
+
 
     def __str__(self):
         return self.text[:60]
@@ -138,22 +118,13 @@ class Questions(models.Model):
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE)
-    question = models.ForeignKey(
-        QuestionTable,
-        on_delete=models.CASCADE
-    )
-
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
 
     notes = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
-
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'question')
-
-    def __str__(self):
-        return f"{self.user.username} - {self.question}"
