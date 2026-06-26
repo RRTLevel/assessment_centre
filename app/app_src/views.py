@@ -117,8 +117,6 @@ class userprofileView(LoginRequiredMixin, TemplateView):
 
         messages.success(request, "Password updated.")
         return redirect("userprofile")
-
-
 # =========================
 # HOME
 # =========================
@@ -325,6 +323,68 @@ def applicant_form(request, pack_id):
         "pack": pack,
         "form": form,
     })
+
+
+@login_required(login_url='/login')
+def add_question(request):
+    form = QuestionForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        category = form.cleaned_data["category"]
+
+        for i in range(1, 6):
+            text = form.cleaned_data[f"question_{i}"]
+            if text:
+                Questions.objects.create(text=text, category=category)
+
+        return redirect("add_questions")
+
+    questions = Questions.objects.all()
+    return render(request, "add_questions/add_questions.html", {
+        "form": form,
+        "questions": questions
+    })
+
+
+@login_required(login_url='/login')
+def delete_question(request, pk):
+    q = get_object_or_404(Questions, id=pk)
+    if request.method == "POST":
+        q.delete()
+    return redirect("add_questions")
+
+
+@login_required(login_url='/login')
+def create_category(request):
+    form = CategoryForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("categories")
+
+    return render(request, "pre_interview/create_category.html", {
+        "form": form,
+        "categories": Category.objects.all()
+    })
+
+
+@login_required(login_url='/login')
+def delete_category(request, pk):
+    c = get_object_or_404(Category, id=pk)
+    if request.method == "POST":
+        c.delete()
+    return redirect("categories")
+
+
+@login_required(login_url='/login')
+def load_questions(request):
+    category_id = request.GET.get("category")
+
+    if not category_id:
+        return JsonResponse([], safe=False)
+
+    questions = Questions.objects.filter(category_id=category_id).values("id", "text")
+    return JsonResponse(list(questions), safe=False)
 
 
 # =========================

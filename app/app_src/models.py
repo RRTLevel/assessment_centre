@@ -24,9 +24,8 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
-#where the system will gather the data for the form and be able to save it to a database
-from django.db import models
 
+# where the system will gather the data for the form and be able to save it to a database
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, blank=True)
