@@ -108,31 +108,48 @@ class Application(models.Model):
     # USED BY YOUR INBOX CALENDAR
     interview_date = models.DateTimeField(null=True, blank=True)
 
+    # Average of the per-question interview scores, calculated on submit.
+    average_score = models.FloatField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.user.username} - {self.application_id}"
 
 
 class Questions(models.Model):
     text = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
 
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='questions'
-    )
 
     def __str__(self):
         return self.text[:60]
 
 
+class InterviewResult(models.Model):
+    """A scored answer for one applicant (Application) and one interview question."""
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="results"
+    )
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+
+    score = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(blank=True, default='')
+    feedback = models.TextField(blank=True, default='')
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('application', 'question')
+
+    def __str__(self):
+        return f"{self.application.user.username} - {self.question} ({self.score})"
+
+
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    question = models.ForeignKey(
-        Questions,
-        on_delete=models.CASCADE
-    )
-
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
