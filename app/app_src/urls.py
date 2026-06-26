@@ -32,9 +32,10 @@ urlpatterns = [
     # =====================
     # QUESTIONS
     # =====================
-    path('add_questions/', views.add_question, name="add_questions"),
+    path('add_questions/', views.add_question, name='add_questions'),
     path('questions/', views.question_list, name='question_list'),
     path('questions/delete/<int:pk>/', views.delete_question, name='delete_question'),
+    path('ajax/load-questions/', views.load_questions, name='ajax_load_questions'),
 
     # =====================
     # CATEGORIES
@@ -51,19 +52,8 @@ urlpatterns = [
     # APPLICATIONS
     # =====================
     path('applications/', views.applications, name='applications'),
-<<<<<<< Updated upstream
-    path('applications/<uuid:application_id>/', views.application_detail, name='application_detail'),
-    path("application-review/", views.application_review, name="application_review"),
-    path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
-    path('applications/<int:pk>/', views.application_detail, name='application_detail'),
-    path("applications/<uuid:pk>/approve/", views.approve_application, name="approve_application"),
-    path("applications/<uuid:pk>/deny/", views.deny_application, name="deny_application"),
-    path("applications/accepted_applicants/", views.accepted_applicants, name="accepted_applicants"),
-    path("applications/start_interview//<uuid:pk>/", views.start_interview, name="start_interview"),
-=======
     path('application_review/', views.application_review, name='application_review'),
     path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
->>>>>>> Stashed changes
 
     # =====================
     # INBOX
@@ -71,7 +61,7 @@ urlpatterns = [
     path('inbox/', views.inbox_view, name='inbox'),
 
     # =====================
-    # APPLICATION DETAIL (UUID FIXED)
+    # APPLICATION DETAIL
     # =====================
     path(
         'applications/<uuid:application_id>/',
@@ -80,7 +70,7 @@ urlpatterns = [
     ),
 
     # =====================
-    # APPROVE / DENY (UUID FIXED)
+    # APPROVE / DENY
     # =====================
     path(
         'applications/<uuid:application_id>/approve/',
@@ -94,18 +84,21 @@ urlpatterns = [
         name='deny_application'
     ),
 
+    path(
+        'applications/accepted_applicants/',
+        views.accepted_applicants,
+        name='accepted_applicants'
+    ),
+
+    path(
+        'applications/start_interview/<uuid:application_id>/',
+        views.start_interview,
+        name='start_interview'
+    ),
+
     # =====================
     # ERROR PAGES
     # =====================
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
-<<<<<<< Updated upstream
-    path("questions/", views.question_list, name="question_list"),
-    path("questions/delete/<int:pk>/", views.delete_question, name="delete_question"),
-    path('interview/save/', views.interview_save, name='interview_save'),
-    path("ajax/load-questions/", views.load_questions, name="ajax_load_questions"),
-    
 ]
-=======
-]
->>>>>>> Stashed changes

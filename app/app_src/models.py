@@ -24,9 +24,8 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
-#where the system will gather the data for the form and be able to save it to a database
-from django.db import models
 
+# where the system will gather the data for the form and be able to save it to a database
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, blank=True)
@@ -46,36 +45,16 @@ class Pack(models.Model):
         null=True,
         blank=True
     )
-<<<<<<< Updated upstream
-    pre_interview_question_1 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    pre_interview_question_2 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    pre_interview_question_3 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-=======
 
     pre_interview_question_1 = models.CharField(max_length=255, blank=True, null=True)
     pre_interview_question_2 = models.CharField(max_length=255, blank=True, null=True)
     pre_interview_question_3 = models.CharField(max_length=255, blank=True, null=True)
->>>>>>> Stashed changes
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
-<<<<<<< Updated upstream
-=======
 
 class QuestionTable(models.Model):
     CATEGORY_CHOICES = [
@@ -97,7 +76,6 @@ class QuestionTable(models.Model):
         return self.question
 
 
->>>>>>> Stashed changes
 class Application(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -136,17 +114,12 @@ class Application(models.Model):
 
 class Questions(models.Model):
     text = models.TextField()
-<<<<<<< Updated upstream
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
-
-=======
 
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
         related_name='questions'
     )
->>>>>>> Stashed changes
 
     def __str__(self):
         return self.text[:60]
@@ -154,17 +127,12 @@ class Questions(models.Model):
 
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-<<<<<<< Updated upstream
-    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
-=======
 
-    # FIXED: only ONE question field now
     question = models.ForeignKey(
         Questions,
         on_delete=models.CASCADE
     )
 
->>>>>>> Stashed changes
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
@@ -174,11 +142,7 @@ class InterviewResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-<<<<<<< Updated upstream
-        unique_together = ('user', 'question')
-=======
         unique_together = ('user', 'question')
 
     def __str__(self):
         return f"{self.user.username} - {self.question}"
->>>>>>> Stashed changes
