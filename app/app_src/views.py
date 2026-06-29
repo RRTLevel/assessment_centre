@@ -203,18 +203,26 @@ def create_pack(request):
 
 @login_required(login_url='/login')
 def interview(request):
-    questions = Questions.objects.all()
+    questions = Questions.objects.prefetch_related('indicators').all()
     saved = {
         r.question_id: r
         for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
     }
-    question_forms = [
-        (question, InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id)))
-        for question in questions
-    ]
+    question_data = []
+    for question in questions:
+        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
+        positives = list(question.indicators.filter(category='positive'))
+        negatives = list(question.indicators.filter(category='negative'))
+        rows = []
+        for i in range(3):
+            rows.append({
+                'pos': positives[i].text if i < len(positives) else '',
+                'neg': negatives[i].text if i < len(negatives) else '',
+            })
+        question_data.append({'question': question, 'form': form, 'rows': rows})
     return render(request, "interview/interview.html", {
         "questions": questions,
-        "question_forms": question_forms,
+        "question_data": question_data,
         "interview": True
     })
 

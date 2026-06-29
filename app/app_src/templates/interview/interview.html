@@ -54,12 +54,12 @@
 
             <form method="POST" action="{% url 'interview_save' %}">
             {% csrf_token %}
-            {% for question, form in question_forms %}
-            <div class="question-row" data-question-id="{{ question.id }}">
+            {% for item in question_data %}
+            <div class="question-row" data-question-id="{{ item.question.id }}">
 
                 <div class="question-card">
                     <p class="question-text">
-                        {{ question.text }}
+                        {{ item.question.text }}
                     </p>
                 </div>
 
@@ -78,21 +78,21 @@
                             <tbody>
                                 <tr>
                                     <th></th>
-                                    <td>this is a positive</td>
-                                    <td>this is a negative</td>
-                                    <td>{{ form.score_1 }}</td>
+                                    <td class="indicator-positive">{{ item.rows.0.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.0.neg }}</td>
+                                    <td>{{ item.form.score_1 }}</td>
                                 </tr>
                                 <tr>
                                     <th></th>
-                                    <td>this is a positive</td>
-                                    <td>this is a negative</td>
-                                    <td>{{ form.score_2 }}</td>
+                                    <td class="indicator-positive">{{ item.rows.1.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.1.neg }}</td>
+                                    <td>{{ item.form.score_2 }}</td>
                                 </tr>
                                 <tr>
                                     <th></th>
-                                    <td>this is a positive</td>
-                                    <td>this is a negative</td>
-                                    <td>{{ form.score_3 }}</td>
+                                    <td class="indicator-positive">{{ item.rows.2.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.2.neg }}</td>
+                                    <td>{{ item.form.score_3 }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -126,11 +126,11 @@
                     </div>
                     <div class="notes_box">
                         <label class="notes-label">Notes</label>
-                        {{ form.notes }}
+                        {{ item.form.notes }}
                     </div>
                     <div class="feedback_box">
                         <label class="feedback-label">Feedback</label>
-                        {{ form.feedback }}
+                        {{ item.form.feedback }}
                     </div>
                 </div>
 
