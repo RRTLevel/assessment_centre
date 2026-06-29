@@ -538,54 +538,6 @@ def load_questions(request):
 
 
 # =========================
-# INTERVIEW SYSTEM
-# =========================
-
-@login_required(login_url='/login')
-def interview(request):
-    questions = Questions.objects.all()
-
-    saved = {
-        r.question_id: r
-        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
-    }
-
-    question_forms = [
-        (q, InterviewResponseForm(instance=saved.get(q.id), prefix=str(q.id)))
-        for q in questions
-    ]
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_forms": question_forms
-    })
-
-
-@login_required(login_url='/login')
-def interview_save(request):
-    if request.method == "POST":
-        for q in Questions.objects.all():
-            existing = InterviewResponse.objects.filter(
-                user=request.user,
-                question=q
-            ).first()
-
-            form = InterviewResponseForm(
-                request.POST,
-                instance=existing,
-                prefix=str(q.id)
-            )
-
-            if form.is_valid():
-                obj = form.save(commit=False)
-                obj.user = request.user
-                obj.question = q
-                obj.save()
-
-    return redirect("interview")
-
-
-# =========================
 # INBOX (CALENDAR)
 # =========================
 
