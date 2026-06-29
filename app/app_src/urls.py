@@ -60,6 +60,7 @@ urlpatterns = [
     path('application-review/',views.application_review,name='application_review'),
     path("application-review/<uuid:application_id>/",views.application_detail,name="application_detail"),
     path("accepted-applicants/",views.accepted_applicants,name="accepted_applicants"),
+    path("interview/<uuid:application_id>/", views.start_interview, name="start_interview"),
 
     # Questions
     path('questions/', views.question_list, name="question_list"),

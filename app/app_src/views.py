@@ -1,63 +1,59 @@
-import datetime
 import calendar
+import datetime
 
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse, reverse_lazy
-from django.views import View
-from django.views.generic import TemplateView
-from django.views.generic.edit import CreateView
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-
-from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm, IndicatorForm
-from .models import Note, Pack, QuestionTable, Application, InterviewResponse, Indicator
-
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import JsonResponse
-from django.utils import timezone
-from django.utils.dateparse import parse_datetime
 from django.db.models import Avg
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.views import View
+from django.views.generic import TemplateView
+from django.views.generic.edit import CreateView
 
 from .forms import (
     AddNoteForm,
-    DomainUserCreationForm,
-    PackForm,
     ApplicantForm,
     CategoryForm,
+    DomainUserCreationForm,
+    IndicatorForm,
     InterviewResponseForm,
+    PackForm,
     QuestionForm,
 )
 from .models import (
-    Note,
-    Pack,
     Application,
+    Category,
+    Indicator,
     InterviewResponse,
     InterviewResult,
+    Note,
+    Pack,
     Questions,
-    Category,
 )
+from .permissions import ASSESSOR_GROUP, ECAM_GROUP, ECD_GROUP, group_required
 
-
-# =========================
-# AUTH
-# =========================
 
 class RememberMeLoginView(LoginView):
     template_name = "registration/login.html"
-
-    # Keep the session alive for 30 days when "remember me" is ticked.
     REMEMBER_ME_AGE = 60 * 60 * 24 * 30
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Invalid username or password.")
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         if self.request.POST.get("remember_me"):
             self.request.session.set_expiry(self.REMEMBER_ME_AGE)
         else:
             self.request.session.set_expiry(0)
+
         return super().form_valid(form)
 
 
@@ -84,17 +80,13 @@ class SignUpView(SuccessMessageMixin, CreateView):
     template_name = "registration/signup.html"
 
 
-# =========================
-# USER PROFILE
-# =========================
-
 class userprofileView(LoginRequiredMixin, TemplateView):
-    login_url = '/login'
-    template_name = 'notes/userprofile.html'
+    login_url = "/login"
+    template_name = "notes/userprofile.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = settings.APPLICATION_NAME + ' - Profile'
+        context["page_title"] = settings.APPLICATION_NAME + " - Profile"
         context["AccountType"] = self.request.user.groups.first()
         return context
 
@@ -119,23 +111,21 @@ class userprofileView(LoginRequiredMixin, TemplateView):
         user.set_password(new_pass1)
         user.save()
         update_session_auth_hash(request, user)
-
         messages.success(request, "Password updated.")
         return redirect("userprofile")
-# =========================
-# HOME
-# =========================
+
 
 class homeView(LoginRequiredMixin, CreateView):
-    login_url = '/login'
+    login_url = "/login"
     form_class = AddNoteForm
     model = Note
-    template_name = 'notes/notes.html'
+    template_name = "notes/notes.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["notes"] = Note.objects.order_by('-pub_date')[:5]
-        context["page_title"] = settings.APPLICATION_NAME + ' - Notes'
+        context["home"] = True
+        context["notes"] = Note.objects.order_by("-pub_date")[:5]
+        context["page_title"] = settings.APPLICATION_NAME + " - Notes"
         return context
 
     def form_valid(self, form):
@@ -143,12 +133,8 @@ class homeView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('home')
+        return reverse("home")
 
-
-# =========================
-# STATIC PAGES
-# =========================
 
 def documentationView(request):
     return render(request, "notes/documentation.html")
@@ -156,39 +142,6 @@ def documentationView(request):
 
 def helpView(request):
     return render(request, "help/help.html")
-
-
-@login_required(login_url='/login')
-def add_indicators(request):
-    if request.method == 'POST':
-        form = IndicatorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('add_indicators')
-    else:
-        form = IndicatorForm()
-
-    questions = Questions.objects.prefetch_related('indicators').all()
-    return render(request, 'indicators/add_indicators.html', {
-        'page_title': settings.APPLICATION_NAME + ' - Add Indicators',
-        'form': form,
-        'questions': questions,
-    })
-
-
-@login_required(login_url='/login')
-def resultsView(request):
-    questions = Questions.objects.all()
-    questions_with_responses = [
-        (question, InterviewResponse.objects.filter(question=question).select_related('user'))
-        for question in questions
-    ]
-    total_responses = InterviewResponse.objects.count()
-    return render(request, 'results/results.html', {
-        'page_title': settings.APPLICATION_NAME + ' - Results',
-        'questions_with_responses': questions_with_responses,
-        'total_responses': total_responses,
-    })
 
 
 class Custom404View(TemplateView):
@@ -199,273 +152,128 @@ class Custom500View(TemplateView):
     template_name = "500.html"
 
 
-# =========================
-# PACKS
-# =========================
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
+def add_indicators(request):
+    if request.method == "POST":
+        form = IndicatorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("add_indicators")
+    else:
+        form = IndicatorForm()
 
-@login_required(login_url='/login')
+    questions = Questions.objects.prefetch_related("indicators").all()
+    return render(request, "indicators/add_indicators.html", {
+        "page_title": settings.APPLICATION_NAME + " - Add Indicators",
+        "form": form,
+        "questions": questions,
+    })
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def resultsView(request):
+    questions = Questions.objects.all()
+    questions_with_responses = [
+        (question, InterviewResponse.objects.filter(question=question).select_related("user"))
+        for question in questions
+    ]
+    total_responses = InterviewResponse.objects.count()
+    return render(request, "results/results.html", {
+        "page_title": settings.APPLICATION_NAME + " - Results",
+        "questions_with_responses": questions_with_responses,
+        "total_responses": total_responses,
+    })
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
 def applications(request):
-    packs = Pack.objects.all()
-    return render(request, "pre_interview/applications.html", {"packs": packs})
+    packs = Pack.objects.all().order_by("-created_at")
+    return render(request, "pre_interview/applications.html", {
+        "packs": packs,
+        "applications": True,
+    })
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
 def create_pack(request):
     form = PackForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        return redirect('applications')
+        return redirect("applications")
 
-    return render(request, "pre_interview/create_pack.html", {"form": form})
-
-
-@login_required(login_url='/login')
-def interview(request):
-    questions = Questions.objects.prefetch_related('indicators').all()
-    saved = {
-        r.question_id: r
-        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
-    }
-    question_data = []
-    for question in questions:
-        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
-        positives = list(question.indicators.filter(category='positive'))
-        negatives = list(question.indicators.filter(category='negative'))
-        rows = []
-        for i in range(3):
-            rows.append({
-                'pos': positives[i].text if i < len(positives) else '',
-                'neg': negatives[i].text if i < len(negatives) else '',
-            })
-        question_data.append({'question': question, 'form': form, 'rows': rows})
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_data": question_data,
-        "interview": True
+    return render(request, "pre_interview/create_pack.html", {
+        "form": form,
+        "create_pack": True,
     })
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+def interview(request):
+    questions = Questions.objects.prefetch_related("indicators").all()
+    saved = {
+        response.question_id: response
+        for response in InterviewResponse.objects.filter(user=request.user, question__in=questions)
+    }
+
+    question_data = []
+    for question in questions:
+        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
+        positives = list(question.indicators.filter(category="positive"))
+        negatives = list(question.indicators.filter(category="negative"))
+        rows = []
+
+        for i in range(3):
+            rows.append({
+                "pos": positives[i].text if i < len(positives) else "",
+                "neg": negatives[i].text if i < len(negatives) else "",
+            })
+
+        question_data.append({"question": question, "form": form, "rows": rows})
+
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "question_data": question_data,
+        "interview": True,
+    })
+
+
+@login_required(login_url="/login")
 def interview_save(request):
-    if request.method == 'POST':
-        questions = Questions.objects.all()
-        for question in questions:
-            existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
+    if request.method == "POST":
+        for question in Questions.objects.all():
+            existing = InterviewResponse.objects.filter(
+                user=request.user,
+                question=question,
+            ).first()
             form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
+
             if form.is_valid():
                 response = form.save(commit=False)
                 response.user = request.user
                 response.question = question
                 response.save()
-    return redirect('interview')
+
+    return redirect("interview")
 
 
-@login_required(login_url='/login')
-def applicant_form(request, pack_id):
-    pack = get_object_or_404(Pack, id=pack_id)
-
-    if request.method == "POST":
-        form = ApplicantForm(request.POST)
-
-        if form.is_valid():
-            answers = form.cleaned_data
-
-            Application.objects.create(
-                user=request.user,
-                pack=pack,
-                answer_1=answers["answer_1"],
-                answer_2=answers["answer_2"],
-                answer_3=answers["answer_3"],
-            )
-            return redirect("applications")
-    else:
-        form = ApplicantForm()
-
-    return render(
-        request,
-        "pre_interview/applicant_form.html",
-        {
-            "pack": pack,
-            "form": form,
-        }
-    )
-
-
-def add_question(request):
-    if request.method == "POST":
-        form = QuestionForm(request.POST)
-
-        if form.is_valid():
-            category = form.cleaned_data["category"]
-
-            for i in range(1, 6):
-                question_text = form.cleaned_data[f"question_{i}"]
-
-                if question_text and question_text.strip():
-                    Questions.objects.create(
-                        text=question_text,
-                        category=category
-                    )
-
-            return redirect("add_questions")  
-
-    else:
-        form = QuestionForm()
-
-    questions = Questions.objects.select_related("category").all().order_by("-id")
-
-    return render(
-        request,
-        "add_questions/add_questions.html",
-        {
-            "form": form,
-            "questions": questions
-        }
-    )
-
-
-def delete_question(request, pk):
-    question = get_object_or_404(Questions, id=pk)
-
-    if request.method == "POST":
-        question.delete()
-
-    return redirect("add_questions")
-
-# =========================
-# APPLICATION REVIEW
-# =========================
-@login_required(login_url='/login')
-def application_review(request):
-    applications_list = Application.objects.select_related('user', 'pack')
-    return render(request, "pre_interview/application_review.html", {
-        "applications": applications_list
-    })
-
-
-@login_required(login_url='/login')
-def application_detail(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
-    return render(request, "pre_interview/view_more.html", {"application": application})
-
-
-# =========================
-# APPROVE / DENY
-# =========================
-
-@login_required(login_url='/login')
-def approve_application(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
-
-    if request.method == "POST":
-        application.status = "Accepted"
-
-        interview_date = request.POST.get("interview_date")
-        if interview_date:
-            application.interview_date = interview_date
-
-        application.save()
-        messages.success(
-            request,
-            f"Application for {application.user.username} approved successfully!"
-        )
-        return redirect("application_review")
-
-    return render(request, "pre_interview/schedule_interview.html", {
-        "application": application
-    })
-
-
-@login_required(login_url='/login')
-def deny_application(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
-
-    if request.method == "POST":
-        application.status = "Denied"
-        application.save()
-        messages.error(
-            request,
-            f"Application for {application.user.username} was denied."
-        )
-
-    return redirect('application_review')
-
-
-@login_required(login_url='/login')
-def accepted_applicants(request):
-    applicants = Application.objects.filter(status="Accepted")
-    return render(request, "pre_interview/accepted_applicants.html", {
-        "applicants": applicants
-    })
-
-
-@login_required(login_url='/login')
-def start_interview(request, application_id):
-    application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(category=application.pack.category)
-
-    if request.method == "POST":
-        scores = []
-
-        for q in questions:
-            score_raw = request.POST.get(f"score_{q.id}")
-            notes = request.POST.get(f"notes_{q.id}", "")
-            feedback = request.POST.get(f"feedback_{q.id}", "")
-
-            score = int(score_raw) if score_raw and score_raw.isdigit() else None
-            if score is not None:
-                scores.append(score)
-
-            InterviewResult.objects.update_or_create(
-                application=application,
-                question=q,
-                defaults={
-                    "score": score,
-                    "notes": notes,
-                    "feedback": feedback,
-                },
-            )
-
-        # Backend math: average of the scores that were filled in.
-        application.average_score = round(sum(scores) / len(scores), 2) if scores else None
-        application.save()
-
-        messages.success(
-            request,
-            f"Interview for {application.user.username} submitted."
-        )
-        return redirect("inbox")
-
-    # GET: pre-fill any results already saved for this applicant.
-    saved = {r.question_id: r for r in application.results.all()}
-    question_results = [(q, saved.get(q.id)) for q in questions]
-
-    return render(request, "pre_interview/start_interview.html", {
-        "application": application,
-        "questions": questions,
-        "question_results": question_results,
-    })
-
-
-# =========================
-# APPLICATION FORM
-# =========================
-
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
 def applicant_form(request, pack_id):
     pack = get_object_or_404(Pack, id=pack_id)
     form = ApplicantForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        answers = form.cleaned_data
-
         Application.objects.create(
             user=request.user,
             pack=pack,
-            answer_1=answers["answer_1"],
-            answer_2=answers["answer_2"],
-            answer_3=answers["answer_3"],
+            answer_1=form.cleaned_data["answer_1"],
+            answer_2=form.cleaned_data["answer_2"],
+            answer_3=form.cleaned_data["answer_3"],
         )
         return redirect("applications")
 
@@ -475,36 +283,49 @@ def applicant_form(request, pack_id):
     })
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
 def add_question(request):
     form = QuestionForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         category = form.cleaned_data["category"]
-
         for i in range(1, 6):
             text = form.cleaned_data[f"question_{i}"]
-            if text:
+            if text and text.strip():
                 Questions.objects.create(text=text, category=category)
 
         return redirect("add_questions")
 
-    questions = Questions.objects.all()
+    questions = Questions.objects.select_related("category").all().order_by("-id")
     return render(request, "add_questions/add_questions.html", {
         "form": form,
-        "questions": questions
+        "questions": questions,
+        "add_question": True,
     })
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
+def question_list(request):
+    questions = Questions.objects.select_related("category").order_by("-id")
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions,
+        "add_question": True,
+    })
+
+
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
 def delete_question(request, pk):
-    q = get_object_or_404(Questions, id=pk)
+    question = get_object_or_404(Questions, pk=pk)
     if request.method == "POST":
-        q.delete()
-    return redirect("add_questions")
+        question.delete()
+    return redirect("question_list")
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
 def create_category(request):
     form = CategoryForm(request.POST or None)
 
@@ -514,19 +335,20 @@ def create_category(request):
 
     return render(request, "pre_interview/create_category.html", {
         "form": form,
-        "categories": Category.objects.all()
+        "categories": Category.objects.all(),
     })
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ASSESSOR_GROUP)
 def delete_category(request, pk):
-    c = get_object_or_404(Category, id=pk)
+    category = get_object_or_404(Category, id=pk)
     if request.method == "POST":
-        c.delete()
+        category.delete()
     return redirect("categories")
 
 
-@login_required(login_url='/login')
+@login_required(login_url="/login")
 def load_questions(request):
     category_id = request.GET.get("category")
 
@@ -537,63 +359,116 @@ def load_questions(request):
     return JsonResponse(list(questions), safe=False)
 
 
-# =========================
-# INTERVIEW SYSTEM
-# =========================
-
-@login_required(login_url='/login')
-def interview(request):
-    questions = Questions.objects.all()
-
-    saved = {
-        r.question_id: r
-        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
-    }
-
-    question_forms = [
-        (q, InterviewResponseForm(instance=saved.get(q.id), prefix=str(q.id)))
-        for q in questions
-    ]
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_forms": question_forms
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def application_review(request):
+    applications_list = Application.objects.select_related("user", "pack")
+    return render(request, "pre_interview/application_review.html", {
+        "applications": applications_list,
+        "applications_active": True,
     })
 
 
-@login_required(login_url='/login')
-def interview_save(request):
-    if request.method == "POST":
-        for q in Questions.objects.all():
-            existing = InterviewResponse.objects.filter(
-                user=request.user,
-                question=q
-            ).first()
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def application_detail(request, application_id):
+    application = get_object_or_404(Application, application_id=application_id)
+    return render(request, "pre_interview/view_more.html", {
+        "application": application,
+    })
 
-            form = InterviewResponseForm(
-                request.POST,
-                instance=existing,
-                prefix=str(q.id)
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def approve_application(request, pk=None, application_id=None):
+    lookup_id = application_id or pk
+    application = get_object_or_404(Application, application_id=lookup_id)
+
+    if request.method == "POST":
+        interview_date = request.POST.get("interview_date")
+        application.status = "Accepted"
+        if interview_date:
+            application.interview_date = interview_date
+        application.save()
+        messages.success(request, f"Application for {application.user.username} approved successfully!")
+        return redirect("application_review")
+
+    return render(request, "pre_interview/schedule_interview.html", {
+        "application": application,
+    })
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def deny_application(request, pk=None, application_id=None):
+    lookup_id = application_id or pk
+    application = get_object_or_404(Application, application_id=lookup_id)
+
+    if request.method == "POST":
+        application.status = "Denied"
+        application.save()
+        messages.error(request, f"Application for {application.user.username} was denied.")
+
+    return redirect("application_review")
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def accepted_applicants(request):
+    applicants = Application.objects.filter(status="Accepted")
+    return render(request, "pre_interview/accepted_applicants.html", {
+        "applicants": applicants,
+        "applications": True,
+    })
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def start_interview(request, application_id):
+    application = get_object_or_404(Application, application_id=application_id)
+    questions = Questions.objects.filter(category=application.pack.category)
+
+    if request.method == "POST":
+        scores = []
+
+        for question in questions:
+            score_raw = request.POST.get(f"score_{question.id}")
+            notes = request.POST.get(f"notes_{question.id}", "")
+            feedback = request.POST.get(f"feedback_{question.id}", "")
+            score = int(score_raw) if score_raw and score_raw.isdigit() else None
+
+            if score is not None:
+                scores.append(score)
+
+            InterviewResult.objects.update_or_create(
+                application=application,
+                question=question,
+                defaults={
+                    "score": score,
+                    "notes": notes,
+                    "feedback": feedback,
+                },
             )
 
-            if form.is_valid():
-                obj = form.save(commit=False)
-                obj.user = request.user
-                obj.question = q
-                obj.save()
+        application.average_score = round(sum(scores) / len(scores), 2) if scores else None
+        application.save()
+        messages.success(request, f"Interview for {application.user.username} submitted.")
+        return redirect("inbox")
 
-    return redirect("interview")
+    saved = {result.question_id: result for result in application.results.all()}
+    question_results = [(question, saved.get(question.id)) for question in questions]
+
+    return render(request, "pre_interview/start_interview.html", {
+        "application": application,
+        "questions": questions,
+        "question_results": question_results,
+    })
 
 
-# =========================
-# INBOX (CALENDAR)
-# =========================
-
-@login_required(login_url='/login')
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
 def inbox_view(request):
     today = datetime.date.today()
-
-    # Read parameters from the URL, guarding against empty/non-numeric values.
     year_param = request.GET.get("year")
     month_param = request.GET.get("month")
 
@@ -603,7 +478,6 @@ def inbox_view(request):
     if month < 1 or month > 12:
         month = today.month
 
-    # Targets for the previous/next navigation links.
     if month == 1:
         prev_month, prev_year = 12, year - 1
     else:
@@ -617,227 +491,44 @@ def inbox_view(request):
     now = timezone.now()
 
     upcoming_interviews = (
-        Application.objects.filter(
-            interview_date__gte=now
-        )
+        Application.objects.filter(interview_date__gte=now)
         .select_related("user", "pack")
         .prefetch_related("results__question")
         .order_by("interview_date")
     )
 
     past_interviews = (
-        Application.objects.filter(
-            interview_date__lt=now
-        )
-        .annotate(
-            avg_score=Avg("results__score")
-        )
+        Application.objects.filter(interview_date__lt=now)
+        .annotate(avg_score=Avg("results__score"))
         .select_related("user", "pack")
         .prefetch_related("results__question")
         .order_by("-interview_date")
     )
 
     month_interviews = Application.objects.filter(
-    interview_date__year=year,
-    interview_date__month=month,
+        interview_date__year=year,
+        interview_date__month=month,
     )
-
-
     marked_days = {
-        a.interview_date.day
-        for a in month_interviews
-        if a.interview_date
+        application.interview_date.day
+        for application in month_interviews
+        if application.interview_date
     }
 
     cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(year, month)
 
     return render(request, "pre_interview/inbox.html", {
-    "month_days": month_days,
-    "month_name": calendar.month_name[month],
-    "year": year,
-    "today_day": today.day if today.month == month else None,
-    "marked_days": marked_days,
-
-    "upcoming_interviews": upcoming_interviews,
-    "past_interviews": past_interviews,
-
-    "prev_month": prev_month,
-    "prev_year": prev_year,
-    "next_month": next_month,
-    "next_year": next_year,
-})
-
-
-# =========================
-# QUESTIONS
-# =========================
-
-@login_required(login_url='/login')
-def add_question(request):
-    form = QuestionForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        category = form.cleaned_data["category"]
-
-        for i in range(1, 6):
-            text = form.cleaned_data[f"question_{i}"]
-            if text:
-                Questions.objects.create(text=text, category=category)
-
-        return redirect("add_questions")
-
-    return render(request, "add_questions/add_questions.html", {
-        "form": form,
-        "questions": Questions.objects.all()
+        "month_days": month_days,
+        "month_name": calendar.month_name[month],
+        "year": year,
+        "today_day": today.day if today.month == month else None,
+        "marked_days": marked_days,
+        "upcoming_interviews": upcoming_interviews,
+        "past_interviews": past_interviews,
+        "prev_month": prev_month,
+        "prev_year": prev_year,
+        "next_month": next_month,
+        "next_year": next_year,
+        "applications": True,
     })
-
-
-def delete_question(request, pk):
-    question = get_object_or_404(Questions, id=pk)
-
-    if request.method == "POST":
-        question.delete()
-
-    return redirect("add_questions")
-
-
-@login_required(login_url='/login')
-def application_review(request):
-    applications_list = Application.objects.all().select_related('user', 'pack')
-    return render(
-        request, 
-        "pre_interview/application_review.html", 
-        {"applications": applications_list}
-    )
-
-@login_required(login_url='/login')
-def approve_application(request, pk):
-    application = get_object_or_404(Application, application_id=pk)
-
-    if request.method == "POST":
-        interview_date = request.POST.get("interview_date")
-        application.status = "Accepted"
-        application.interview_date = interview_date
-        application.save()
-        messages.success(request, f"Application for {application.user.username} approved successfully!")
-
-        return redirect("application_review")
-
-    return render(request, "pre_interview/schedule_interview.html", {"application": application})
-
-
-@login_required(login_url='/login')
-def deny_application(request, pk):
-    application = get_object_or_404(Application, application_id=pk)
-    
-    if request.method == "POST":
-        application.status = 'Denied'
-        application.save()
-        messages.error(request, f"Application for {application.user.username} was denied.")
-        
-    return redirect('application_review')
-@login_required(login_url='/login')
-def question_list(request):
-    questions = Questions.objects.select_related('category').order_by('-id')
-    return render(request, "add_questions/question_list.html", {
-        "questions": questions
-    })
-
-
-@login_required(login_url='/login')
-def delete_question(request, pk):
-    question = get_object_or_404(Questions, pk=pk)
-    if request.method == "POST":
-        question.delete()
-    return redirect("question_list")
-
-
-@login_required(login_url='/login')
-def load_questions(request):
-    category_id = request.GET.get("category")
-
-    if not category_id:
-        return JsonResponse([], safe=False)
-
-    questions = Questions.objects.filter(category_id=category_id).values("id", "text")
-    return JsonResponse(list(questions), safe=False)
-
-
-# =========================
-# CATEGORIES
-# =========================
-
-@login_required(login_url='/login')
-def create_category(request):
-    form = CategoryForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return redirect("categories")
-
-    return render(request, "pre_interview/create_category.html", {
-        "form": form,
-        "categories": Category.objects.all()
-    })
-
-
-@login_required(login_url='/login')
-def delete_category(request, pk):
-    category = get_object_or_404(Category, id=pk)
-    if request.method == "POST":
-        category.delete()
-    return redirect("categories")
-
-@login_required(login_url='/login')
-def application_detail(request, application_id):
-    application = get_object_or_404(
-        Application,
-        application_id=application_id
-    )
-
-    return render(request, "pre_interview/view_more.html", {
-        "application": application
-    })
-class RememberMeLoginView(LoginView):
-    template_name = "registration/login.html"
-
-    def form_valid(self, form):
-        remember_me = self.request.POST.get("remember_me")
-
-        if remember_me:
-            self.request.session.set_expiry(60 * 60 * 24 * 30)
-        else:
-            self.request.session.set_expiry(0)
-
-        return super().form_valid(form)
-
-def question_list(request):
-    questions = Questions.objects.all().order_by("-id")
-
-    return render(request, "add_questions/question_list.html", {
-        "questions": questions
-    })
-
-def delete_question(request, pk):
-    question = get_object_or_404(Questions, pk=pk)
-
-    if request.method == "POST":
-        question.delete()
-        return redirect("question_list")
-
-    return redirect("question_list")
-
-
-def load_questions(request):
-    category_id = request.GET.get("category")
-
-    if not category_id:
-        return JsonResponse([], safe=False)
-
-    questions = Questions.objects.filter(category_id=category_id).values(
-        "id",
-        "text"
-    )
-
-    return JsonResponse(list(questions), safe=False)
