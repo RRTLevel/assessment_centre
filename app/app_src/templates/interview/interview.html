@@ -1,55 +1,35 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
 
-<head>
-    <title>Interview</title>
-    {% load static %}
-    <meta charset="utf-8">
+{% block content %}
 
-    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
-    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+<br>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
-
-    <script>
-        (function () {
-            const savedTheme = localStorage.getItem('siteTheme') || 'system';
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
-
-            document.documentElement.dataset.theme = activeTheme;
-            document.documentElement.dataset.themePreference = savedTheme;
-        })();
-    </script>
-
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-
-<body>
-
-<header>
-    {% include 'includes/title.html' %}
-    {% include 'includes/nav.html' %}
-</header>
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Interview Questions</h1>
+      <p class="rr-white">
+        Total Questions: {{ questions|length }}
+      </p>
+    </div>
+  </div>
+</section>
 
 <main class="section">
 <div class="container interview-container">
 
     <main class="section">
 
-        <div class="container interview-container">
+<!--        <div class="container interview-container">-->
 
-            {% block content %}
-
-            <div class="interview-header">
-                <h1 class="title interview-title">
-                    Interview Questions
-                </h1>
-                <p class="interview-count">
-                    Total Questions: {{ questions|length }}
-                </p>
-            </div>
+<!--            <div class="interview-header">-->
+<!--                <h1 class="title interview-title">-->
+<!--                    Interview Questions-->
+<!--                </h1>-->
+<!--                <p class="interview-count">-->
+<!--                    Total Questions: {{ questions|length }}-->
+<!--                </p>-->
+<!--            </div>-->
 
             <form method="POST" action="{% url 'interview_save' %}">
             {% csrf_token %}
@@ -95,8 +75,6 @@
                                 </tr>
                             </tbody>
                         </table>
-
-                        <!--<button class="add-row-btn" onclick="addRow()">+</button>-->
 
                         <script>
                         function addRow() {
@@ -148,14 +126,11 @@
             </div>
             </form>
 
-            {% endblock %}
-
         </div>
 
     </main>
 
-    {% include 'includes/footer.html' %}
+</div>
+</main>
 
-</body>
-
-</html>
+{% endblock %}
