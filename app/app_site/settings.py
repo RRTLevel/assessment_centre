@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
 
 # Set the application Name, Version and Environment
 APPLICATION_NAME = "Rolls Royce"
-APPLICATION_VERSION = "ersion: x"
+APPLICATION_VERSION = "1.21.2"
 APPLICATION_ENVIRONMENT = os.getenv("APPLICATION_ENVIRONMENT", default="local")
 
 # A list representing the host/domain names to serve to
