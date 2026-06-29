@@ -11,6 +11,11 @@ from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+
+from .forms import AddNoteForm, DomainUserCreationForm, PackForm, ApplicantForm, CategoryForm, InterviewResponseForm, IndicatorForm
+from .models import Note, Pack, QuestionTable, Application, InterviewResponse, Indicator
+
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import JsonResponse
@@ -153,6 +158,39 @@ def helpView(request):
     return render(request, "help/help.html")
 
 
+@login_required(login_url='/login')
+def add_indicators(request):
+    if request.method == 'POST':
+        form = IndicatorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_indicators')
+    else:
+        form = IndicatorForm()
+
+    questions = Questions.objects.prefetch_related('indicators').all()
+    return render(request, 'indicators/add_indicators.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Add Indicators',
+        'form': form,
+        'questions': questions,
+    })
+
+
+@login_required(login_url='/login')
+def resultsView(request):
+    questions = Questions.objects.all()
+    questions_with_responses = [
+        (question, InterviewResponse.objects.filter(question=question).select_related('user'))
+        for question in questions
+    ]
+    total_responses = InterviewResponse.objects.count()
+    return render(request, 'results/results.html', {
+        'page_title': settings.APPLICATION_NAME + ' - Results',
+        'questions_with_responses': questions_with_responses,
+        'total_responses': total_responses,
+    })
+
+
 class Custom404View(TemplateView):
     template_name = "404.html"
 
@@ -182,10 +220,122 @@ def create_pack(request):
     return render(request, "pre_interview/create_pack.html", {"form": form})
 
 
+@login_required(login_url='/login')
+def interview(request):
+    questions = Questions.objects.prefetch_related('indicators').all()
+    saved = {
+        r.question_id: r
+        for r in InterviewResponse.objects.filter(user=request.user, question__in=questions)
+    }
+    question_data = []
+    for question in questions:
+        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
+        positives = list(question.indicators.filter(category='positive'))
+        negatives = list(question.indicators.filter(category='negative'))
+        rows = []
+        for i in range(3):
+            rows.append({
+                'pos': positives[i].text if i < len(positives) else '',
+                'neg': negatives[i].text if i < len(negatives) else '',
+            })
+        question_data.append({'question': question, 'form': form, 'rows': rows})
+    return render(request, "interview/interview.html", {
+        "questions": questions,
+        "question_data": question_data,
+        "interview": True
+    })
+
+
+@login_required(login_url='/login')
+def interview_save(request):
+    if request.method == 'POST':
+        questions = Questions.objects.all()
+        for question in questions:
+            existing = InterviewResponse.objects.filter(user=request.user, question=question).first()
+            form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
+            if form.is_valid():
+                response = form.save(commit=False)
+                response.user = request.user
+                response.question = question
+                response.save()
+    return redirect('interview')
+
+
+@login_required(login_url='/login')
+def applicant_form(request, pack_id):
+    pack = get_object_or_404(Pack, id=pack_id)
+
+    if request.method == "POST":
+        form = ApplicantForm(request.POST)
+
+        if form.is_valid():
+            answers = form.cleaned_data
+
+            Application.objects.create(
+                user=request.user,
+                pack=pack,
+                answer_1=answers["answer_1"],
+                answer_2=answers["answer_2"],
+                answer_3=answers["answer_3"],
+            )
+            return redirect("applications")
+    else:
+        form = ApplicantForm()
+
+    return render(
+        request,
+        "pre_interview/applicant_form.html",
+        {
+            "pack": pack,
+            "form": form,
+        }
+    )
+
+
+def add_question(request):
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+
+        if form.is_valid():
+            category = form.cleaned_data["category"]
+
+            for i in range(1, 6):
+                question_text = form.cleaned_data[f"question_{i}"]
+
+                if question_text and question_text.strip():
+                    Questions.objects.create(
+                        text=question_text,
+                        category=category
+                    )
+
+            return redirect("add_questions")  
+
+    else:
+        form = QuestionForm()
+
+    questions = Questions.objects.select_related("category").all().order_by("-id")
+
+    return render(
+        request,
+        "add_questions/add_questions.html",
+        {
+            "form": form,
+            "questions": questions
+        }
+    )
+
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, id=pk)
+
+    if request.method == "POST":
+        question.delete()
+
+    return redirect("add_questions")
+
 # =========================
 # APPLICATION REVIEW
 # =========================
-
 @login_required(login_url='/login')
 def application_review(request):
     applications_list = Application.objects.select_related('user', 'pack')

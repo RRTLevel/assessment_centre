@@ -36,72 +36,126 @@
 <main class="section">
 <div class="container interview-container">
 
-    <div class="interview-header">
-        <h1 class="title interview-title">Interview Questions</h1>
-        <p class="interview-count">
-            Total Questions: {{ questions|length }}
-        </p>
-    </div>
+    <main class="section">
 
-    {% for question in questions %}
+        <div class="container interview-container">
 
-        <div class="question-row">
+            {% block content %}
 
-            <div class="question-card">
-                <p class="question-text">{{ question.text }}</p>
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Interview Questions
+                </h1>
+                <p class="interview-count">
+                    Total Questions: {{ questions|length }}
+                </p>
             </div>
 
-            <div class="Score-Box">
+            <form method="POST" action="{% url 'interview_save' %}">
+            {% csrf_token %}
+            {% for item in question_data %}
+            <div class="question-row" data-question-id="{{ item.question.id }}">
 
-                <div class="table-container">
-                    <table class="score-table" id="scoreTable-{{ forloop.counter }}">
-                        <thead>
-                        <tr>
-                            <th>indicators</th>
-                            <th>positive</th>
-                            <th>negative</th>
-                            <th>score</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        <tr>
-                            <th></th>
-                            <td>this is a positive</td>
-                            <td>this is a negative</td>
-                            <td>
-                                <input type="number" min="1" max="6" step="1" class="score-input">
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="question-card">
+                    <p class="question-text">
+                        {{ item.question.text }}
+                    </p>
                 </div>
 
-                <div class="notes_box">
-                    <label for="notes-{{ forloop.counter }}">Notes</label>
-                    <textarea id="notes-{{ forloop.counter }}" class="notes-textarea"></textarea>
+                <div class="Score-Box">
+                    <div class="table-container">
+                        <table class="score-table" id="scoreTable">
+                            <thead>
+                                <tr>
+                                    <th>indicators</th>
+                                    <th>positive</th>
+                                    <th>negative</th>
+                                    <th>score</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <th></th>
+                                    <td class="indicator-positive">{{ item.rows.0.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.0.neg }}</td>
+                                    <td>{{ item.form.score_1 }}</td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td class="indicator-positive">{{ item.rows.1.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.1.neg }}</td>
+                                    <td>{{ item.form.score_2 }}</td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td class="indicator-positive">{{ item.rows.2.pos }}</td>
+                                    <td class="indicator-negative">{{ item.rows.2.neg }}</td>
+                                    <td>{{ item.form.score_3 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!--<button class="add-row-btn" onclick="addRow()">+</button>-->
+
+                        <script>
+                        function addRow() {
+                            const table = document
+                                .getElementById("scoreTable")
+                                .getElementsByTagName("tbody")[0];
+
+                            const newRow = table.insertRow();
+
+                            newRow.innerHTML = `
+                                <th></th>
+                                <td>this is a positive</td>
+                                <td>this is a negative</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="6"
+                                        step="1"
+                                        class="score-input"
+                                    >
+                                </td>
+                            `;
+                        }
+                        </script>
+                    </div>
+                    <div class="notes_box">
+                        <label class="notes-label">Notes</label>
+                        {{ item.form.notes }}
+                    </div>
+                    <div class="feedback_box">
+                        <label class="feedback-label">Feedback</label>
+                        {{ item.form.feedback }}
+                    </div>
                 </div>
 
-                <div class="feedback_box">
-                    <label for="feedback-{{ forloop.counter }}">Feedback</label>
-                    <textarea id="feedback-{{ forloop.counter }}" class="feedback-textarea"></textarea>
-                </div>
+            {% empty %}
 
+            <div class="no-questions">
+                No interview questions available.
             </div>
+
+            {% endfor %}
+
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">
+                    Submit
+                </button>
+            </div>
+            </form>
+
+            {% endblock %}
+
         </div>
 
-    {% empty %}
-        <div class="no-questions">
-            No interview questions available.
-        </div>
-    {% endfor %}
+    </main>
 
-    <div class="submit-section">
-        <button class="submit-btn">Submit</button>
-    </div>
-
-</div>
-</main>
+    {% include 'includes/footer.html' %}
 
 </body>
+
 </html>

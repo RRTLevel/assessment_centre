@@ -124,6 +124,18 @@ class Questions(models.Model):
         return self.text[:60]
 
 
+class Indicator(models.Model):
+    CATEGORY_CHOICES = [
+        ('positive', 'Positive'),
+        ('negative', 'Negative'),
+    ]
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE, related_name='indicators')
+    text = models.TextField()
+    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
+
+    def __str__(self):
+        return f"[{self.category}] {self.text[:50]}"
+
 class InterviewResult(models.Model):
     """A scored answer for one applicant (Application) and one interview question."""
 
@@ -150,6 +162,7 @@ class InterviewResult(models.Model):
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
