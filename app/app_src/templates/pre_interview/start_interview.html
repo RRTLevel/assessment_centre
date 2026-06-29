@@ -35,12 +35,12 @@
     <form method="post" action="{% url 'start_interview' application.application_id %}">
         {% csrf_token %}
 
-        {% for question, result in question_results %}
+        {% for item in question_data %}
 
             <div class="question-row">
 
                 <div class="question-card">
-                    <p class="question-text">{{ question.text }}</p>
+                    <p class="question-text">{{ item.question.text }}</p>
                 </div>
 
                 <div class="Score-Box">
@@ -58,29 +58,39 @@
                             <tbody>
                             <tr>
                                 <th></th>
-                                <td>this is a positive</td>
-                                <td>this is a negative</td>
-                                <td>
+                                <td class="indicator-positive">{{ item.rows.0.pos }}</td>
+                                <td class="indicator-negative">{{ item.rows.0.neg }}</td>
+                                <td rowspan="3">
                                     <input type="number" min="1" max="6" step="1"
                                            class="score-input"
-                                           name="score_{{ question.id }}"
-                                           value="{{ result.score|default_if_none:'' }}">
+                                           name="score_{{ item.question.id }}"
+                                           value="{{ item.result.score|default_if_none:'' }}">
                                 </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td class="indicator-positive">{{ item.rows.1.pos }}</td>
+                                <td class="indicator-negative">{{ item.rows.1.neg }}</td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td class="indicator-positive">{{ item.rows.2.pos }}</td>
+                                <td class="indicator-negative">{{ item.rows.2.neg }}</td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="notes_box">
-                        <label for="notes-{{ question.id }}">Notes</label>
-                        <textarea id="notes-{{ question.id }}" class="notes-textarea"
-                                  name="notes_{{ question.id }}">{{ result.notes|default:'' }}</textarea>
+                        <label for="notes-{{ item.question.id }}">Notes</label>
+                        <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
+                                  name="notes_{{ item.question.id }}">{{ item.result.notes|default:'' }}</textarea>
                     </div>
 
                     <div class="feedback_box">
-                        <label for="feedback-{{ question.id }}">Feedback</label>
-                        <textarea id="feedback-{{ question.id }}" class="feedback-textarea"
-                                  name="feedback_{{ question.id }}">{{ result.feedback|default:'' }}</textarea>
+                        <label for="feedback-{{ item.question.id }}">Feedback</label>
+                        <textarea id="feedback-{{ item.question.id }}" class="feedback-textarea"
+                                  name="feedback_{{ item.question.id }}">{{ item.result.feedback|default:'' }}</textarea>
                     </div>
 
                 </div>

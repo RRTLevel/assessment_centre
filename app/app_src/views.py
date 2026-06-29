@@ -426,7 +426,7 @@ def accepted_applicants(request):
 @group_required(ECD_GROUP, ECAM_GROUP)
 def start_interview(request, application_id):
     application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(category=application.pack.category)
+    questions = Questions.objects.filter(category=application.pack.category).prefetch_related("indicators")
 
     if request.method == "POST":
         scores = []
@@ -456,12 +456,22 @@ def start_interview(request, application_id):
         return redirect("inbox")
 
     saved = {result.question_id: result for result in application.results.all()}
-    question_results = [(question, saved.get(question.id)) for question in questions]
+    question_data = []
+    for question in questions:
+        result = saved.get(question.id)
+        positives = list(question.indicators.filter(category="positive"))
+        negatives = list(question.indicators.filter(category="negative"))
+        rows = []
+        for i in range(3):
+            rows.append({
+                "pos": positives[i].text if i < len(positives) else "",
+                "neg": negatives[i].text if i < len(negatives) else "",
+            })
+        question_data.append({"question": question, "result": result, "rows": rows})
 
     return render(request, "pre_interview/start_interview.html", {
         "application": application,
-        "questions": questions,
-        "question_results": question_results,
+        "question_data": question_data,
     })
 
 
