@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Help</title>
+
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container">
+
+            <div class="interview-header">
+                <h1 class="title interview-title">
+                    Help &amp; Documentation
+                </h1>
+            </div>
+
+            <div class="columns">
+
+                <!-- Sidebar -->
+                <div class="column is-3">
+                    <aside class="help-box" style="position: sticky; top: 1rem;">
+                        <p class="title is-5 interview-title" style="margin-bottom: 1rem;">Contents</p>
+                        <ul class="menu-list">
+                            <li><a href="#getting-started">Getting Started</a></li>
+                            <li><a href="#your-account">Your Account</a></li>
+                            <li><a href="#interview">Interview Page</a></li>
+                            <li><a href="#applications">Applications</a></li>
+                            <li><a href="#adding-questions">Adding Questions</a></li>
+                        </ul>
+                    </aside>
+                </div>
+
+                <!-- Content -->
+                <div class="column">
+
+                    <div class="help-box mb-4" id="getting-started">
+                        <h4 class="title is-4">Getting Started</h4>
+                        <div class="my-3 is-size-6">
+                            <p>
+                                To use the system you will need an account. If you do not have one, click
+                                <strong>Sign Up</strong> on the login page. You will be asked to provide:
+                            </p>
+                            <br>
+                            <ul>
+                                <li>A username</li>
+                                <li>An email address</li>
+                                <li>An account type</li>
+                                <li>A password</li>
+                            </ul>
+                            <br>
+                            <p>
+                                Once registered, return to the login page and enter your username and password.
+                                Tick <strong>Remember Me</strong> if you want to stay logged in between sessions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="help-box mb-4" id="your-account">
+                        <h4 class="title is-4">Your Account</h4>
+                        <div class="my-3 is-size-6">
+                            <p>
+                                Your account page shows your username, email address, and account type.
+                            </p>
+                            <br>
+                            <p>
+                                To change your password, enter your current password followed by your new password
+                                twice, then click <strong>Update Password</strong>.
+                            </p>
+                            <br>
+                            <p>
+                                To delete your account, click <strong>Delete Account</strong> and confirm by
+                                entering your password in the prompt. This action is permanent and cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="help-box mb-4" id="interview">
+                        <h4 class="title is-4">Interview Page</h4>
+                        <div class="my-3 is-size-6">
+                            <p>
+                                The interview page shows all active interview questions. For each question,
+                                enter scores, notes, and feedback, then click <strong>Submit</strong> to save.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="help-box mb-4" id="applications">
+                        <h4 class="title is-4">Applications</h4>
+                        <div class="my-3 is-size-6">
+                            <p>
+                                The applications page shows all available packs. Each pack represents a role
+                                and contains a set of pre-interview questions. Click
+                                <strong>Open Pre-Interview Form</strong> on a pack to answer its questions
+                                and submit.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="help-box mb-4" id="adding-questions">
+                        <h4 class="title is-4">Adding Questions</h4>
+                        <div class="my-3 is-size-6">
+                            <p>
+                                Navigate to <strong>Add Question</strong> in the navigation bar. You can add
+                                up to five questions at a time and assign them to a category. Click
+                                <strong>Save Questions</strong> to submit. Added questions will appear on
+                                the interview page.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+</body>
+
+</html>

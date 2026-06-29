@@ -19,16 +19,13 @@ class Note(models.Model):
     author = models.ForeignKey(DomainUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     body = models.TextField()
-    pub_date = models.DateTimeField(
-        'date_published',
-        auto_now_add=True,
-        blank=True
-    )
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
 
+# where the system will gather the data for the form and be able to save it to a database
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=255, blank=True)
@@ -40,6 +37,7 @@ class Category(models.Model):
 class Pack(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
+
     category = models.ForeignKey(
         "Category",
         on_delete=models.CASCADE,
@@ -47,21 +45,11 @@ class Pack(models.Model):
         null=True,
         blank=True
     )
-    pre_interview_question_1 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    pre_interview_question_2 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    pre_interview_question_3 = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
+
+    pre_interview_question_1 = models.CharField(max_length=255, blank=True, null=True)
+    pre_interview_question_2 = models.CharField(max_length=255, blank=True, null=True)
+    pre_interview_question_3 = models.CharField(max_length=255, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -77,6 +65,7 @@ class QuestionTable(models.Model):
     ]
 
     question = models.TextField()
+
     category = models.CharField(
         max_length=50,
         choices=CATEGORY_CHOICES,
@@ -95,11 +84,13 @@ class Application(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     application_id = models.UUIDField(
         default=uuid.uuid4,
         unique=True,
         editable=False
     )
+
     pack = models.ForeignKey("Pack", on_delete=models.CASCADE)
 
     answer_1 = models.TextField()
@@ -114,10 +105,11 @@ class Application(models.Model):
         default='Pending'
     )
 
-    interview_date = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    # USED BY YOUR INBOX CALENDAR
+    interview_date = models.DateTimeField(null=True, blank=True)
+
+    # Average of the per-question interview scores, calculated on submit.
+    average_score = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.application_id}"
@@ -125,30 +117,45 @@ class Application(models.Model):
 
 class Questions(models.Model):
     text = models.TextField()
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='questions'
-    )
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
+
 
     def __str__(self):
         return self.text[:60]
 
 
+class InterviewResult(models.Model):
+    """A scored answer for one applicant (Application) and one interview question."""
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="results"
+    )
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+
+    score = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(blank=True, default='')
+    feedback = models.TextField(blank=True, default='')
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('application', 'question')
+
+    def __str__(self):
+        return f"{self.application.user.username} - {self.question} ({self.score})"
+
+
 class InterviewResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(
-        QuestionTable,
-        on_delete=models.CASCADE
-    )
-
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
     score_1 = models.IntegerField(null=True, blank=True)
     score_2 = models.IntegerField(null=True, blank=True)
     score_3 = models.IntegerField(null=True, blank=True)
 
     notes = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
-
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

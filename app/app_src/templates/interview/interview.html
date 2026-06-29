@@ -1,160 +1,107 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html>
 
-{% block content %}
+<head>
+    <title>Interview</title>
+    {% load static %}
+    <meta charset="utf-8">
 
-<br>
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
 
-<section class="hero rr-primary">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title rr-white">Interview Questions</h1>
-      <p class="rr-white">
-        Total Questions: {{ questions|length }}
-      </p>
-    </div>
-  </div>
-</section>
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
 
-<br>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('siteTheme') || 'system';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
 
-<!--<div class="interview-header">-->
-<!--    <h1 class="title interview-title">-->
-<!--        Interview Questions-->
-<!--    </h1>-->
-<!--    <p class="interview-count">-->
-<!--        Total Questions: {{ questions|length }}-->
-<!--    </p>-->
-<!--</div>-->
+            document.documentElement.dataset.theme = activeTheme;
+            document.documentElement.dataset.themePreference = savedTheme;
+        })();
+    </script>
 
-{% for question in questions %}
-<div class="question-row">
-    <div class="question-card">
-        <p class="question-text">
-            {{ question.question }}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<header>
+    {% include 'includes/title.html' %}
+    {% include 'includes/nav.html' %}
+</header>
+
+<main class="section">
+<div class="container interview-container">
+
+    <div class="interview-header">
+        <h1 class="title interview-title">Interview Questions</h1>
+        <p class="interview-count">
+            Total Questions: {{ questions|length }}
         </p>
     </div>
 
-    <div class="Score-Box">
-        <div class="table-container">
-            <table class="score-table" id="scoreTable">
-                <thead>
-                    <tr>
-                        <th>indicators</th>
-                        <th>positive</th>
-                        <th>negative</th>
-                        <th>score</th>
-                    </tr>
-                </thead>
+    {% for question in questions %}
 
-                <tbody>
-                    <tr>
-                        <th></th>
-                        <td>this is a positive</td>
-                        <td>this is a negative</td>
-                        <td>
-                            <input 
-                                type="number" 
-                                min="1" 
-                                max="6" 
-                                step="1"
-                                class="score-input"
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td>this is a positive</td>
-                        <td>this is a negative</td>
-                        <td>
-                            <input 
-                                type="number" 
-                                min="1" 
-                                max="6" 
-                                step="1"
-                                class="score-input"
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td>this is a positive</td>
-                        <td>this is a negative</td>
-                        <td>
-                            <input 
-                                type="number" 
-                                min="1" 
-                                max="6" 
-                                step="1"
-                                class="score-input"
-                            >
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
+        <div class="question-row">
 
-            <script>
-            function addRow() {
-                const table = document
-                    .getElementById("scoreTable")
-                    .getElementsByTagName("tbody")[0];
+            <div class="question-card">
+                <p class="question-text">{{ question.text }}</p>
+            </div>
 
-                const newRow = table.insertRow();
+            <div class="Score-Box">
 
-                newRow.innerHTML = `
-                    <th></th>
-                    <td>this is a positive</td>
-                    <td>this is a negative</td>
-                    <td>
-                        <input 
-                            type="number" 
-                            min="1" 
-                            max="6" 
-                            step="1"
-                            class="score-input"
-                        >
-                    </td>
-                `;
-            }
-            </script>
+                <div class="table-container">
+                    <table class="score-table" id="scoreTable-{{ forloop.counter }}">
+                        <thead>
+                        <tr>
+                            <th>indicators</th>
+                            <th>positive</th>
+                            <th>negative</th>
+                            <th>score</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr>
+                            <th></th>
+                            <td>this is a positive</td>
+                            <td>this is a negative</td>
+                            <td>
+                                <input type="number" min="1" max="6" step="1" class="score-input">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="notes_box">
+                    <label for="notes-{{ forloop.counter }}">Notes</label>
+                    <textarea id="notes-{{ forloop.counter }}" class="notes-textarea"></textarea>
+                </div>
+
+                <div class="feedback_box">
+                    <label for="feedback-{{ forloop.counter }}">Feedback</label>
+                    <textarea id="feedback-{{ forloop.counter }}" class="feedback-textarea"></textarea>
+                </div>
+
+            </div>
         </div>
-        
-        <div class="notes_box">
-            <label for="notes-{{ forloop.counter }}" class="notes-label">
-                Notes
-            </label>
-            <textarea
-                id="notes-{{ forloop.counter }}"
-                class="notes-textarea"
-                placeholder="Enter interview notes here..."
-            ></textarea>
+
+    {% empty %}
+        <div class="no-questions">
+            No interview questions available.
         </div>
-        
-        <div class="feedback_box">
-            <label for="feedback-{{ forloop.counter }}" class="feedback-label">
-                Feedback
-            </label>
-            <textarea
-                id="feedback-{{ forloop.counter }}"
-                class="feedback-textarea"
-                placeholder="Enter feedback here..."
-            ></textarea>
-        </div>
+    {% endfor %}
+
+    <div class="submit-section">
+        <button class="submit-btn">Submit</button>
     </div>
+
 </div>
+</main>
 
-{% empty %}
-
-<div class="no-questions">
-    No interview questions available.
-</div>
-
-{% endfor %}
-
-<div class="submit-section">
-    <button class="submit-btn">
-        Submit
-    </button>
-</div>
-
-{% endblock %}
+</body>
+</html>

@@ -89,7 +89,8 @@
 
                 <div class="field is-grouped is-grouped-right">
                     <p class="control">
-                        <a href="{% url 'applications_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
+                        <!-- FIXED: Plural string changed to singular 'application_review' -->
+                        <a href="{% url 'application_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
                     </p>
                     <p class="control">
                         <button type="submit" class="button is-success" style="border-radius: 8px; background-color: #5cb85c;">Confirm & Accept</button>
