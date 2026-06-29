@@ -543,6 +543,50 @@ def add_question(request):
     })
 
 
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, id=pk)
+
+    if request.method == "POST":
+        question.delete()
+
+    return redirect("add_questions")
+
+
+@login_required(login_url='/login')
+def application_review(request):
+    applications_list = Application.objects.all().select_related('user', 'pack')
+    return render(
+        request, 
+        "pre_interview/application_review.html", 
+        {"applications": applications_list}
+    )
+
+@login_required(login_url='/login')
+def approve_application(request, pk):
+    application = get_object_or_404(Application, application_id=pk)
+
+    if request.method == "POST":
+        interview_date = request.POST.get("interview_date")
+        application.status = "Accepted"
+        application.interview_date = interview_date
+        application.save()
+        messages.success(request, f"Application for {application.user.username} approved successfully!")
+
+        return redirect("application_review")
+
+    return render(request, "pre_interview/schedule_interview.html", {"application": application})
+
+
+@login_required(login_url='/login')
+def deny_application(request, pk):
+    application = get_object_or_404(Application, application_id=pk)
+    
+    if request.method == "POST":
+        application.status = 'Denied'
+        application.save()
+        messages.error(request, f"Application for {application.user.username} was denied.")
+        
+    return redirect('application_review')
 @login_required(login_url='/login')
 def question_list(request):
     questions = Questions.objects.select_related('category').order_by('-id')
@@ -594,3 +638,56 @@ def delete_category(request, pk):
     if request.method == "POST":
         category.delete()
     return redirect("categories")
+
+@login_required(login_url='/login')
+def application_detail(request, application_id):
+    application = get_object_or_404(
+        Application,
+        application_id=application_id
+    )
+
+    return render(request, "pre_interview/view_more.html", {
+        "application": application
+    })
+class RememberMeLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def form_valid(self, form):
+        remember_me = self.request.POST.get("remember_me")
+
+        if remember_me:
+            self.request.session.set_expiry(60 * 60 * 24 * 30)
+        else:
+            self.request.session.set_expiry(0)
+
+        return super().form_valid(form)
+
+def question_list(request):
+    questions = Questions.objects.all().order_by("-id")
+
+    return render(request, "add_questions/question_list.html", {
+        "questions": questions
+    })
+
+def delete_question(request, pk):
+    question = get_object_or_404(Questions, pk=pk)
+
+    if request.method == "POST":
+        question.delete()
+        return redirect("question_list")
+
+    return redirect("question_list")
+
+
+def load_questions(request):
+    category_id = request.GET.get("category")
+
+    if not category_id:
+        return JsonResponse([], safe=False)
+
+    questions = Questions.objects.filter(category_id=category_id).values(
+        "id",
+        "text"
+    )
+
+    return JsonResponse(list(questions), safe=False)
