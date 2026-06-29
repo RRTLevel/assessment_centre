@@ -3,9 +3,7 @@
 
 <head>
     <title>Interview</title>
-
     {% load static %}
-
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
@@ -30,12 +28,13 @@
 
 <body>
 
-    <!-- {% include 'includes/non_production_banner.html' %} -->
+<header>
+    {% include 'includes/title.html' %}
+    {% include 'includes/nav.html' %}
+</header>
 
-    <header>
-        {% include 'includes/title.html' %}
-        {% include 'includes/nav.html' %}
-    </header>
+<main class="section">
+<div class="container interview-container">
 
     <main class="section">
 

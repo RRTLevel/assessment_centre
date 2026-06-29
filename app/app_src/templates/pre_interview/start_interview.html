@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="section">
+<div class="container interview-container">
+
+    <div class="interview-header">
+        <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
+        <p class="interview-count">
+            Pack: {{ application.pack.title }} &middot; Total Questions: {{ questions|length }}
+        </p>
+    </div>
+
+    <!-- Applicant's pre-interview answers (read-only context) -->
+    <div class="applicant-answers box">
+        <h2 class="title is-5">Applicant Answers</h2>
+
+        {% if application.pack.pre_interview_question_1 %}
+            <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+            <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
+        {% endif %}
+
+        {% if application.pack.pre_interview_question_2 %}
+            <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+            <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
+        {% endif %}
+
+        {% if application.pack.pre_interview_question_3 %}
+            <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+            <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{% url 'start_interview' application.application_id %}">
+        {% csrf_token %}
+
+        {% for question, result in question_results %}
+
+            <div class="question-row">
+
+                <div class="question-card">
+                    <p class="question-text">{{ question.text }}</p>
+                </div>
+
+                <div class="Score-Box">
+
+                    <div class="table-container">
+                        <table class="score-table">
+                            <thead>
+                            <tr>
+                                <th>indicators</th>
+                                <th>positive</th>
+                                <th>negative</th>
+                                <th>score</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th></th>
+                                <td>this is a positive</td>
+                                <td>this is a negative</td>
+                                <td>
+                                    <input type="number" min="1" max="6" step="1"
+                                           class="score-input"
+                                           name="score_{{ question.id }}"
+                                           value="{{ result.score|default_if_none:'' }}">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="notes_box">
+                        <label for="notes-{{ question.id }}">Notes</label>
+                        <textarea id="notes-{{ question.id }}" class="notes-textarea"
+                                  name="notes_{{ question.id }}">{{ result.notes|default:'' }}</textarea>
+                    </div>
+
+                    <div class="feedback_box">
+                        <label for="feedback-{{ question.id }}">Feedback</label>
+                        <textarea id="feedback-{{ question.id }}" class="feedback-textarea"
+                                  name="feedback_{{ question.id }}">{{ result.feedback|default:'' }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+
+        {% empty %}
+            <div class="no-questions">
+                No interview questions available.
+            </div>
+        {% endfor %}
+
+        <div class="submit-section">
+            <button type="submit" class="submit-btn">Submit</button>
+        </div>
+
+    </form>
+
+</div>
+</main>
+
+{% endblock %}
