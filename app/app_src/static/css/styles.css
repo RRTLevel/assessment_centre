@@ -378,7 +378,6 @@ select {
     color: #fff !important;
 }
 
-<<<<<<< Updated upstream
 /* Active page */
 .navbar-item.is-active {
     color: #ffffff !important;
@@ -500,9 +499,7 @@ select {
     font-weight: 600;
 }
 
-=======
 .calendar-empty {
     height: 40px;
     width: 40px;
 }
->>>>>>> Stashed changes

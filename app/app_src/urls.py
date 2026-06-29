@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 from .views import DeleteAccountView, RememberMeLoginView
 
@@ -52,49 +53,18 @@ urlpatterns = [
     # APPLICATIONS
     # =====================
     path('applications/', views.applications, name='applications'),
-    path('application_review/', views.application_review, name='application_review'),
     path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
+    path('application-review/', views.application_review, name='application_review'),
+    path('applications/accepted_applicants/', views.accepted_applicants, name='accepted_applicants'),
+    path('applications/start_interview/<uuid:application_id>/', views.start_interview, name='start_interview'),
+    path('applications/<uuid:application_id>/', views.application_detail, name='application_detail'),
+    path('applications/<uuid:application_id>/approve/', views.approve_application, name='approve_application'),
+    path('applications/<uuid:application_id>/deny/', views.deny_application, name='deny_application'),
 
     # =====================
     # INBOX
     # =====================
     path('inbox/', views.inbox_view, name='inbox'),
-
-    # =====================
-    # APPLICATION DETAIL
-    # =====================
-    path(
-        'applications/<uuid:application_id>/',
-        views.application_detail,
-        name='application_detail'
-    ),
-
-    # =====================
-    # APPROVE / DENY
-    # =====================
-    path(
-        'applications/<uuid:application_id>/approve/',
-        views.approve_application,
-        name='approve_application'
-    ),
-
-    path(
-        'applications/<uuid:application_id>/deny/',
-        views.deny_application,
-        name='deny_application'
-    ),
-
-    path(
-        'applications/accepted_applicants/',
-        views.accepted_applicants,
-        name='accepted_applicants'
-    ),
-
-    path(
-        'applications/start_interview/<uuid:application_id>/',
-        views.start_interview,
-        name='start_interview'
-    ),
 
     # =====================
     # ERROR PAGES

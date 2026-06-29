@@ -2,109 +2,103 @@
 
 {% block content %}
 
-
-<table class="accepted-applicant-table">
-    
-    <thead>
-        <tr>
-            <th>Applicant name</th>
-            <th>Applicant's pack</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr>
-            <td>{{applicant.user.username}}</td>
-            <td>{{applicant.pack}}</td>
-        </tr>
-    </tbody>
-    
-</table>
-
-
-<script>
-        (function () {
-            const savedTheme = localStorage.getItem('siteTheme') || 'system';
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
-
-            document.documentElement.dataset.theme = activeTheme;
-            document.documentElement.dataset.themePreference = savedTheme;
-        })();
-</script>
-
-
 <main class="section">
 <div class="container interview-container">
 
     <div class="interview-header">
-        <h1 class="title interview-title">Interview Questions</h1>
+        <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
         <p class="interview-count">
-            Total Questions: {{ questions|length }}
+            Pack: {{ application.pack.title }} &middot; Total Questions: {{ questions|length }}
         </p>
     </div>
 
-    {% for question in questions %}
+    <!-- Applicant's pre-interview answers (read-only context) -->
+    <div class="applicant-answers box">
+        <h2 class="title is-5">Applicant Answers</h2>
 
-        <div class="question-row">
+        {% if application.pack.pre_interview_question_1 %}
+            <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+            <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
+        {% endif %}
 
-            <div class="question-card">
-                <p class="question-text">{{ question.text }}</p>
-            </div>
+        {% if application.pack.pre_interview_question_2 %}
+            <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+            <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
+        {% endif %}
 
-            <div class="Score-Box">
-
-                <div class="table-container">
-                    <table class="score-table" id="scoreTable-{{ forloop.counter }}">
-                        <thead>
-                        <tr>
-                            <th>indicators</th>
-                            <th>positive</th>
-                            <th>negative</th>
-                            <th>score</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        <tr>
-                            <th></th>
-                            <td>this is a positive</td>
-                            <td>this is a negative</td>
-                            <td>
-                                <input type="number" min="1" max="6" step="1" class="score-input">
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="notes_box">
-                    <label for="notes-{{ forloop.counter }}">Notes</label>
-                    <textarea id="notes-{{ forloop.counter }}" class="notes-textarea"></textarea>
-                </div>
-
-                <div class="feedback_box">
-                    <label for="feedback-{{ forloop.counter }}">Feedback</label>
-                    <textarea id="feedback-{{ forloop.counter }}" class="feedback-textarea"></textarea>
-                </div>
-
-            </div>
-        </div>
-
-    {% empty %}
-        <div class="no-questions">
-            No interview questions available.
-        </div>
-    {% endfor %}
-
-    <div class="submit-section">
-        <button class="submit-btn">Submit</button>
+        {% if application.pack.pre_interview_question_3 %}
+            <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+            <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
+        {% endif %}
     </div>
+
+    <form method="post" action="{% url 'start_interview' application.application_id %}">
+        {% csrf_token %}
+
+        {% for question, result in question_results %}
+
+            <div class="question-row">
+
+                <div class="question-card">
+                    <p class="question-text">{{ question.text }}</p>
+                </div>
+
+                <div class="Score-Box">
+
+                    <div class="table-container">
+                        <table class="score-table">
+                            <thead>
+                            <tr>
+                                <th>indicators</th>
+                                <th>positive</th>
+                                <th>negative</th>
+                                <th>score</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th></th>
+                                <td>this is a positive</td>
+                                <td>this is a negative</td>
+                                <td>
+                                    <input type="number" min="1" max="6" step="1"
+                                           class="score-input"
+                                           name="score_{{ question.id }}"
+                                           value="{{ result.score|default_if_none:'' }}">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="notes_box">
+                        <label for="notes-{{ question.id }}">Notes</label>
+                        <textarea id="notes-{{ question.id }}" class="notes-textarea"
+                                  name="notes_{{ question.id }}">{{ result.notes|default:'' }}</textarea>
+                    </div>
+
+                    <div class="feedback_box">
+                        <label for="feedback-{{ question.id }}">Feedback</label>
+                        <textarea id="feedback-{{ question.id }}" class="feedback-textarea"
+                                  name="feedback_{{ question.id }}">{{ result.feedback|default:'' }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+
+        {% empty %}
+            <div class="no-questions">
+                No interview questions available.
+            </div>
+        {% endfor %}
+
+        <div class="submit-section">
+            <button type="submit" class="submit-btn">Submit</button>
+        </div>
+
+    </form>
 
 </div>
 </main>
-
-</body>
-
 
 {% endblock %}
