@@ -2,45 +2,54 @@
 
 {% block content %}
 
+<section class="section">
+    <div class="container">
 
+        <div class="card">
+            <div class="card-content">
 
-<table class="accepted-applicant-table">
-    
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Pack</th>
-            <th>Interview Date</th>
-            <th>Start Interview</th>
-        </tr>
-    </thead>
+                <div class="table-container">
+                    <table class="accepted-applicant-table">
 
-    {% for applicant in applicants %}
+                        <thead>
+                            <tr>
+                                <th class="rr-white">Name</th>
+                                <th class="rr-white">Status</th>
+                                <th class="rr-white">Pack</th>
+                                <th class="rr-white">Interview Date</th>
+                                <th class="rr-white">Start Interview</th>
+                            </tr>
+                        </thead>
 
-    <tbody>
+                        <tbody>
+                            {% for applicant in applicants %}
+                            <tr>
+                                <td>{{ applicant.user.username }}</td>
+                                <td>{{ applicant.status }}</td>
+                                <td>{{ applicant.pack }}</td>
+                                <td>{{ applicant.interview_date }}</td>
+                                <td>
+                                    <a class="button is-small is-link" href="{% url 'start_interview' applicant.application_id %}">
+                                        Start
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="has-text-centered has-text-muted py-4">
+                                    No accepted applicants found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
 
+                    </table>
+                </div>
 
+            </div>
+        </div>
 
-        <tr>
-            <td>{{applicant.user.username}}</td>
-            <td>{{applicant.status}}</td>
-            <td>{{applicant.pack}}</td>
-            <td>{{applicant.interview_date}}</td>
-            <td>
-                <a class="button is-small is-link"
-                href="{% url 'start_interview' applicant.application_id %}">
-                    Start
-                </a>
-            </td>
-        </tr>
-    </tbody>
-
-    {% endfor %}
-
-</table>
-
-
-
+    </div>
+</section>
 
 {% endblock %}

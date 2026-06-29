@@ -258,6 +258,13 @@ a.has-text-rr-secondary {
     color: #271EA8;
 }
 
+.hero.rr-primary .title,
+.hero.rr-primary .subtitle,
+.hero.rr-primary p,
+.hero.rr-primary strong {
+    color: #ffffff !important;
+}
+
 .control.has-icons-left .input:focus ~ .icon,
 .control.has-icons-left .select:focus ~ .icon,
 .control.has-icons-right .input:focus ~ .icon,

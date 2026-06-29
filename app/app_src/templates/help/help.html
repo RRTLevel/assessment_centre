@@ -1,283 +1,267 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
 
-<head>
-    <title>Help</title>
+{% block content %}
 
-    {% load static %}
+<br>
 
-    <meta charset="utf-8">
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Help &amp; Documentation</h1>
+      <p class="rr-white">
+        Please read the below should you be in need of any help.
+      </p>
+    </div>
+  </div>
+</section>
 
-    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
-    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+<main class="section">
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+    <div class="container">
 
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
+<!--        <div class="interview-header">-->
+<!--            <h1 class="title interview-title">-->
+<!--                Help &amp; Documentation-->
+<!--            </h1>-->
+<!--        </div>-->
 
-<body>
+        <div class="columns">
 
-    <header>
-        {% include 'includes/title.html' %}
-        {% include 'includes/nav.html' %}
-    </header>
-
-    <main class="section">
-
-        <div class="container">
-
-            <div class="interview-header">
-                <h1 class="title interview-title">
-                    Help &amp; Documentation
-                </h1>
+            <div class="column is-3">
+                <aside class="help-box" style="position: sticky; top: 1rem;">
+                    <p class="title is-5 interview-title" style="margin-bottom: 1rem;">Contents</p>
+                    <ul class="menu-list">
+                        <li><a href="#getting-started">Getting Started</a></li>
+                        <li><a href="#navigation">Navigation</a></li>
+                        <li><a href="#your-account">Your Account</a></li>
+                        <li><a href="#home">Home Page</a></li>
+                        <li><a href="#interview">Interview Page</a></li>
+                        <li><a href="#results">Results</a></li>
+                        <li><a href="#applications">Applications</a></li>
+                        <li><a href="#application-review">Application Review</a></li>
+                        <li><a href="#adding-questions">Adding Questions</a></li>
+                    </ul>
+                </aside>
             </div>
 
-            <div class="columns">
+            <div class="column">
 
-                <!-- Sidebar -->
-                <div class="column is-3">
-                    <aside class="help-box" style="position: sticky; top: 1rem;">
-                        <p class="title is-5 interview-title" style="margin-bottom: 1rem;">Contents</p>
-                        <ul class="menu-list">
-                            <li><a href="#getting-started">Getting Started</a></li>
-                            <li><a href="#navigation">Navigation</a></li>
-                            <li><a href="#your-account">Your Account</a></li>
-                            <li><a href="#home">Home Page</a></li>
-                            <li><a href="#interview">Interview Page</a></li>
-                            <li><a href="#results">Results</a></li>
-                            <li><a href="#applications">Applications</a></li>
-                            <li><a href="#application-review">Application Review</a></li>
-                            <li><a href="#adding-questions">Adding Questions</a></li>
+                <div class="help-box mb-4" id="getting-started">
+                    <h4 class="title is-4">Getting Started</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            To use the system you will need an account. If you do not have one, click
+                            <strong>Sign Up</strong> on the login page. You will be asked to provide:
+                        </p>
+                        <br>
+                        <ul style="list-style: disc; padding-left: 1.5rem;">
+                            <li><strong>Username</strong> — your unique login name</li>
+                            <li><strong>Email address</strong> — used for account identification</li>
+                            <li><strong>Account type</strong> — your role (e.g. Assessor, Early Careers Definer)</li>
+                            <li><strong>Password</strong> — must be at least 8 characters</li>
                         </ul>
-                    </aside>
+                        <br>
+                        <p>
+                            Once registered, return to the login page and enter your username and password.
+                            Tick <strong>Remember Me</strong> if you want to stay logged in between sessions.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Content -->
-                <div class="column">
-
-                    <div class="help-box mb-4" id="getting-started">
-                        <h4 class="title is-4">Getting Started</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                To use the system you will need an account. If you do not have one, click
-                                <strong>Sign Up</strong> on the login page. You will be asked to provide:
-                            </p>
-                            <br>
-                            <ul style="list-style: disc; padding-left: 1.5rem;">
-                                <li><strong>Username</strong> — your unique login name</li>
-                                <li><strong>Email address</strong> — used for account identification</li>
-                                <li><strong>Account type</strong> — your role (e.g. Assessor, Early Careers Definer)</li>
-                                <li><strong>Password</strong> — must be at least 8 characters</li>
-                            </ul>
-                            <br>
-                            <p>
-                                Once registered, return to the login page and enter your username and password.
-                                Tick <strong>Remember Me</strong> if you want to stay logged in between sessions.
-                            </p>
-                        </div>
+                <div class="help-box mb-4" id="navigation">
+                    <h4 class="title is-4">Navigation</h4>
+                    <div class="my-3 is-size-6">
+                        <p>The navigation bar at the top of every page gives you access to all sections of the system:</p>
+                        <br>
+                        <ul style="list-style: disc; padding-left: 1.5rem;">
+                            <li><strong>Home</strong> — your notes board</li>
+                            <li><strong>Interview Questions</strong> — score and annotate interview questions</li>
+                            <li><strong>Applications</strong> — view and submit pre-interview forms</li>
+                            <li><strong>Create Pack</strong> — create a new application pack for a role</li>
+                            <li><strong>Add Question</strong> — add new interview questions</li>
+                            <li><strong>Create Category</strong> — add question categories</li>
+                            <li><strong>Application Review</strong> — review submitted applications</li>
+                            <li><strong>Your username</strong> (top right) — view and manage your account</li>
+                            <li><strong>Logout</strong> (top right) — sign out of the system</li>
+                        </ul>
                     </div>
-
-                    <div class="help-box mb-4" id="navigation">
-                        <h4 class="title is-4">Navigation</h4>
-                        <div class="my-3 is-size-6">
-                            <p>The navigation bar at the top of every page gives you access to all sections of the system:</p>
-                            <br>
-                            <ul style="list-style: disc; padding-left: 1.5rem;">
-                                <li><strong>Home</strong> — your notes board</li>
-                                <li><strong>Interview Questions</strong> — score and annotate interview questions</li>
-                                <li><strong>Applications</strong> — view and submit pre-interview forms</li>
-                                <li><strong>Create Pack</strong> — create a new application pack for a role</li>
-                                <li><strong>Add Question</strong> — add new interview questions</li>
-                                <li><strong>Create Category</strong> — add question categories</li>
-                                <li><strong>Application Review</strong> — review submitted applications</li>
-                                <li><strong>Your username</strong> (top right) — view and manage your account</li>
-                                <li><strong>Logout</strong> (top right) — sign out of the system</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="your-account">
-                        <h4 class="title is-4">Your Account</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                Click your username in the top-right of the navigation bar to access your account page.
-                                Here you can see your username, email address, and account type.
-                            </p>
-                            <br>
-                            <p><strong>Changing your password:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Enter your current password</li>
-                                <li>Enter your new password twice</li>
-                                <li>Click <strong>Update Password</strong></li>
-                            </ol>
-                            <br>
-                            <p><strong>Logging out:</strong></p>
-                            <p>
-                                Click <strong>Logout</strong> in the top-right of the navigation bar to sign out.
-                                If you did not tick Remember Me when logging in, you will be logged out automatically
-                                when you close the browser.
-                            </p>
-                            <br>
-                            <p><strong>Deleting your account:</strong></p>
-                            <p>
-                                Click <strong>Delete Account</strong> and confirm by entering your password.
-                                This is permanent and cannot be undone — all your data will be removed.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="home">
-                        <h4 class="title is-4">Home Page</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                The home page is your personal notes board. You can write short notes visible to
-                                all users — useful for leaving reminders or observations during an assessment day.
-                            </p>
-                            <br>
-                            <p><strong>Adding a note:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Enter a title for your note</li>
-                                <li>Enter the note body</li>
-                                <li>Click <strong>Add Note</strong> to save</li>
-                            </ol>
-                            <br>
-                            <p>The five most recent notes are shown on the page.</p>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="interview">
-                        <h4 class="title is-4">Interview Page</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                The interview page shows all active interview questions. Each question has its own
-                                scoring table, notes field, and feedback field.
-                            </p>
-                            <br>
-                            <p><strong>Scoring a question:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Read the question shown at the top of each card</li>
-                                <li>For each indicator row in the table, enter a score between <strong>1 and 6</strong> in the Score column</li>
-                                <li>Use the <strong>Notes</strong> field to record anything observed during the interview for that question</li>
-                                <li>Use the <strong>Feedback</strong> field to write your overall assessment for that question</li>
-                            </ol>
-                            <br>
-                            <p><strong>Scoring scale:</strong></p>
-                            <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li><strong>1–2</strong> — below expectation</li>
-                                <li><strong>3–4</strong> — meets expectation</li>
-                                <li><strong>5–6</strong> — exceeds expectation</li>
-                            </ul>
-                            <br>
-                            <p>
-                                Once you have filled in all questions, scroll to the bottom and click
-                                <strong>Submit</strong>. Your responses are saved and can be updated at any time
-                                by returning to this page and submitting again.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="results">
-                        <h4 class="title is-4">Results</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                The results page shows a summary of all submitted interview responses across all assessors.
-                            </p>
-                            <br>
-                            <p>Each question is displayed as a card containing a table with:</p>
-                            <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li><strong>User</strong> — the assessor who submitted the response</li>
-                                <li><strong>Score 1, 2, 3</strong> — scores entered for each indicator row</li>
-                                <li><strong>Notes</strong> — notes recorded during the interview</li>
-                                <li><strong>Feedback</strong> — overall feedback for the question</li>
-                                <li><strong>Last Updated</strong> — when the response was last saved</li>
-                            </ul>
-                            <br>
-                            <p>
-                                Questions with no responses yet will show a message indicating no data has been submitted.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="applications">
-                        <h4 class="title is-4">Applications</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                The applications page lists all available application packs. Each pack represents
-                                a role and contains up to three pre-interview questions for candidates to answer
-                                before their interview.
-                            </p>
-                            <br>
-                            <p><strong>Submitting a pre-interview form:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Find the relevant pack on the applications page</li>
-                                <li>Click <strong>Open Pre-Interview Form</strong></li>
-                                <li>Answer the questions provided</li>
-                                <li>Click <strong>Submit</strong> to send your answers</li>
-                            </ol>
-                            <br>
-                            <p>Submitted applications can be reviewed and approved or denied by your assessor.</p>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="application-review">
-                        <h4 class="title is-4">Application Review</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                The application review page shows all pre-interview forms submitted by candidates.
-                                Each entry shows the applicant's username, the pack they applied for, their answers,
-                                and the current status of their application.
-                            </p>
-                            <br>
-                            <p><strong>Approving an application:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Find the application in the list</li>
-                                <li>Click <strong>Approve</strong></li>
-                                <li>Select an interview date from the calendar</li>
-                                <li>Click <strong>Confirm</strong> to save — the application status will update to Accepted</li>
-                            </ol>
-                            <br>
-                            <p><strong>Denying an application:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Find the application in the list</li>
-                                <li>Click <strong>Deny</strong></li>
-                                <li>The application status will update to Denied</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="help-box mb-4" id="adding-questions">
-                        <h4 class="title is-4">Adding Questions</h4>
-                        <div class="my-3 is-size-6">
-                            <p>
-                                Navigate to <strong>Add Question</strong> in the navigation bar to add new
-                                interview questions to the system.
-                            </p>
-                            <br>
-                            <p><strong>Adding questions:</strong></p>
-                            <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                                <li>Enter up to five questions in the fields provided (only the first is required)</li>
-                                <li>Select a category to group the questions under</li>
-                                <li>Click <strong>Save Questions</strong> to submit</li>
-                            </ol>
-                            <br>
-                            <p>
-                                Added questions will immediately appear on the interview page for all users.
-                            </p>
-                        </div>
-                    </div>
-
                 </div>
+
+                <div class="help-box mb-4" id="your-account">
+                    <h4 class="title is-4">Your Account</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            Click your username in the top-right of the navigation bar to access your account page.
+                            Here you can see your username, email address, and account type.
+                        </p>
+                        <br>
+                        <p><strong>Changing your password:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Enter your current password</li>
+                            <li>Enter your new password twice</li>
+                            <li>Click <strong>Update Password</strong></li>
+                        </ol>
+                        <br>
+                        <p><strong>Logging out:</strong></p>
+                        <p>
+                            Click <strong>Logout</strong> in the top-right of the navigation bar to sign out.
+                            If you did not tick Remember Me when logging in, you will be logged out automatically
+                            when you close the browser.
+                        </p>
+                        <br>
+                        <p><strong>Deleting your account:</strong></p>
+                        <p>
+                            Click <strong>Delete Account</strong> and confirm by entering your password.
+                            This is permanent and cannot be undone — all your data will be removed.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="home">
+                    <h4 class="title is-4">Home Page</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The home page is your personal notes board. You can write short notes visible to
+                            all users — useful for leaving reminders or observations during an assessment day.
+                        </p>
+                        <br>
+                        <p><strong>Adding a note:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Enter a title for your note</li>
+                            <li>Enter the note body</li>
+                            <li>Click <strong>Add Note</strong> to save</li>
+                        </ol>
+                        <br>
+                        <p>The five most recent notes are shown on the page.</p>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="interview">
+                    <h4 class="title is-4">Interview Page</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The interview page shows all active interview questions. Each question has its own
+                            scoring table, notes field, and feedback field.
+                        </p>
+                        <br>
+                        <p><strong>Scoring a question:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Read the question shown at the top of each card</li>
+                            <li>For each indicator row in the table, enter a score between <strong>1 and 6</strong> in the Score column</li>
+                            <li>Use the <strong>Notes</strong> field to record anything observed during the interview for that question</li>
+                            <li>Use the <strong>Feedback</strong> field to write your overall assessment for that question</li>
+                        </ol>
+                        <br>
+                        <p><strong>Scoring scale:</strong></p>
+                        <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>1–2</strong> — below expectation</li>
+                            <li><strong>3–4</strong> — meets expectation</li>
+                            <li><strong>5–6</strong> — exceeds expectation</li>
+                        </ul>
+                        <br>
+                        <p>
+                            Once you have filled in all questions, scroll to the bottom and click
+                            <strong>Submit</strong>. Your responses are saved and can be updated at any time
+                            by returning to this page and submitting again.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="results">
+                    <h4 class="title is-4">Results</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The results page shows a summary of all submitted interview responses across all assessors.
+                        </p>
+                        <br>
+                        <p>Each question is displayed as a card containing a table with:</p>
+                        <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>User</strong> — the assessor who submitted the response</li>
+                            <li><strong>Score 1, 2, 3</strong> — scores entered for each indicator row</li>
+                            <li><strong>Notes</strong> — notes recorded during the interview</li>
+                            <li><strong>Feedback</strong> — overall feedback for the question</li>
+                            <li><strong>Last Updated</strong> — when the response was last saved</li>
+                        </ul>
+                        <br>
+                        <p>
+                            Questions with no responses yet will show a message indicating no data has been submitted.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="applications">
+                    <h4 class="title is-4">Applications</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The applications page lists all available application packs. Each pack represents
+                            a role and contains up to three pre-interview questions for candidates to answer
+                            before their interview.
+                        </p>
+                        <br>
+                        <p><strong>Submitting a pre-interview form:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Find the relevant pack on the applications page</li>
+                            <li>Click <strong>Open Pre-Interview Form</strong></li>
+                            <li>Answer the questions provided</li>
+                            <li>Click <strong>Submit</strong> to send your answers</li>
+                        </ol>
+                        <br>
+                        <p>Submitted applications can be reviewed and approved or denied by your assessor.</p>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="application-review">
+                    <h4 class="title is-4">Application Review</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            The application review page shows all pre-interview forms submitted by candidates.
+                            Each entry shows the applicant's username, the pack they applied for, their answers,
+                            and the current status of their application.
+                        </p>
+                        <br>
+                        <p><strong>Approving an application:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Find the application in the list</li>
+                            <li>Click <strong>Approve</strong></li>
+                            <li>Select an interview date from the calendar</li>
+                            <li>Click <strong>Confirm</strong> to save — the application status will update to Accepted</li>
+                        </ol>
+                        <br>
+                        <p><strong>Denying an application:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Find the application in the list</li>
+                            <li>Click <strong>Deny</strong></li>
+                            <li>The application status will update to Denied</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="help-box mb-4" id="adding-questions">
+                    <h4 class="title is-4">Adding Questions</h4>
+                    <div class="my-3 is-size-6">
+                        <p>
+                            Navigate to <strong>Add Question</strong> in the navigation bar to add new
+                            interview questions to the system.
+                        </p>
+                        <br>
+                        <p><strong>Adding questions:</strong></p>
+                        <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Enter up to five questions in the fields provided (only the first is required)</li>
+                            <li>Select a category to group the questions under</li>
+                            <li>Click <strong>Save Questions</strong> to submit</li>
+                        </ol>
+                        <br>
+                        <p>
+                            Added questions will immediately appear on the interview page for all users.
+                        </p>
+                    </div>
+                </div>
+
             </div>
-
         </div>
 
-    </main>
+    </div>
 
-    {% include 'includes/footer.html' %}
+</main>
 
-</body>
-
-</html>
+{% endblock %}
