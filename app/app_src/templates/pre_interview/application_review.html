@@ -17,38 +17,62 @@
 
 <section class="section">
     <div class="container">
-        <!-- UPDATED: GREEN SUCCESS TOAST DESIGN WITH CHECKMARK & CLOSE BUTTON -->
+        <!-- UPDATED: TOAST DESIGN WITH VARIABLE TO FIX VS CODE SYNTAX WARNINGS -->
         {% if messages %}
-        <div id="django-messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: 350px; background-color: #5cb85c; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 16px; transition: all 0.4s ease; opacity: 0; transform: translateY(-20px); display: flex; align-items: flex-start; gap: 14px;">
             {% for message in messages %}
-            
-            <!-- Left Side: White Checkmark Icon -->
-            <div style="display: flex; align-items: center; justify-content: center; min-width: 24px; height: 24px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-
-            <!-- Center Content: Title and Message -->
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
-                <div style="font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.2;">
-                    Success
+            <div id="django-messages-container-{{ forloop.counter }}" class="django-messages-toast-item"
+                 style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: 350px;
+                 --toast-bg: {% if message.tags == 'error' %}#dc3545{% else %}#5cb85c{% endif %};
+                 background-color: var(--toast-bg);
+                 border-radius: 4px;
+                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                 padding: 16px;
+                 transition: all 0.4s ease;
+                 opacity: 0;
+                 transform: translateY(-20px);
+                 display: flex;
+                 align-items: flex-start;
+                 gap: 14px;">
+                
+                <!-- Left Side: Icon depending on Success or Error -->
+                <div style="display: flex; align-items: center; justify-content: center; min-width: 24px; height: 24px;">
+                    {% if message.tags == 'error' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    {% endif %}
                 </div>
-                <div style="font-size: 13px; font-weight: 400; color: #ffffff; line-height: 1.3; opacity: 0.95;">
-                    {{ message }}
+
+                <!-- Center Content: Title and Message -->
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+                    <div style="font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.2;">
+                        {% if message.tags == 'error' %}
+                            Denied
+                        {% else %}
+                            Success
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 13px; font-weight: 400; color: #ffffff; line-height: 1.3; opacity: 0.95;">
+                        {{ message }}
+                    </div>
                 </div>
-            </div>
 
-            <!-- Right Side: Close Button -->
-            <div style="font-size: 16px; font-weight: 700; color: #ffffff; cursor: pointer; line-height: 1; opacity: 0.8; user-select: none; transition: opacity 0.2s;" 
-                 onclick="document.getElementById('django-messages-container').remove();"
-                 onmouseover="this.style.opacity='1'" 
-                 onmouseout="this.style.opacity='0.8'">
-                X
-            </div>
+                <!-- Right Side: Close Button -->
+                <div style="font-size: 16px; font-weight: 700; color: #ffffff; cursor: pointer; line-height: 1; opacity: 0.8; user-select: none; transition: opacity 0.2s;" 
+                     onclick="document.getElementById('django-messages-container-{{ forloop.counter }}').remove();"
+                     onmouseover="this.style.opacity='1'" 
+                     onmouseout="this.style.opacity='0.8'">
+                    X
+                </div>
 
+            </div>
             {% endfor %}
-        </div>
         {% endif %}
 
         {% if applications %}
@@ -109,12 +133,12 @@
                         <td>
                             <div class="buttons are-small">
 
-                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW (FIXED) -->
+                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW -->
                                 <a href="{% url 'approve_application' application.application_id %}" class="button is-success is-outlined">
                                     Accept
                                 </a>
 
-                                <!-- DENY (FIXED) -->
+                                <!-- DENY -->
                                 <form method="post" action="{% url 'deny_application' application.application_id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button class="button is-danger is-outlined">
@@ -122,7 +146,7 @@
                                     </button>
                                 </form>
 
-                                <!-- VIEW MORE BUTTON (FIXED) -->
+                                <!-- VIEW MORE BUTTON -->
                                 <a class="button is-link is-light is-small"
                                     href="{% url 'application_detail' application.application_id %}">
                                     View More
@@ -153,8 +177,8 @@
 <!-- SMOOTH ENTRY AND EXIT FADE/SLIDE TIMING ANIMATION -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const toast = document.getElementById("django-messages-container");
-        if (toast) {
+        const toasts = document.querySelectorAll(".django-messages-toast-item");
+        toasts.forEach((toast) => {
             // Smoothly slide down / fade into view slightly after page render
             setTimeout(() => {
                 toast.style.opacity = "1";
@@ -169,7 +193,7 @@
                     toast.remove();
                 }, 400); 
             }, 4000);
-        }
+        });
     });
 </script>
 
