@@ -18,98 +18,97 @@
 <main class="section">
     <div class="container question-container">
 
-        <div class="question-card">
+        <div class="card mb-5">
+            <div class="card-content">
 
-<!--            <div class="question-header">-->
-<!--                <h1 class="title is-3">-->
-<!--                    Add Questions-->
-<!--                </h1>-->
-<!--                <p class="subtitle is-6">-->
-<!--                    Create up to five assessment questions and assign them to a category.-->
-<!--                </p>-->
-<!--            </div>-->
+                <form method="post">
+                    {% csrf_token %}
 
-            <form method="post">
-                {% csrf_token %}
+                    <div class="field">
+                        <label class="label">Question 1</label>
+                        {{ form.question_1 }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Question 1</label>
-                    {{ form.question_1 }}
-                </div>
+                    <div class="field">
+                        <label class="label">Question 2</label>
+                        {{ form.question_2 }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Question 2</label>
-                    {{ form.question_2 }}
-                </div>
+                    <div class="field">
+                        <label class="label">Question 3</label>
+                        {{ form.question_3 }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Question 3</label>
-                    {{ form.question_3 }}
-                </div>
+                    <div class="field">
+                        <label class="label">Question 4</label>
+                        {{ form.question_4 }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Question 4</label>
-                    {{ form.question_4 }}
-                </div>
+                    <div class="field">
+                        <label class="label">Question 5</label>
+                        {{ form.question_5 }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Question 5</label>
-                    {{ form.question_5 }}
-                </div>
+                    <div class="field">
+                        <label class="label">Category</label>
+                        {{ form.category }}
+                    </div>
 
-                <div class="field">
-                    <label class="label">Category</label>
-                    {{ form.category }}
-                </div>
+                    <button type="submit" class="button rr-primary save-btn">
+                        Save Questions
+                    </button>
 
-            <button type="submit" class="button rr-primary save-btn">
-                Save Questions
-            </button>
+                </form>
 
-            </form>
-
+            </div>
         </div>
 
-        <hr>
+        <div class="card">
+            <div class="card-content">
 
-        <h2 class="title is-5">Existing Questions</h2>
+                <h2 class="title is-5 mb-4">Existing Questions</h2>
 
-        <table class="table is-fullwidth is-striped">
-            <thead>
-                <tr>
-                    <th>Question</th>
-                    <th>Category</th>
-                    <th class="has-text-right">Action</th>
-                </tr>
-            </thead>
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Category</th>
+                                <th class="has-text-right">Action</th>
+                            </tr>
+                        </thead>
 
-            <tbody>
-                {% for q in questions %}
-                <tr>
-                    <td>{{ q.text }}</td>
-                    <td>
-                        <span class="tag is-info is-light">
-                            {{ q.category.name }}
-                        </span>
-                    </td>
-                    <td class="has-text-right">
+                        <tbody>
+                            {% for q in questions %}
+                            <tr>
+                                <td>{{ q.text }}</td>
+                                <td>
+                                    <span class="tag is-info is-light">
+                                        {{ q.category.name }}
+                                    </span>
+                                </td>
+                                <td class="has-text-right">
 
-                        <form method="post"
-                            action="{% url 'delete_question' q.id %}"
-                            style="display:inline;">
-                            {% csrf_token %}
+                                    <form method="post"
+                                        action="{% url 'delete_question' q.id %}"
+                                        style="display:inline;">
+                                        {% csrf_token %}
 
-                            <button class="button is-small is-danger is-light"
-                                    onclick="return confirm('Delete this question?')">
-                                Delete
-                            </button>
-                        </form>
+                                        <button class="button is-small is-danger is-light"
+                                                onclick="return confirm('Delete this question?')">
+                                            Delete
+                                        </button>
+                                    </form>
 
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
 
     </div>
 </main>
