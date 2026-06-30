@@ -16,24 +16,25 @@
                             <header class="header title is-4"> User Profile </header>
 
                             <div class="field my-4">
+                            <div class="field my-4 profile-setting">
                                 <label class="label">Username</label>
-                                <div>
+                                <div class="profile-setting-value">
                                     {{ user.username }}
                                 </div>
                             </div>
 
-                            <div class="field my-4">
+                            <div class="field my-4 profile-setting">
                                 <label class="label">Email</label>
-                                <div>
+                                <div class="profile-setting-value">
                                     {{ user.email }}
                                 </div>
                             </div>
 
                             <!-- Account Type Section -->
-                            <div class="field my-4">
+                            <div class="field my-4 profile-setting">
                                 <label class="label">Account Type</label>
-                                <div>
-                                    <span class="tag rr-secondary is-medium">
+                                <div class="profile-setting-value">
+                                    <span class="tag rr-secondary is-medium profile-account-type">
                                         <!-- Fixed: Relying entirely on your team's custom backend context variable -->
                                         {{ AccountType|default:"Standard User" }}
                                     </span>

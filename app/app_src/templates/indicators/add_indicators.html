@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Indicators</title>
+
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container">
+
+            <div class="interview-header">
+                <h1 class="title interview-title">Add Indicators</h1>
+            </div>
+
+            <div class="columns">
+
+                <!-- Form -->
+                <div class="column is-4">
+                    <div class="help-box">
+                        <h2 class="title is-5 interview-title" style="margin-bottom: 1rem;">Add Indicator</h2>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="field">
+                                <label class="label">Question</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">{{ form.question }}</div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Indicator Text</label>
+                                <div class="control">
+                                    {{ form.text }}
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Type</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">{{ form.category }}</div>
+                                </div>
+                            </div>
+                            <div class="field mt-4">
+                                <button type="submit" class="submit-btn" style="width: 100%;">
+                                    Add Indicator
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing indicators grouped by question -->
+                <div class="column">
+                    {% if questions %}
+                        {% for question in questions %}
+                        {% with positives=question.indicators.all|dictsort:"category" %}
+                        {% if question.indicators.all %}
+                        <div class="question-card mb-4">
+                            <p class="has-text-weight-bold mb-3">{{ question.text }}</p>
+                            <table class="score-table" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Positive</th>
+                                        <th>Negative</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for indicator in question.indicators.all %}
+                                    <tr>
+                                        {% if indicator.category == 'positive' %}
+                                        <td class="indicator-positive">{{ indicator.text }}</td>
+                                        <td></td>
+                                        {% else %}
+                                        <td></td>
+                                        <td class="indicator-negative">{{ indicator.text }}</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="has-text-grey">No questions available. Add questions first.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+</body>
+
+</html>

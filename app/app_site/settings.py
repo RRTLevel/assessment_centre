@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
 
 # Set the application Name, Version and Environment
 APPLICATION_NAME = "Rolls Royce"
-APPLICATION_VERSION = "ersion: x"
+APPLICATION_VERSION = "Version: 0.0.1"
 APPLICATION_ENVIRONMENT = os.getenv("APPLICATION_ENVIRONMENT", default="local")
 
 # A list representing the host/domain names to serve to
@@ -64,7 +64,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'app_src.contexts.applicationNameContext',
                 'app_src.contexts.applicationVersionContext',
-                'app_src.contexts.applicationEnvironmentContext'
+                'app_src.contexts.applicationEnvironmentContext',
+                'app_src.contexts.navigationPermissionsContext'
             ],
         },
     },

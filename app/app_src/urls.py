@@ -4,10 +4,6 @@ from . import views
 from .views import DeleteAccountView, RememberMeLoginView
 
 urlpatterns = [
-
-    # =====================
-    # HOME
-    # =====================
     path('', views.homeView.as_view(), name='home'),
 
     # =====================
@@ -23,6 +19,11 @@ urlpatterns = [
     # =====================
     path('documentation/', views.documentationView, name='documentation'),
     path('help/', views.helpView, name='help'),
+    path('results/', views.resultsView, name='results'),
+    path('add_indicators/', views.add_indicators, name='add_indicators'),
+    path('interview/', views.interview, name='interview'),
+    path('interview/save/', views.interview_save, name='interview_save'),
+    path('add_questions/', views.add_question, name="add_questions"),
 
     # =====================
     # INTERVIEW
@@ -54,10 +55,20 @@ urlpatterns = [
     # =====================
     path('applications/', views.applications, name='applications'),
     path('applicant-form/<int:pack_id>/', views.applicant_form, name='applicant_form'),
-    path('application-review/', views.application_review, name='application_review'),
-    path('applications/accepted_applicants/', views.accepted_applicants, name='accepted_applicants'),
-    path('applications/start_interview/<uuid:application_id>/', views.start_interview, name='start_interview'),
-    path('applications/<uuid:application_id>/', views.application_detail, name='application_detail'),
+    path("applications/<uuid:pk>/approve/", views.approve_application, name="approve_application"),
+    path("applications/<uuid:pk>/deny/", views.deny_application, name="deny_application"),
+    path('application-review/',views.application_review,name='application_review'),
+    path("application-review/<uuid:application_id>/",views.application_detail,name="application_detail"),
+    path("accepted-applicants/",views.accepted_applicants,name="accepted_applicants"),
+    path("interview/<uuid:application_id>/", views.start_interview, name="start_interview"),
+
+    # Questions
+    path('questions/', views.question_list, name="question_list"),
+    path('questions/delete/<int:pk>/', views.delete_question, name="delete_question"),
+
+    # Error pages
+
+    # Approve / Deny
     path('applications/<uuid:application_id>/approve/', views.approve_application, name='approve_application'),
     path('applications/<uuid:application_id>/deny/', views.deny_application, name='deny_application'),
 
