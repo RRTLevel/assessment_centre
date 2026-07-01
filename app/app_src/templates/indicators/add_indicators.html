@@ -38,7 +38,7 @@
                 <!-- Form -->
                 <div class="column is-4">
                     <div class="help-box">
-                        <h2 class="title is-5 interview-title" style="margin-bottom: 1rem;">Add Indicator</h2>
+                        <h2 class="title is-5 interview-title" style="margin-bottom: 1rem;">Add Indicator Pair</h2>
                         <form method="POST">
                             {% csrf_token %}
                             <div class="field">
@@ -48,20 +48,20 @@
                                 </div>
                             </div>
                             <div class="field">
-                                <label class="label">Indicator Text</label>
+                                <label class="label">Positive Indicator</label>
                                 <div class="control">
-                                    {{ form.text }}
+                                    {{ form.positive }}
                                 </div>
                             </div>
                             <div class="field">
-                                <label class="label">Type</label>
+                                <label class="label">Negative Indicator</label>
                                 <div class="control">
-                                    <div class="select is-fullwidth">{{ form.category }}</div>
+                                    {{ form.negative }}
                                 </div>
                             </div>
                             <div class="field mt-4">
                                 <button type="submit" class="submit-btn" style="width: 100%;">
-                                    Add Indicator
+                                    Add Indicator Pair
                                 </button>
                             </div>
                         </form>
@@ -72,7 +72,6 @@
                 <div class="column">
                     {% if questions %}
                         {% for question in questions %}
-                        {% with positives=question.indicators.all|dictsort:"category" %}
                         {% if question.indicators.all %}
                         <div class="question-card mb-4">
                             <p class="has-text-weight-bold mb-3">{{ question.text }}</p>
@@ -86,20 +85,14 @@
                                 <tbody>
                                     {% for indicator in question.indicators.all %}
                                     <tr>
-                                        {% if indicator.category == 'positive' %}
-                                        <td class="indicator-positive">{{ indicator.text }}</td>
-                                        <td></td>
-                                        {% else %}
-                                        <td></td>
-                                        <td class="indicator-negative">{{ indicator.text }}</td>
-                                        {% endif %}
+                                        <td class="indicator-positive">{{ indicator.positive }}</td>
+                                        <td class="indicator-negative">{{ indicator.negative }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                         {% endif %}
-                        {% endwith %}
                         {% endfor %}
                     {% else %}
                         <p class="has-text-grey">No questions available. Add questions first.</p>
