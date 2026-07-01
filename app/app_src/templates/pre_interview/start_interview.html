@@ -8,35 +8,62 @@
     <div class="interview-header">
         <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
         <p class="interview-count">
-            Pack: {{ application.pack.title }} &middot; Total Questions: {{ questions|length }}
+            Pack: {{ application.pack.title }} &middot; Total Questions: {{ question_data|length }}
         </p>
     </div>
 
-    <!-- Applicant's pre-interview answers (read-only context) -->
-    <div class="applicant-answers box">
-        <h2 class="title is-5">Applicant Answers</h2>
-
-        {% if application.pack.pre_interview_question_1 %}
-            <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
-            <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
-        {% endif %}
-
-        {% if application.pack.pre_interview_question_2 %}
-            <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
-            <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
-        {% endif %}
-
-        {% if application.pack.pre_interview_question_3 %}
-            <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
-            <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
-        {% endif %}
+    {% if application.pack.description %}
+    <div class="box mb-4">
+        <h2 class="title is-5">Pack Description</h2>
+        <p>{{ application.pack.description }}</p>
     </div>
+    {% endif %}
+
+    <div class="box mb-4">
+        <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers()">
+            <span>Applicant Answers</span>
+            <span id="answers-arrow" style="margin-left: auto;">&#9660;</span>
+        </button>
+        <div id="applicant-answers" style="display: none; margin-top: 1rem;">
+            {% if application.pack.pre_interview_question_1 %}
+                <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+                <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
+            {% endif %}
+
+            {% if application.pack.pre_interview_question_2 %}
+                <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+                <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
+            {% endif %}
+
+            {% if application.pack.pre_interview_question_3 %}
+                <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+                <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const el = document.getElementById('applicant-answers');
+            const arrow = document.getElementById('answers-arrow');
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                arrow.innerHTML = '&#9650;';
+            } else {
+                el.style.display = 'none';
+                arrow.innerHTML = '&#9660;';
+            }
+        }
+    </script>
 
     <form method="post" action="{% url 'start_interview' application.application_id %}">
         {% csrf_token %}
 
         {% for item in question_data %}
-
+        <div class="box mb-4">
+            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
+                Question {{ forloop.counter }} &mdash; {{ application.pack.title }}
+            </p>
             <div class="question-row">
 
                 <div class="question-card">
@@ -44,63 +71,69 @@
                 </div>
 
                 <div class="Score-Box">
-
-                    <div class="table-container">
-                        <table class="score-table">
-                            <thead>
-                            <tr>
-                                <th>indicators</th>
-                                <th>positive</th>
-                                <th>negative</th>
-                                <th>score</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <th></th>
-                                <td class="indicator-positive">{{ item.rows.0.pos }}</td>
-                                <td class="indicator-negative">{{ item.rows.0.neg }}</td>
-                                <td rowspan="3">
-                                    <input type="number" min="1" max="6" step="1"
-                                           class="score-input"
-                                           name="score_{{ item.question.id }}"
-                                           value="{{ item.result.score|default_if_none:'' }}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <td class="indicator-positive">{{ item.rows.1.pos }}</td>
-                                <td class="indicator-negative">{{ item.rows.1.neg }}</td>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <td class="indicator-positive">{{ item.rows.2.pos }}</td>
-                                <td class="indicator-negative">{{ item.rows.2.neg }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
                     <div class="notes_box">
-                        <label for="notes-{{ item.question.id }}">Notes</label>
+                        <label class="notes-label" for="notes-{{ item.question.id }}">Notes</label>
                         <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
                                   name="notes_{{ item.question.id }}">{{ item.result.notes|default:'' }}</textarea>
                     </div>
-
-                    <div class="feedback_box">
-                        <label for="feedback-{{ item.question.id }}">Feedback</label>
-                        <textarea id="feedback-{{ item.question.id }}" class="feedback-textarea"
-                                  name="feedback_{{ item.question.id }}">{{ item.result.feedback|default:'' }}</textarea>
-                    </div>
-
                 </div>
-            </div>
 
-        {% empty %}
-            <div class="no-questions">
-                No interview questions available.
             </div>
+        </div>
+        {% empty %}
+            <div class="no-questions">No interview questions available.</div>
         {% endfor %}
+
+        <div class="question-card mt-5">
+            <h2 class="title is-5 interview-title">Interview Assessment</h2>
+        </div>
+
+        {% for item in question_data %}
+        <div class="Score-Box mt-4">
+            <p class="question-text mb-2"><strong>{{ item.question.text }}</strong></p>
+            <div class="table-container">
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>indicators</th>
+                            <th>positive</th>
+                            <th>negative</th>
+                            <th>score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <td class="indicator-positive">{{ item.rows.0.pos }}</td>
+                            <td class="indicator-negative">{{ item.rows.0.neg }}</td>
+                            <td rowspan="3">
+                                <input type="number" min="1" max="6" step="1"
+                                       class="score-input"
+                                       name="score_{{ item.question.id }}"
+                                       value="{{ item.result.score|default_if_none:'' }}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td class="indicator-positive">{{ item.rows.1.pos }}</td>
+                            <td class="indicator-negative">{{ item.rows.1.neg }}</td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td class="indicator-positive">{{ item.rows.2.pos }}</td>
+                            <td class="indicator-negative">{{ item.rows.2.neg }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="Score-Box mt-4">
+            <label class="feedback-label" for="overall-feedback">Overall Feedback</label>
+            <textarea id="overall-feedback" class="feedback-textarea"
+                      name="overall_feedback" placeholder="Enter overall feedback here..."></textarea>
+        </div>
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
