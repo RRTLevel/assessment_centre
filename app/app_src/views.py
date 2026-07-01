@@ -223,14 +223,13 @@ def interview(request):
     question_data = []
     for question in questions:
         form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
-        positives = list(question.indicators.filter(category="positive"))
-        negatives = list(question.indicators.filter(category="negative"))
+        indicators = list(question.indicators.all())
         rows = []
 
         for i in range(3):
             rows.append({
-                "pos": positives[i].text if i < len(positives) else "",
-                "neg": negatives[i].text if i < len(negatives) else "",
+                "pos": indicators[i].positive if i < len(indicators) else "",
+                "neg": indicators[i].negative if i < len(indicators) else "",
             })
 
         question_data.append({"question": question, "form": form, "rows": rows})
@@ -459,13 +458,12 @@ def start_interview(request, application_id):
     question_data = []
     for question in questions:
         result = saved.get(question.id)
-        positives = list(question.indicators.filter(category="positive"))
-        negatives = list(question.indicators.filter(category="negative"))
+        indicators = list(question.indicators.all())
         rows = []
         for i in range(3):
             rows.append({
-                "pos": positives[i].text if i < len(positives) else "",
-                "neg": negatives[i].text if i < len(negatives) else "",
+                "pos": indicators[i].positive if i < len(indicators) else "",
+                "neg": indicators[i].negative if i < len(indicators) else "",
             })
         question_data.append({"question": question, "result": result, "rows": rows})
 
