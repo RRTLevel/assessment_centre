@@ -430,11 +430,11 @@ def start_interview(request, application_id):
 
     if request.method == "POST":
         scores = []
+        overall_feedback = request.POST.get("overall_feedback", "")
 
         for question in questions:
             score_raw = request.POST.get(f"score_{question.id}")
             notes = request.POST.get(f"notes_{question.id}", "")
-            feedback = request.POST.get(f"feedback_{question.id}", "")
             score = int(score_raw) if score_raw and score_raw.isdigit() else None
 
             if score is not None:
@@ -446,7 +446,7 @@ def start_interview(request, application_id):
                 defaults={
                     "score": score,
                     "notes": notes,
-                    "feedback": feedback,
+                    "feedback": overall_feedback,
                 },
             )
 
