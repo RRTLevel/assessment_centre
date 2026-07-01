@@ -21,14 +21,12 @@ urlpatterns = [
     path('help/', views.helpView, name='help'),
     path('results/', views.resultsView, name='results'),
     path('add_indicators/', views.add_indicators, name='add_indicators'),
-    path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
     path('add_questions/', views.add_question, name="add_questions"),
 
     # =====================
     # INTERVIEW
     # =====================
-    path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
 
     # =====================
