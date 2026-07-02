@@ -48,6 +48,12 @@
                                 </div>
                             </div>
                             <div class="field">
+                                <label class="label">Name</label>
+                                <div class="control">
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="field">
                                 <label class="label">Positive Indicator</label>
                                 <div class="control">
                                     {{ form.positive }}
@@ -78,6 +84,7 @@
                             <table class="score-table" style="width: 100%;">
                                 <thead>
                                     <tr>
+                                        <th>Name</th>
                                         <th>Positive</th>
                                         <th>Negative</th>
                                     </tr>
@@ -85,6 +92,7 @@
                                 <tbody>
                                     {% for indicator in question.indicators.all %}
                                     <tr>
+                                        <td><strong>{{ indicator.name }}</strong></td>
                                         <td class="indicator-positive">{{ indicator.positive }}</td>
                                         <td class="indicator-negative">{{ indicator.negative }}</td>
                                     </tr>

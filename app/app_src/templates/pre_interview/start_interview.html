@@ -29,12 +29,10 @@
                 <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
                 <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
             {% endif %}
-
             {% if application.pack.pre_interview_question_2 %}
                 <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
                 <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
             {% endif %}
-
             {% if application.pack.pre_interview_question_3 %}
                 <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
                 <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
@@ -42,98 +40,138 @@
         </div>
     </div>
 
-    <script>
-        function toggleAnswers() {
-            const el = document.getElementById('applicant-answers');
-            const arrow = document.getElementById('answers-arrow');
-            if (el.style.display === 'none') {
-                el.style.display = 'block';
-                arrow.innerHTML = '&#9650;';
-            } else {
-                el.style.display = 'none';
-                arrow.innerHTML = '&#9660;';
-            }
-        }
-    </script>
-
-    <form method="post" action="{% url 'start_interview' application.application_id %}">
+    <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
         {% csrf_token %}
 
+        <!-- ── QUESTIONS ── -->
         {% for item in question_data %}
         <div class="box mb-4">
             <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
                 Question {{ forloop.counter }} &mdash; {{ application.pack.title }}
             </p>
             <div class="question-row">
-
                 <div class="question-card">
                     <p class="question-text">{{ item.question.text }}</p>
                 </div>
-
                 <div class="Score-Box">
                     <div class="notes_box">
                         <label class="notes-label" for="notes-{{ item.question.id }}">Notes</label>
                         <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
-                                  name="notes_{{ item.question.id }}">{{ item.result.notes|default:'' }}</textarea>
+                                  name="notes_{{ item.question.id }}"
+                                  required>{{ item.result.notes|default:'' }}</textarea>
                     </div>
                 </div>
-
             </div>
         </div>
         {% empty %}
             <div class="no-questions">No interview questions available.</div>
         {% endfor %}
 
-        <div class="question-card mt-5">
+        <!-- ── ASSESSMENT ── -->
+        <div class="question-card mt-5 mb-4">
             <h2 class="title is-5 interview-title">Interview Assessment</h2>
         </div>
 
         {% for item in question_data %}
-        <div class="Score-Box mt-4">
-            <p class="question-text mb-2"><strong>{{ item.question.text }}</strong></p>
+        <div class="box mb-5">
+            <div style="display:flex; justify-content:space-between; align-items:center;" class="mb-3">
+                <p class="has-text-weight-semibold" style="color:#1800A8;">
+                    Assessment — {{ item.question.text|truncatechars:60 }}
+                </p>
+                {% if item.indicators %}
+                <button type="button" class="button is-small submit-btn"
+                        onclick="openModal('modal-{{ item.question.id }}')">
+                    + Add Indicator
+                </button>
+                {% endif %}
+            </div>
+
             <div class="table-container">
-                <table class="score-table">
+                <table class="score-table" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>indicators</th>
-                            <th>positive</th>
-                            <th>negative</th>
-                            <th>score</th>
+                            <th>Indicator</th>
+                            <th>Positive</th>
+                            <th>Negative</th>
+                            <th>Score (1–6)</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tbody-{{ item.question.id }}">
+                        <!-- rows added dynamically -->
+                    </tbody>
+                    <tfoot>
                         <tr>
-                            <th></th>
-                            <td class="indicator-positive">{{ item.rows.0.pos }}</td>
-                            <td class="indicator-negative">{{ item.rows.0.neg }}</td>
-                            <td rowspan="3">
+                            <td colspan="3"><strong>Overall Score</strong></td>
+                            <td>
                                 <input type="number" min="1" max="6" step="1"
                                        class="score-input"
-                                       name="score_{{ item.question.id }}"
-                                       value="{{ item.result.score|default_if_none:'' }}">
+                                       name="overall_score_{{ item.question.id }}"
+                                       placeholder="1–6"
+                                       required>
                             </td>
                         </tr>
-                        <tr>
-                            <th></th>
-                            <td class="indicator-positive">{{ item.rows.1.pos }}</td>
-                            <td class="indicator-negative">{{ item.rows.1.neg }}</td>
-                        </tr>
-                        <tr>
-                            <th></th>
-                            <td class="indicator-positive">{{ item.rows.2.pos }}</td>
-                            <td class="indicator-negative">{{ item.rows.2.neg }}</td>
-                        </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </div>
-        </div>
-        {% endfor %}
 
-        <div class="Score-Box mt-4">
-            <label class="feedback-label" for="overall-feedback">Overall Feedback</label>
-            <textarea id="overall-feedback" class="feedback-textarea"
-                      name="overall_feedback" placeholder="Enter overall feedback here..."></textarea>
+            <div class="field mt-3">
+                <label class="feedback-label">Feedback</label>
+                <textarea class="feedback-textarea"
+                          name="feedback_{{ item.question.id }}"
+                          placeholder="Enter feedback for this question..."
+                          required>{{ item.result.feedback|default:'' }}</textarea>
+            </div>
+
+            {% if not item.indicators %}
+            <p class="has-text-grey is-size-7 mt-2">No indicators added for this question yet.</p>
+            {% endif %}
         </div>
+
+        <!-- ── MODAL ── -->
+        {% if item.indicators %}
+        <div class="modal" id="modal-{{ item.question.id }}">
+            <div class="modal-background" onclick="closeModal('modal-{{ item.question.id }}')"></div>
+            <div class="modal-card">
+                <header class="modal-card-head" style="background:#1800A8;">
+                    <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
+                    <button class="delete" aria-label="close"
+                            onclick="closeModal('modal-{{ item.question.id }}')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p class="is-size-7 has-text-grey mb-3">
+                        Click an indicator to add it to the assessment table.
+                        Already-added indicators are hidden.
+                    </p>
+                    {% for indicator in item.indicators %}
+                    <div class="box mb-3 indicator-card"
+                         id="card-{{ item.question.id }}-{{ indicator.id }}"
+                         style="cursor:pointer;"
+                         onclick="addIndicatorRow(
+                             '{{ item.question.id }}',
+                             '{{ indicator.id }}',
+                             '{{ indicator.name|escapejs }}',
+                             '{{ indicator.positive|escapejs }}',
+                             '{{ indicator.negative|escapejs }}'
+                         )">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div>
+                                <p class="has-text-weight-bold">{{ indicator.name }}</p>
+                                <p class="is-size-7 indicator-positive mt-1">+ {{ indicator.positive|truncatechars:80 }}</p>
+                                <p class="is-size-7 indicator-negative">− {{ indicator.negative|truncatechars:80 }}</p>
+                            </div>
+                            <span class="button is-small is-primary ml-3" style="pointer-events:none;">Add</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <p id="no-more-{{ item.question.id }}" style="display:none;"
+                       class="has-text-grey has-text-centered">
+                        All indicators have been added.
+                    </p>
+                </section>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
@@ -143,5 +181,67 @@
 
 </div>
 </main>
+
+<script>
+function toggleAnswers() {
+    const el = document.getElementById('applicant-answers');
+    const arrow = document.getElementById('answers-arrow');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    arrow.innerHTML = el.style.display === 'none' ? '&#9660;' : '&#9650;';
+}
+
+function openModal(id) {
+    document.getElementById(id).classList.add('is-active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('is-active');
+}
+
+function addIndicatorRow(questionId, indicatorId, name, positive, negative) {
+    const tbody = document.getElementById('tbody-' + questionId);
+
+    // Don't add duplicates
+    if (document.getElementById('row-' + questionId + '-' + indicatorId)) return;
+
+    const row = document.createElement('tr');
+    row.id = 'row-' + questionId + '-' + indicatorId;
+    row.innerHTML =
+        '<td><strong>' + name + '</strong></td>' +
+        '<td class="indicator-positive">' + positive + '</td>' +
+        '<td class="indicator-negative">' + negative + '</td>' +
+        '<td>' +
+            '<input type="number" min="1" max="6" step="1" class="score-input"' +
+            ' name="indicator_score_' + questionId + '_' + indicatorId + '"' +
+            ' placeholder="1–6" required>' +
+        '</td>';
+    tbody.appendChild(row);
+
+    // Hide the card in the modal
+    const card = document.getElementById('card-' + questionId + '-' + indicatorId);
+    if (card) card.style.display = 'none';
+
+    // Check if all cards are hidden
+    const allCards = document.querySelectorAll('#modal-' + questionId + ' .indicator-card');
+    const allHidden = Array.from(allCards).every(c => c.style.display === 'none');
+    if (allHidden) {
+        document.getElementById('no-more-' + questionId).style.display = 'block';
+    }
+
+    closeModal('modal-' + questionId);
+}
+
+// Enforce 1-6 range on blur for all score inputs
+document.getElementById('interview-form').addEventListener('blur', function(e) {
+    if (e.target.classList.contains('score-input')) {
+        const val = parseInt(e.target.value);
+        if (e.target.value !== '' && (isNaN(val) || val < 1 || val > 6)) {
+            e.target.setCustomValidity('Score must be between 1 and 6.');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    }
+}, true);
+</script>
 
 {% endblock %}
