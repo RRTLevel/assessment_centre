@@ -31,6 +31,7 @@ from .models import (
     Application,
     Category,
     Indicator,
+    IndicatorScore,
     InterviewResponse,
     InterviewResult,
     Note,
@@ -428,44 +429,51 @@ def start_interview(request, application_id):
     questions = Questions.objects.filter(category=application.pack.category).prefetch_related("indicators")
 
     if request.method == "POST":
-        scores = []
-        overall_feedback = request.POST.get("overall_feedback", "")
+        overall_scores = []
 
         for question in questions:
-            score_raw = request.POST.get(f"score_{question.id}")
             notes = request.POST.get(f"notes_{question.id}", "")
-            score = int(score_raw) if score_raw and score_raw.isdigit() else None
+            feedback = request.POST.get(f"feedback_{question.id}", "")
+            overall_score_raw = request.POST.get(f"overall_score_{question.id}")
+            overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
 
-            if score is not None:
-                scores.append(score)
+            if overall_score is not None:
+                overall_scores.append(overall_score)
 
-            InterviewResult.objects.update_or_create(
+            result, _ = InterviewResult.objects.update_or_create(
                 application=application,
                 question=question,
-                defaults={
-                    "score": score,
-                    "notes": notes,
-                    "feedback": overall_feedback,
-                },
+                defaults={"score": overall_score, "notes": notes, "feedback": feedback},
             )
 
-        application.average_score = round(sum(scores) / len(scores), 2) if scores else None
+            for indicator in question.indicators.all():
+                score_raw = request.POST.get(f"indicator_score_{question.id}_{indicator.id}")
+                if score_raw and score_raw.isdigit():
+                    IndicatorScore.objects.update_or_create(
+                        result=result,
+                        indicator=indicator,
+                        defaults={"score": int(score_raw)},
+                    )
+
+        application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
         application.save()
         messages.success(request, f"Interview for {application.user.username} submitted.")
         return redirect("inbox")
 
-    saved = {result.question_id: result for result in application.results.all()}
+    saved = {result.question_id: result for result in application.results.prefetch_related("indicator_scores").all()}
     question_data = []
     for question in questions:
         result = saved.get(question.id)
         indicators = list(question.indicators.all())
-        rows = []
-        for i in range(3):
-            rows.append({
-                "pos": indicators[i].positive if i < len(indicators) else "",
-                "neg": indicators[i].negative if i < len(indicators) else "",
-            })
-        question_data.append({"question": question, "result": result, "rows": rows})
+        saved_scores = {}
+        if result:
+            saved_scores = {s.indicator_id: s.score for s in result.indicator_scores.all()}
+        question_data.append({
+            "question": question,
+            "result": result,
+            "indicators": indicators,
+            "saved_scores": saved_scores,
+        })
 
     return render(request, "pre_interview/start_interview.html", {
         "application": application,
