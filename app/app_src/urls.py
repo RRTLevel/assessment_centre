@@ -80,4 +80,6 @@ urlpatterns = [
     # =====================
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
+
+    path('statistics_dashboard/candidate_dashboard',views.candidate_dashboard, name='candidate_dashboard' )
 ]

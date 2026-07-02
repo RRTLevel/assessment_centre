@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
+from django.contrib.auth.models import User
 
 from .forms import (
     AddNoteForm,
@@ -532,3 +533,32 @@ def inbox_view(request):
         "next_year": next_year,
         "applications": True,
     })
+
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
+def candidate_dashboard(request):
+    questions = Questions.objects.all().order_by("id")
+
+    users = (
+        User.objects
+        .filter(application__results__isnull=False)   # only users who have scored results
+        .distinct()
+        .annotate(avg=Avg("application__results__score"))
+        .order_by("-avg")
+    )
+
+    rows = []
+    for user in users:
+        results = InterviewResult.objects.filter(application__user=user)
+        scores = {r.question_id: r.score for r in results}
+        cells = [scores.get(q.id) for q in questions]
+        rows.append({
+            "name": user.username,
+            "cells": cells,
+            "avg": user.avg,
+        })
+
+    context = {"questions": questions, "rows": rows}
+    return render(request, "statistics_dashboard/candidate_dashboard.html", context)
