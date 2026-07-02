@@ -72,75 +72,32 @@
             <h2 class="title is-5 interview-title">Interview Assessment</h2>
         </div>
 
-        {% for item in question_data %}
-        <div class="box mb-5">
-            <div style="display:flex; justify-content:space-between; align-items:center;" class="mb-3">
-                <p class="has-text-weight-semibold" style="color:#1800A8;">
-                    Assessment — {{ item.question.text|truncatechars:60 }}
-                </p>
-                {% if item.indicators %}
-                <button type="button" class="button is-small submit-btn"
-                        onclick="openModal('modal-{{ item.question.id }}')">
-                    + Add Indicator
-                </button>
-                {% endif %}
-            </div>
+        <!-- Dynamically created assessment boxes appear here -->
+        <div id="assessment-container"></div>
 
-            <div class="table-container">
-                <table class="score-table" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>Indicator</th>
-                            <th>Positive</th>
-                            <th>Negative</th>
-                            <th>Score (1–6)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-{{ item.question.id }}">
-                        <!-- rows added dynamically -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3"><strong>Overall Score</strong></td>
-                            <td>
-                                <input type="number" min="1" max="6" step="1"
-                                       class="score-input"
-                                       name="overall_score_{{ item.question.id }}"
-                                       placeholder="1–6"
-                                       required>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="field mt-3">
-                <label class="feedback-label">Feedback</label>
-                <textarea class="feedback-textarea"
-                          name="feedback_{{ item.question.id }}"
-                          placeholder="Enter feedback for this question..."
-                          required>{{ item.result.feedback|default:'' }}</textarea>
-            </div>
-
-            {% if not item.indicators %}
-            <p class="has-text-grey is-size-7 mt-2">No indicators added for this question yet.</p>
-            {% endif %}
+        <div class="mb-4">
+            <button type="button" class="submit-btn" onclick="openModal('indicator-modal')">
+                + Add Indicator
+            </button>
         </div>
 
-        <!-- ── MODAL ── -->
-        {% if item.indicators %}
-        <div class="modal" id="modal-{{ item.question.id }}">
-            <div class="modal-background" onclick="closeModal('modal-{{ item.question.id }}')"></div>
+        <!-- Single modal with all indicators -->
+        <div class="modal" id="indicator-modal">
+            <div class="modal-background" onclick="closeModal('indicator-modal')"></div>
             <div class="modal-card">
                 <header class="modal-card-head" style="background:#1800A8;">
                     <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
-                    <button class="delete" aria-label="close"
-                            onclick="closeModal('modal-{{ item.question.id }}')"></button>
+                    <button class="delete" aria-label="close" onclick="closeModal('indicator-modal')"></button>
                 </header>
                 <section class="modal-card-body">
                     <p class="is-size-7 has-text-grey mb-3">
-                        Click an indicator to add it to the assessment table.
-                        Already-added indicators are hidden.
+                        Select a behavioural indicator to assess. Each indicator includes
+                        positive and negative examples to guide your scoring.
+                    </p>
+                    {% for item in question_data %}
+                    {% if item.indicators %}
+                    <p class="has-text-weight-semibold is-size-7 mb-2" style="color:#1800A8;">
+                        {{ item.question.text|truncatechars:70 }}
                     </p>
                     {% for indicator in item.indicators %}
                     <div class="box mb-3 indicator-card"
@@ -148,6 +105,7 @@
                          style="cursor:pointer;"
                          onclick="addIndicatorRow(
                              '{{ item.question.id }}',
+                             '{{ item.question.text|escapejs }}',
                              '{{ indicator.id }}',
                              '{{ indicator.name|escapejs }}',
                              '{{ indicator.positive|escapejs }}',
@@ -163,15 +121,14 @@
                         </div>
                     </div>
                     {% endfor %}
-                    <p id="no-more-{{ item.question.id }}" style="display:none;"
-                       class="has-text-grey has-text-centered">
-                        All indicators have been added.
+                    {% endif %}
+                    {% endfor %}
+                    <p id="no-more-all" style="display:none;" class="has-text-grey has-text-centered">
+                        All available indicators have been added.
                     </p>
                 </section>
             </div>
         </div>
-        {% endif %}
-        {% endfor %}
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
@@ -198,37 +155,64 @@ function closeModal(id) {
     document.getElementById(id).classList.remove('is-active');
 }
 
-function addIndicatorRow(questionId, indicatorId, name, positive, negative) {
-    const tbody = document.getElementById('tbody-' + questionId);
-
+function addIndicatorRow(questionId, questionText, indicatorId, name, positive, negative) {
     // Don't add duplicates
     if (document.getElementById('row-' + questionId + '-' + indicatorId)) return;
 
+    // Create the assessment box for this question if it doesn't exist yet
+    let box = document.getElementById('assessment-box-' + questionId);
+    if (!box) {
+        const container = document.getElementById('assessment-container');
+        box = document.createElement('div');
+        box.className = 'box mb-4';
+        box.id = 'assessment-box-' + questionId;
+        box.innerHTML =
+            '<p class="has-text-weight-semibold mb-3" style="color:#1800A8;">' +
+                'Assessment — ' + questionText + '</p>' +
+            '<div class="table-container">' +
+                '<table class="score-table" style="width:100%;">' +
+                    '<thead><tr>' +
+                        '<th>Indicator</th><th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
+                    '</tr></thead>' +
+                    '<tbody id="tbody-' + questionId + '"></tbody>' +
+                    '<tfoot><tr>' +
+                        '<td colspan="3"><strong>Overall Score</strong></td>' +
+                        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
+                            ' name="overall_score_' + questionId + '" placeholder="1–6" required></td>' +
+                    '</tr></tfoot>' +
+                '</table>' +
+            '</div>' +
+            '<div class="field mt-3">' +
+                '<label class="feedback-label">Feedback</label>' +
+                '<textarea class="feedback-textarea" name="feedback_' + questionId + '"' +
+                    ' placeholder="Enter feedback for this question..." required></textarea>' +
+            '</div>';
+        container.appendChild(box);
+    }
+
+    // Add the row
+    const tbody = document.getElementById('tbody-' + questionId);
     const row = document.createElement('tr');
     row.id = 'row-' + questionId + '-' + indicatorId;
     row.innerHTML =
         '<td><strong>' + name + '</strong></td>' +
         '<td class="indicator-positive">' + positive + '</td>' +
         '<td class="indicator-negative">' + negative + '</td>' +
-        '<td>' +
-            '<input type="number" min="1" max="6" step="1" class="score-input"' +
+        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
             ' name="indicator_score_' + questionId + '_' + indicatorId + '"' +
-            ' placeholder="1–6" required>' +
-        '</td>';
+            ' placeholder="1–6" required></td>';
     tbody.appendChild(row);
 
     // Hide the card in the modal
     const card = document.getElementById('card-' + questionId + '-' + indicatorId);
     if (card) card.style.display = 'none';
 
-    // Check if all cards are hidden
-    const allCards = document.querySelectorAll('#modal-' + questionId + ' .indicator-card');
+    // Check if all cards are now hidden
+    const allCards = document.querySelectorAll('#indicator-modal .indicator-card');
     const allHidden = Array.from(allCards).every(c => c.style.display === 'none');
-    if (allHidden) {
-        document.getElementById('no-more-' + questionId).style.display = 'block';
-    }
+    if (allHidden) document.getElementById('no-more-all').style.display = 'block';
 
-    closeModal('modal-' + questionId);
+    closeModal('indicator-modal');
 }
 
 // Enforce 1-6 range on blur for all score inputs
