@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+{% endblock %}
+
 {% block content %}
 
 <main class="section">
@@ -140,6 +145,24 @@
 </main>
 
 <script>
+$(document).ready(function () {
+    // Initialise Summernote on all notes textareas
+    $('.notes-textarea').summernote({
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['misc', ['undo', 'redo']]
+        ],
+        height: 150,
+        placeholder: 'Enter interview notes here...',
+        callbacks: {
+            onChange: function (contents) {
+                $(this).val(contents);
+            }
+        }
+    });
+});
+
 function toggleAnswers() {
     const el = document.getElementById('applicant-answers');
     const arrow = document.getElementById('answers-arrow');
@@ -156,10 +179,8 @@ function closeModal(id) {
 }
 
 function addIndicatorRow(questionId, questionText, indicatorId, name, positive, negative) {
-    // Don't add duplicates
     if (document.getElementById('row-' + questionId + '-' + indicatorId)) return;
 
-    // Create the assessment box for this question if it doesn't exist yet
     let box = document.getElementById('assessment-box-' + questionId);
     if (!box) {
         const container = document.getElementById('assessment-container');
@@ -185,12 +206,11 @@ function addIndicatorRow(questionId, questionText, indicatorId, name, positive, 
             '<div class="field mt-3">' +
                 '<label class="feedback-label">Feedback</label>' +
                 '<textarea class="feedback-textarea" name="feedback_' + questionId + '"' +
-                    ' placeholder="Enter feedback for this question..." required></textarea>' +
+                    ' placeholder="Enter feedback for this question..."></textarea>' +
             '</div>';
         container.appendChild(box);
     }
 
-    // Add the row
     const tbody = document.getElementById('tbody-' + questionId);
     const row = document.createElement('tr');
     row.id = 'row-' + questionId + '-' + indicatorId;
@@ -203,11 +223,9 @@ function addIndicatorRow(questionId, questionText, indicatorId, name, positive, 
             ' placeholder="1–6" required></td>';
     tbody.appendChild(row);
 
-    // Hide the card in the modal
     const card = document.getElementById('card-' + questionId + '-' + indicatorId);
     if (card) card.style.display = 'none';
 
-    // Check if all cards are now hidden
     const allCards = document.querySelectorAll('#indicator-modal .indicator-card');
     const allHidden = Array.from(allCards).every(c => c.style.display === 'none');
     if (allHidden) document.getElementById('no-more-all').style.display = 'block';
@@ -226,6 +244,20 @@ document.getElementById('interview-form').addEventListener('blur', function(e) {
         }
     }
 }, true);
+
+// Validate notes are not empty before submit (Summernote hides the textarea so 'required' won't fire)
+document.getElementById('interview-form').addEventListener('submit', function(e) {
+    let valid = true;
+    $('.notes-textarea').each(function() {
+        const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
+        if (!content) {
+            alert('Please fill in all notes before submitting.');
+            valid = false;
+            return false;
+        }
+    });
+    if (!valid) e.preventDefault();
+});
 </script>
 
 {% endblock %}
