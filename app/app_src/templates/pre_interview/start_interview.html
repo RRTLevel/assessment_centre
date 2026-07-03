@@ -209,6 +209,22 @@ function addIndicatorRow(questionId, questionText, indicatorId, name, positive, 
                     ' placeholder="Enter feedback for this question..."></textarea>' +
             '</div>';
         container.appendChild(box);
+
+        // Initialise Summernote on the feedback textarea now it's in the DOM
+        $(box).find('.feedback-textarea').summernote({
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline']],
+                ['para', ['ul', 'ol']],
+                ['misc', ['undo', 'redo']]
+            ],
+            height: 150,
+            placeholder: 'Enter feedback for this question...',
+            callbacks: {
+                onChange: function (contents) {
+                    $(this).val(contents);
+                }
+            }
+        });
     }
 
     const tbody = document.getElementById('tbody-' + questionId);
@@ -245,13 +261,13 @@ document.getElementById('interview-form').addEventListener('blur', function(e) {
     }
 }, true);
 
-// Validate notes are not empty before submit (Summernote hides the textarea so 'required' won't fire)
+// Validate notes and feedback are not empty before submit (Summernote hides textareas so 'required' won't fire)
 document.getElementById('interview-form').addEventListener('submit', function(e) {
     let valid = true;
-    $('.notes-textarea').each(function() {
+    $('.notes-textarea, .feedback-textarea').each(function() {
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
         if (!content) {
-            alert('Please fill in all notes before submitting.');
+            alert('Please fill in all notes and feedback before submitting.');
             valid = false;
             return false;
         }
