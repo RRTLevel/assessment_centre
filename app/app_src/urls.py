@@ -21,14 +21,12 @@ urlpatterns = [
     path('help/', views.helpView, name='help'),
     path('results/', views.resultsView, name='results'),
     path('add_indicators/', views.add_indicators, name='add_indicators'),
-    path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
     path('add_questions/', views.add_question, name="add_questions"),
 
     # =====================
     # INTERVIEW
     # =====================
-    path('interview/', views.interview, name='interview'),
     path('interview/save/', views.interview_save, name='interview_save'),
 
     # =====================
@@ -82,4 +80,6 @@ urlpatterns = [
     # =====================
     path('404', views.Custom404View.as_view(), name='404'),
     path('500', views.Custom500View.as_view(), name='500'),
+
+    path('statistics_dashboard/candidate_dashboard',views.candidate_dashboard, name='candidate_dashboard' )
 ]

@@ -18,12 +18,6 @@
                 </a>
                 {% endif %}
 
-                {% if can_see_interview %}
-                <a class="navbar-item rr-white {% if interview %}is-active{% endif %}" href="{% url 'interview' %}">
-                    Interview Questions
-                </a>
-                {% endif %}
-
                 {% if can_see_applications %}
                 <a class="navbar-item rr-white {% if applications %}is-active{% endif %}" href="{% url 'applications' %}">
                     Applications
