@@ -64,7 +64,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'app_src.contexts.applicationNameContext',
                 'app_src.contexts.applicationVersionContext',
-                'app_src.contexts.applicationEnvironmentContext'
+                'app_src.contexts.applicationEnvironmentContext',
+                'app_src.contexts.navigationPermissionsContext'
             ],
         },
     },

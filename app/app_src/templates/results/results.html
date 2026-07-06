@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Results</title>
+
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
+    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <header>
+        {% include 'includes/title.html' %}
+        {% include 'includes/nav.html' %}
+    </header>
+
+    <main class="section">
+
+        <div class="container">
+
+            <div class="interview-header">
+                <h1 class="title interview-title">Interview Results</h1>
+                <p class="interview-count">{{ total_responses }} response{{ total_responses|pluralize }} recorded</p>
+            </div>
+
+            {% if questions_with_responses %}
+                {% for question, responses in questions_with_responses %}
+                <div class="question-card mb-5">
+
+                    <p class="has-text-weight-bold mb-3">{{ question.text }}</p>
+
+                    {% if responses %}
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Score 1</th>
+                                <th>Score 2</th>
+                                <th>Score 3</th>
+                                <th>Notes</th>
+                                <th>Feedback</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for response in responses %}
+                            <tr>
+                                <td>{{ response.user.username }}</td>
+                                <td>{{ response.score_1|default:"—" }}</td>
+                                <td>{{ response.score_2|default:"—" }}</td>
+                                <td>{{ response.score_3|default:"—" }}</td>
+                                <td>{{ response.notes|default:"—" }}</td>
+                                <td>{{ response.feedback|default:"—" }}</td>
+                                <td>{{ response.updated_at|date:"d M Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="has-text-grey">No responses for this question yet.</p>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+            {% else %}
+            <p class="has-text-grey">No results to display yet.</p>
+            {% endif %}
+
+        </div>
+
+    </main>
+
+    {% include 'includes/footer.html' %}
+
+</body>
+
+</html>

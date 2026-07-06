@@ -10,9 +10,21 @@
     <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
 
     <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
+    <script src="https://unpkg.com"></script>
 
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('siteTheme') || 'system';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const activeTheme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
+
+            document.documentElement.dataset.theme = activeTheme;
+            document.documentElement.dataset.themePreference = savedTheme;
+        })();
+    </script>
 
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
@@ -22,6 +34,21 @@
 <body>
     
 <!--    {% include 'includes/non_production_banner.html' %}-->
+
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true">
+        {% if messages %}
+            {% for message in messages %}
+                <!-- UPDATED: Background uses #FF0F0F for error and #4cd137 for success. Text is set to white for readability. -->
+                <div class="toast-message toast-{{ message.tags|default:'info' }}" data-toast
+                     style="--toast-bg: {% if message.tags == 'error' %}#FF0F0F{% else %}#4cd137{% endif %};
+                     background-color: var(--toast-bg); 
+                     color: #ffffff;">
+                    <button class="toast-close" type="button" aria-label="Dismiss notification">&times;</button>
+                    <div class="toast-content">{{ message }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
     <header>
 
@@ -40,6 +67,21 @@
     </main>
 
     {% include 'includes/footer.html' %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-toast]').forEach((toast) => {
+                const closeButton = toast.querySelector('.toast-close');
+                const dismiss = () => {
+                    toast.classList.add('toast-hiding');
+                    window.setTimeout(() => toast.remove(), 250);
+                };
+
+                closeButton.addEventListener('click', dismiss);
+                window.setTimeout(dismiss, 4000);
+            });
+        });
+    </script>
 
 </body>
 

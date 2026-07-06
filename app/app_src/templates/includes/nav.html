@@ -1,61 +1,73 @@
 {% load static %}
 
-
-<nav class='navbar rr-secondary py-1' role='navigation' aria-label='main navigation'>
-
+<nav class="navbar rr-secondary py-1" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="main-navbar-menu">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
         </a>
     </div>
 
-    <div class='navbar-menu'>
-
+    <div id="main-navbar-menu" class="navbar-menu">
         <div class="container is-flex is-flex-grow-1 is-flex-shrink-0">
-            <div class='navbar-start'>
-                <a class='navbar-item rr-white {% if home %} is-active {% endif %}' href="{% url 'home' %}">
+            <div class="navbar-start">
+                {% if can_see_home %}
+                <a class="navbar-item rr-white {% if home %}is-active{% endif %}" href="{% url 'home' %}">
                     Home
                 </a>
-<!--                <a class='navbar-item rr-white {% if documentation %} is-active {% endif %}'-->
-<!--                    href="{% url 'documentation' %}">-->
-<!--                    Option 2-->
-<!--                </a>-->
-                <a class='navbar-item rr-white {% if interview %} is-active {% endif %}' href="{% url 'interview' %}">
-                    Interview Questions
-                </a>
-                <a class='navbar-item rr-white {% if applications %} is-active {% endif %}' href="{% url 'applications' %}">
+                {% endif %}
+
+                {% if can_see_applications %}
+                <a class="navbar-item rr-white {% if applications %}is-active{% endif %}" href="{% url 'applications' %}">
                     Applications
                 </a>
-                <a class='navbar-item rr-white {% if create_pack %} is-active {% endif %}' href="{% url 'create_pack' %}">
-                    Create Pack
-                </a>
-                <a class='navbar-item rr-white {% if add_question %} is-active {% endif %}' href="{% url 'add_questions' %}">
-                    Add Question
-                </a>
-                <a class='navbar-item rr-white {% if categories %} is-active {% endif %}' href="{% url 'categories' %}">
-                    Create Category
-                </a>
-                <a class='navbar-item rr-white {% if applications_review %} is-active {% endif %}' href="{% url 'applications_review' %}">
-                    Application Review
-                </a>
+                {% endif %}
+
+                {% if can_see_create_pack or can_see_add_question or can_see_create_category or can_see_applications %}
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link rr-white">
+                        More
+                    </a>
+
+                    <div class="navbar-dropdown">
+                        {% if can_see_create_pack %}
+                        <a class="navbar-item" href="{% url 'create_pack' %}">Create Pack</a>
+                        {% endif %}
+                        {% if can_see_add_question %}
+                        <a class="navbar-item" href="{% url 'add_questions' %}">Add Questions</a>
+                        {% endif %}
+                        {% if can_see_create_category %}
+                        <a class="navbar-item" href="{% url 'categories' %}">Create Category</a>
+                        {% endif %}
+                        {% if can_see_applications %}
+                        <a class="navbar-item" href="{% url 'application_review' %}">Application Review</a>
+                        <a class="navbar-item" href="{% url 'accepted_applicants' %}">Accepted Applicants</a>
+                        <a class="navbar-item" href="{% url 'candidate_dashboard' %}">Candidate Statistics</a>
+                        {% endif %}
+                        <a class="navbar-item" href="{% url 'help' %}">Help</a>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <div class="navbar-end">
-                <div class="navbar-item">
+                <div class="navbar-item" style="display: flex; align-items: center;">
                     {% if user.is_authenticated %}
                     {% if user.is_superuser %}
                     <a class="button is-warning mr-2" href="{% url 'admin:index' %}">
                         <i class="fas fa-tools mr-1"></i>
-                        <strong>&nbsp;Admin Interface
-                        </strong>
+                        <strong>&nbsp;Admin Interface</strong>
                     </a>
                     {% endif %}
 
+                    <a class="button is-light mr-2" href="{% url 'inbox' %}" title="Inbox">
+                        <i class="fas fa-inbox text-rr-primary"></i>
+                    </a>
+
                     <a class="button is-light mr-2" href="{% url 'userprofile' %}">
                         <i class="fas fa-user-alt mr-1"></i>
-                        <strong>&nbsp;{{ user }} </strong>
+                        <strong>&nbsp;{{ user }}</strong>
                     </a>
 
                     <form action="{% url 'logout' %}" method="post">
@@ -65,7 +77,6 @@
                             <strong>Logout</strong>
                         </button>
                     </form>
-
                     {% else %}
                     <div class="buttons">
                         <a class="button is-light" href="{% url 'login' %}">
@@ -84,23 +95,19 @@
             </div>
         </div>
     </div>
-
 </nav>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Get all "navbar-burger" elements
-        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-        // Add a click event on each of them
-        $navbarBurgers.forEach(el => {
-            el.addEventListener('click', () => {
-                // Get the target from the "data-target" attribute
-                const target = el.dataset.target;
-                const $target = document.getElementById(target);
+        const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
-                // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        navbarBurgers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.dataset.target;
+                const targetEl = document.getElementById(target);
+
                 el.classList.toggle('is-active');
-                $target.classList.toggle('is-active');
+                targetEl.classList.toggle('is-active');
             });
         });
     });

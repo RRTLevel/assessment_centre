@@ -89,7 +89,7 @@
 
                 <div class="field is-grouped is-grouped-right">
                     <p class="control">
-                        <a href="{% url 'applications_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
+                        <a href="{% url 'application_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
                     </p>
                     <p class="control">
                         <button type="submit" class="button is-success" style="border-radius: 8px; background-color: #5cb85c;">Confirm & Accept</button>
@@ -101,9 +101,53 @@
 </section>
 
 <script>
+    const datePicker = document.getElementById('date_picker');
+    const timePicker = document.getElementById('time_picker');
+
+    function getLocalISOString() {
+        const now = new Date();
+        const offset = now.getTimezoneOffset();
+        const localTime = new Date(now.getTime() - (offset * 60 * 1000));
+        return localTime.toISOString();
+    }
+
+    function updateMinDateTime() {
+        const localISO = getLocalISOString();
+        const todayStr = localISO.split('T')[0];
+        const currentTimeStr = localISO.split('T')[1].substring(0, 5);
+
+        // Prevent selecting past dates
+        datePicker.min = todayStr;
+
+        // If today is selected, restrict time picker to current/future times
+        if (datePicker.value === todayStr) {
+            timePicker.min = currentTimeStr;
+        } else {
+            timePicker.removeAttribute('min');
+        }
+    }
+
+    // Run on page load
+    updateMinDateTime();
+
+    // Re-evaluate whenever the date picker changes
+    datePicker.addEventListener('change', updateMinDateTime);
+
+    // Form submission validation
     document.getElementById('interview-schedule-form').addEventListener('submit', function(e) {
-        const dateVal = document.getElementById('date_picker').value;
-        const timeVal = document.getElementById('time_picker').value;
+        const localISO = getLocalISOString();
+        const todayStr = localISO.split('T')[0];
+        const currentTimeStr = localISO.split('T')[1].substring(0, 5);
+
+        const dateVal = datePicker.value;
+        const timeVal = timePicker.value;
+
+        // Extra validation fallback for same-day past times
+        if (dateVal === todayStr && timeVal < currentTimeStr) {
+            e.preventDefault();
+            alert("Please pick a future time for today's interview.");
+            return;
+        }
         
         if (dateVal && timeVal) {
             document.getElementById('interview_date').value = dateVal + 'T' + timeVal;
