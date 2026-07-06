@@ -126,12 +126,12 @@ class Questions(models.Model):
 
 class Indicator(models.Model):
     question = models.ForeignKey(Questions, on_delete=models.CASCADE, related_name='indicators', null=True, blank=True)
-    name = models.CharField(max_length=100, default='')
+ 
     positive = models.TextField()
     negative = models.TextField()
-
+ 
     def __str__(self):
-        return self.name or f"{self.positive[:30]} / {self.negative[:30]}"
+        return f"{self.positive} / {self.negative}"
 
 
 class IndicatorScore(models.Model):
@@ -176,3 +176,4 @@ class InterviewResponse(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.question}"
+

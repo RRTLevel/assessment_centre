@@ -809,3 +809,155 @@ html[data-theme] .interview-container .score-table tbody th {
 .score.sx { background: #f5f5f5; color: #999; }
 
 .avg { font-weight: 600; background: #f0f0f0; }
+
+body {
+    background: #f6f7fb;
+}
+ 
+/* LAYOUT */
+.indicator-layout {
+    gap: 20px;
+}
+ 
+/* CARD BASE */
+.card-box {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+ 
+/* HEADER */
+.card-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+ 
+.title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+ 
+.subtitle {
+    font-size: 13px;
+    color: #777;
+    margin: 2px 0 0 0;
+}
+ 
+/* ICON */
+.icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #e6e0ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #4b2fff;
+}
+ 
+.icon-circle.purple {
+    background: #e9e7ff;
+}
+ 
+/* FORM */
+.indicator-form label {
+    display: block;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+ 
+.indicator-form input,
+.indicator-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+ 
+.btn-primary {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4b2fff;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+ 
+/* TABLE */
+.indicator-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+}
+ 
+.indicator-table th {
+    text-align: left;
+    font-size: 12px;
+    color: #777;
+    padding-bottom: 10px;
+}
+ 
+.indicator-table td {
+    vertical-align: top;
+}
+ 
+/* POSITIVE / NEGATIVE BOXES */
+.positive-box {
+    background: #e9f9ef;
+    color: #1f8b4c;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+ 
+.negative-box {
+    background: #ffecec;
+    color: #d93b3b;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+ 
+/* ACTIONS */
+.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+ 
+.btn-edit {
+    background: #4b2fff;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+}
+ 
+.btn-delete {
+    background: #ff3b3b;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+ 
+/* EMPTY */
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
