@@ -161,22 +161,3 @@ class InterviewResult(models.Model):
     def __str__(self):
         return f"{self.application.user.username} - {self.question} ({self.score})"
 
-
-class InterviewResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
-
-    score_1 = models.IntegerField(null=True, blank=True)
-    score_2 = models.IntegerField(null=True, blank=True)
-    score_3 = models.IntegerField(null=True, blank=True)
-
-    notes = models.TextField(blank=True, default='')
-    feedback = models.TextField(blank=True, default='')
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'question')
-
-    def __str__(self):
-        return f"{self.user.username} - {self.question}"
-
