@@ -18,6 +18,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.models import User
 
+
 from .forms import (
     AddNoteForm,
     ApplicantForm,
@@ -32,7 +33,6 @@ from .models import (
     Application,
     Category,
     Indicator,
-    InterviewResponse,
     InterviewResult,
     Note,
     Pack,
@@ -171,22 +171,20 @@ def add_indicators(request):
         "questions": questions,
     })
 
-
 @login_required(login_url="/login")
 @group_required(ECD_GROUP, ECAM_GROUP)
 def resultsView(request):
-    questions = Questions.objects.all()
-    questions_with_responses = [
-        (question, InterviewResponse.objects.filter(question=question).select_related("user"))
-        for question in questions
-    ]
-    total_responses = InterviewResponse.objects.count()
+    applications = (
+        Application.objects
+        .select_related("user")
+        .prefetch_related("results__question")
+        .order_by("-created_at")
+    )
+
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
-        "questions_with_responses": questions_with_responses,
-        "total_responses": total_responses,
+        "applications": applications,
     })
-
 
 @login_required(login_url="/login")
 @group_required(ECD_GROUP, ECAM_GROUP)
@@ -213,53 +211,7 @@ def create_pack(request):
     })
 
 
-@login_required(login_url="/login")
-def interview(request):
-    questions = Questions.objects.prefetch_related("indicators").all()
-    saved = {
-        response.question_id: response
-        for response in InterviewResponse.objects.filter(user=request.user, question__in=questions)
-    }
 
-    question_data = []
-    for question in questions:
-        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
-        positives = list(question.indicators.filter(category="positive"))
-        negatives = list(question.indicators.filter(category="negative"))
-        rows = []
-
-        for i in range(3):
-            rows.append({
-                "pos": positives[i].text if i < len(positives) else "",
-                "neg": negatives[i].text if i < len(negatives) else "",
-            })
-
-        question_data.append({"question": question, "form": form, "rows": rows})
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_data": question_data,
-        "interview": True,
-    })
-
-
-@login_required(login_url="/login")
-def interview_save(request):
-    if request.method == "POST":
-        for question in Questions.objects.all():
-            existing = InterviewResponse.objects.filter(
-                user=request.user,
-                question=question,
-            ).first()
-            form = InterviewResponseForm(request.POST, instance=existing, prefix=str(question.id))
-
-            if form.is_valid():
-                response = form.save(commit=False)
-                response.user = request.user
-                response.question = question
-                response.save()
-
-    return redirect("interview")
 
 
 @login_required(login_url="/login")
@@ -536,6 +488,8 @@ def inbox_view(request):
 
 
 
+
+
 @login_required(login_url="/login")
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard(request):
@@ -543,22 +497,62 @@ def candidate_dashboard(request):
 
     users = (
         User.objects
-        .filter(application__results__isnull=False)   # only users who have scored results
+        .filter(application__results__isnull=False)
         .distinct()
         .annotate(avg=Avg("application__results__score"))
-        .order_by("-avg")
     )
 
+    # Filters
+    date_from = request.GET.get("from")
+    date_to = request.GET.get("to")
+    sort = request.GET.get("sort")
+
+    if date_from:
+        users = users.filter(application__created_at__date__gte=date_from)
+
+    if date_to:
+        users = users.filter(application__created_at__date__lte=date_to)
+
+    if sort == "highest":
+        users = users.order_by("-avg")
+    elif sort == "lowest":
+        users = users.order_by("avg")
+    elif sort == "newest":
+        users = users.order_by("-application__created_at")
+    elif sort == "oldest":
+        users = users.order_by("application__created_at")
+    else:
+        users = users.order_by("-avg")
+
     rows = []
+
     for user in users:
-        results = InterviewResult.objects.filter(application__user=user)
+        application = (
+            Application.objects
+            .filter(user=user)
+            .order_by("-created_at")
+            .first()
+        )
+
+        results = InterviewResult.objects.filter(application=application)
+
         scores = {r.question_id: r.score for r in results}
         cells = [scores.get(q.id) for q in questions]
+
         rows.append({
             "name": user.username,
+            "date": application.created_at if application else None,
             "cells": cells,
             "avg": user.avg,
         })
 
-    context = {"questions": questions, "rows": rows}
-    return render(request, "statistics_dashboard/candidate_dashboard.html", context)
+    context = {
+        "questions": questions,
+        "rows": rows,
+    }
+
+    return render(
+        request,
+        "statistics_dashboard/candidate_dashboard.html",
+        context,
+    )

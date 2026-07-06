@@ -2,9 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
-
-from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse, Indicator
-from .models import DomainUser, Note, Pack, Application, Category, InterviewResponse, Questions
+from .models import DomainUser, Note, Pack, Application, Category, InterviewResult,  Questions, Indicator
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -187,22 +185,31 @@ class QuestionForm(forms.Form):
 
 class InterviewResponseForm(forms.ModelForm):
     class Meta:
-        model = InterviewResponse
-        fields = ["score_1", "score_2", "score_3", "notes", "feedback"]
-        widgets = {
-            "score_1": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
-            "score_2": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
-            "score_3": forms.NumberInput(attrs={"class": "score-input", "min": "1", "max": "6", "step": "1"}),
-            "notes": forms.Textarea(attrs={
-                "class": "notes-textarea",
-                "placeholder": "Enter interview notes here...",
-            }),
-            "feedback": forms.Textarea(attrs={
-                "class": "feedback-textarea",
-                "placeholder": "Enter feedback here...",
-            }),
-        }
+        model = InterviewResult
+        fields = ["score", "notes", "feedback"]
 
+        widgets = {
+            "score": forms.NumberInput(
+                attrs={
+                    "class": "score-input",
+                    "min": "1",
+                    "max": "6",
+                    "step": "1",
+                }
+            ),
+            "notes": forms.Textarea(
+                attrs={
+                    "class": "notes-textarea",
+                    "placeholder": "Enter interview notes here...",
+                }
+            ),
+            "feedback": forms.Textarea(
+                attrs={
+                    "class": "feedback-textarea",
+                    "placeholder": "Enter feedback here...",
+                }
+            ),
+        }
 
 class IndicatorForm(forms.ModelForm):
     class Meta:
