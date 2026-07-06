@@ -157,30 +157,21 @@ class Custom500View(TemplateView):
 @login_required(login_url="/login")
 @group_required(ASSESSOR_GROUP)
 def add_indicators(request):
-    indicator = None
- 
-    # EDIT MODE
-    if "edit" in request.GET:
-        indicator = get_object_or_404(Indicator, id=request.GET["edit"])
- 
-    form = IndicatorForm(request.POST or None, instance=indicator)
- 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return redirect("add_indicators")
-   
-    if request.method == "POST" and "delete_indicator" in request.POST:
-            Indicator.objects.filter(id=request.POST.get("indicator_id")).delete()
+    if request.method == "POST":
+        form = IndicatorForm(request.POST)
+        if form.is_valid():
+            form.save()
             return redirect("add_indicators")
- 
-    indicators = Indicator.objects.all()
- 
+    else:
+        form = IndicatorForm()
+
+    indicators = Indicator.objects.select_related("category").order_by("category__name", "name")
+
     return render(request, "indicators/add_indicators.html", {
+        "page_title": settings.APPLICATION_NAME + " - Add Indicators",
         "form": form,
         "indicators": indicators,
     })
-
-
 @login_required(login_url="/login")
 @group_required(ECD_GROUP, ECAM_GROUP)
 def resultsView(request):

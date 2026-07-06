@@ -207,12 +207,25 @@ class InterviewResponseForm(forms.ModelForm):
 class IndicatorForm(forms.ModelForm):
     class Meta:
         model = Indicator
-        fields = ["positive", "negative"]
- 
-class IndicatorPairForm(forms.Form):
-    positive = forms.CharField(required=True)
-    negative = forms.CharField(required=True)
+        fields = ["category", "name", "positive", "negative"]
 
+        widgets = {
+            "category": forms.Select(attrs={"class": "select"}),
+            "name": forms.TextInput(attrs={
+                "class": "input",
+                "placeholder": "Indicator name..."
+            }),
+           "positive": forms.Textarea(attrs={
+            "class": "textarea",
+            "rows": 3,
+            "placeholder": "Positive indicator..."
+            }),
+            "negative": forms.Textarea(attrs={
+                "class": "textarea",
+                "rows": 3,
+                "placeholder": "Negative indicator..."
+            }),
+        }
 
 class IndicatorPairForm(forms.Form):
     positive = forms.CharField(

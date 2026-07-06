@@ -8,100 +8,141 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/add_indicators.css' %}">
 </head>
+
 <body>
 <header>
     {% include 'includes/title.html' %}
     {% include 'includes/nav.html' %}
 </header>
+
 <main class="section">
 <div class="columns indicator-layout">
- 
+
     <!-- LEFT FORM -->
     <div class="column is-4">
         <div class="card-box">
+
             <div class="card-header">
                 <div class="icon-circle">+</div>
                 <div>
                     <h1 class="title">Add Indicator</h1>
-                    <p class="subtitle">Create a new positive and negative indicator</p>
+                    <p class="subtitle">Create indicator with category, name, positive & negative</p>
                 </div>
             </div>
- 
+
             <form method="POST" class="indicator-form">
                 {% csrf_token %}
- 
-                <label>Positive Indicator (required)</label>
-                {{ form.positive }}
- 
-                <label>Negative Indicator (required)</label>
-                {{ form.negative }}
- 
-                <button type="submit" class="btn-primary">Save Indicator</button>
+
+                <!-- ROW 1 -->
+                <div class="row">
+                    <div>
+                        <label>Name</label>
+                        {{ form.name }}
+                    </div>
+
+                    <div>
+                        <label>Category</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="row">
+                    <div>
+                        <label>Positive</label>
+                        {{ form.positive }}
+                    </div>
+
+                    <div>
+                        <label>Negative</label>
+                        {{ form.negative }}
+                    </div>
+                </div>
+
+                <!-- SAVE -->
+                <button type="submit" class="btn-primary">
+                    Save Indicator
+                </button>
             </form>
+
         </div>
     </div>
- 
+
     <!-- RIGHT LIST -->
     <div class="column">
         <div class="card-box">
- 
+
             <div class="card-header">
                 <div class="icon-circle purple">📚</div>
                 <div>
                     <h2 class="title">Existing Indicators</h2>
-                    <p class="subtitle">All saved positive and negative indicators</p>
+                    <p class="subtitle">All saved indicators grouped by category</p>
                 </div>
             </div>
- 
+
             <table class="indicator-table">
                 <thead>
                     <tr>
-                        <th>Positive Indicator</th>
-                        <th>Negative Indicator</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Positive</th>
+                        <th>Negative</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
- 
+
                 <tbody>
                     {% for indicator in indicators %}
                     <tr>
- 
+
+                        <td>{{ indicator.name }}</td>
+
+                        <td>
+                            <span class="category-tag">
+                                {{ indicator.category.name }}
+                            </span>
+                        </td>
+
                         <td>
                             <div class="positive-box">
                                 {{ indicator.positive }}
                             </div>
                         </td>
- 
+
                         <td>
                             <div class="negative-box">
                                 {{ indicator.negative }}
                             </div>
                         </td>
- 
+
                         <td class="actions">
                             <a href="?edit={{ indicator.id }}" class="btn-edit">Edit</a>
-                            <br>
+
                             <form method="POST" class="inline">
                                 {% csrf_token %}
                                 <input type="hidden" name="indicator_id" value="{{ indicator.id }}">
-                                <button name="delete_indicator" class="btn-delete">Delete</button>
+                                <button type="submit" name="delete_indicator" class="btn-delete">
+                                    Delete
+                                </button>
                             </form>
                         </td>
- 
+
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" class="empty">No indicators yet</td>
+                        <td colspan="5" class="empty">No indicators found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
+
             </table>
- 
+
         </div>
     </div>
- 
+
 </div>
 </main>
+
 {% include 'includes/footer.html' %}
 </body>
 </html>

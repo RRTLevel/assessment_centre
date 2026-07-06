@@ -123,17 +123,20 @@ class Questions(models.Model):
     def __str__(self):
         return self.text[:60]
 
-
 class Indicator(models.Model):
-    question = models.ForeignKey(Questions, on_delete=models.CASCADE, related_name='indicators', null=True, blank=True)
- 
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="indicators"
+    )
+
+    name = models.CharField(max_length=100)
+
     positive = models.TextField()
     negative = models.TextField()
- 
+
     def __str__(self):
-        return f"{self.positive} / {self.negative}"
-
-
+        return self.name
 class IndicatorScore(models.Model):
     result = models.ForeignKey('InterviewResult', on_delete=models.CASCADE, related_name='indicator_scores')
     indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
