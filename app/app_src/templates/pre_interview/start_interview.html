@@ -8,89 +8,127 @@
     <div class="interview-header">
         <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
         <p class="interview-count">
-            Pack: {{ application.pack.title }} &middot; Total Questions: {{ questions|length }}
+            Pack: {{ application.pack.title }} &middot; Total Questions: {{ question_data|length }}
         </p>
     </div>
 
-    <!-- Applicant's pre-interview answers (read-only context) -->
-    <div class="applicant-answers box">
-        <h2 class="title is-5">Applicant Answers</h2>
+    {% if application.pack.description %}
+    <div class="box mb-4">
+        <h2 class="title is-5">Pack Description</h2>
+        <p>{{ application.pack.description }}</p>
+    </div>
+    {% endif %}
 
-        {% if application.pack.pre_interview_question_1 %}
-            <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
-            <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
-        {% endif %}
-
-        {% if application.pack.pre_interview_question_2 %}
-            <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
-            <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
-        {% endif %}
-
-        {% if application.pack.pre_interview_question_3 %}
-            <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
-            <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
-        {% endif %}
+    <div class="box mb-4">
+        <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers()">
+            <span>Pre Interview Answers</span>
+            <span id="answers-arrow" style="margin-left: auto;">&#9660;</span>
+        </button>
+        <div id="applicant-answers" style="display: none; margin-top: 1rem;">
+            {% if application.pack.pre_interview_question_1 %}
+                <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+                <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
+            {% endif %}
+            {% if application.pack.pre_interview_question_2 %}
+                <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+                <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
+            {% endif %}
+            {% if application.pack.pre_interview_question_3 %}
+                <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+                <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
+            {% endif %}
+        </div>
     </div>
 
-    <form method="post" action="{% url 'start_interview' application.application_id %}">
+    <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
         {% csrf_token %}
 
-        {% for question, result in question_results %}
-
+        <!-- ── QUESTIONS ── -->
+        {% for item in question_data %}
+        <div class="box mb-4">
+            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
+                Question {{ forloop.counter }} &mdash; {{ application.pack.title }}
+            </p>
             <div class="question-row">
-
                 <div class="question-card">
-                    <p class="question-text">{{ question.text }}</p>
+                    <p class="question-text">{{ item.question.text }}</p>
                 </div>
-
                 <div class="Score-Box">
-
-                    <div class="table-container">
-                        <table class="score-table">
-                            <thead>
-                            <tr>
-                                <th>indicators</th>
-                                <th>positive</th>
-                                <th>negative</th>
-                                <th>score</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <th></th>
-                                <td>this is a positive</td>
-                                <td>this is a negative</td>
-                                <td>
-                                    <input type="number" min="1" max="6" step="1"
-                                           class="score-input"
-                                           name="score_{{ question.id }}"
-                                           value="{{ result.score|default_if_none:'' }}">
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
                     <div class="notes_box">
-                        <label for="notes-{{ question.id }}">Notes</label>
-                        <textarea id="notes-{{ question.id }}" class="notes-textarea"
-                                  name="notes_{{ question.id }}">{{ result.notes|default:'' }}</textarea>
+                        <label class="notes-label" for="notes-{{ item.question.id }}">Notes</label>
+                        <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
+                                  name="notes_{{ item.question.id }}"
+                                  required>{{ item.result.notes|default:'' }}</textarea>
                     </div>
-
-                    <div class="feedback_box">
-                        <label for="feedback-{{ question.id }}">Feedback</label>
-                        <textarea id="feedback-{{ question.id }}" class="feedback-textarea"
-                                  name="feedback_{{ question.id }}">{{ result.feedback|default:'' }}</textarea>
-                    </div>
-
                 </div>
             </div>
-
+        </div>
         {% empty %}
-            <div class="no-questions">
-                No interview questions available.
-            </div>
+            <div class="no-questions">No interview questions available.</div>
         {% endfor %}
+
+        <!-- ── ASSESSMENT ── -->
+        <div class="question-card mt-5 mb-4">
+            <h2 class="title is-5 interview-title">Interview Assessment</h2>
+        </div>
+
+        <!-- Dynamically created assessment boxes appear here -->
+        <div id="assessment-container"></div>
+
+        <div class="mb-4">
+            <button type="button" class="submit-btn" onclick="openModal('indicator-modal')">
+                + Add Indicator
+            </button>
+        </div>
+
+        <!-- Single modal with all indicators -->
+        <div class="modal" id="indicator-modal">
+            <div class="modal-background" onclick="closeModal('indicator-modal')"></div>
+            <div class="modal-card">
+                <header class="modal-card-head" style="background:#1800A8;">
+                    <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
+                    <button class="delete" aria-label="close" onclick="closeModal('indicator-modal')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p class="is-size-7 has-text-grey mb-3">
+                        Select a behavioural indicator to assess. Each indicator includes
+                        positive and negative examples to guide your scoring.
+                    </p>
+                    {% for item in question_data %}
+                    {% if item.indicators %}
+                    <p class="has-text-weight-semibold is-size-7 mb-2" style="color:#1800A8;">
+                        {{ item.question.text|truncatechars:70 }}
+                    </p>
+                    {% for indicator in item.indicators %}
+                    <div class="box mb-3 indicator-card"
+                         id="card-{{ item.question.id }}-{{ indicator.id }}"
+                         style="cursor:pointer;"
+                         onclick="addIndicatorRow(
+                             '{{ item.question.id }}',
+                             '{{ item.question.text|escapejs }}',
+                             '{{ indicator.id }}',
+                             '{{ indicator.name|escapejs }}',
+                             '{{ indicator.positive|escapejs }}',
+                             '{{ indicator.negative|escapejs }}'
+                         )">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div>
+                                <p class="has-text-weight-bold">{{ indicator.name }}</p>
+                                <p class="is-size-7 indicator-positive mt-1">+ {{ indicator.positive|truncatechars:80 }}</p>
+                                <p class="is-size-7 indicator-negative">− {{ indicator.negative|truncatechars:80 }}</p>
+                            </div>
+                            <span class="button is-small is-primary ml-3" style="pointer-events:none;">Add</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    <p id="no-more-all" style="display:none;" class="has-text-grey has-text-centered">
+                        All available indicators have been added.
+                    </p>
+                </section>
+            </div>
+        </div>
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
@@ -100,5 +138,94 @@
 
 </div>
 </main>
+
+<script>
+function toggleAnswers() {
+    const el = document.getElementById('applicant-answers');
+    const arrow = document.getElementById('answers-arrow');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    arrow.innerHTML = el.style.display === 'none' ? '&#9660;' : '&#9650;';
+}
+
+function openModal(id) {
+    document.getElementById(id).classList.add('is-active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('is-active');
+}
+
+function addIndicatorRow(questionId, questionText, indicatorId, name, positive, negative) {
+    // Don't add duplicates
+    if (document.getElementById('row-' + questionId + '-' + indicatorId)) return;
+
+    // Create the assessment box for this question if it doesn't exist yet
+    let box = document.getElementById('assessment-box-' + questionId);
+    if (!box) {
+        const container = document.getElementById('assessment-container');
+        box = document.createElement('div');
+        box.className = 'box mb-4';
+        box.id = 'assessment-box-' + questionId;
+        box.innerHTML =
+            '<p class="has-text-weight-semibold mb-3" style="color:#1800A8;">' +
+                'Assessment — ' + questionText + '</p>' +
+            '<div class="table-container">' +
+                '<table class="score-table" style="width:100%;">' +
+                    '<thead><tr>' +
+                        '<th>Indicator</th><th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
+                    '</tr></thead>' +
+                    '<tbody id="tbody-' + questionId + '"></tbody>' +
+                    '<tfoot><tr>' +
+                        '<td colspan="3"><strong>Overall Score</strong></td>' +
+                        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
+                            ' name="overall_score_' + questionId + '" placeholder="1–6" required></td>' +
+                    '</tr></tfoot>' +
+                '</table>' +
+            '</div>' +
+            '<div class="field mt-3">' +
+                '<label class="feedback-label">Feedback</label>' +
+                '<textarea class="feedback-textarea" name="feedback_' + questionId + '"' +
+                    ' placeholder="Enter feedback for this question..." required></textarea>' +
+            '</div>';
+        container.appendChild(box);
+    }
+
+    // Add the row
+    const tbody = document.getElementById('tbody-' + questionId);
+    const row = document.createElement('tr');
+    row.id = 'row-' + questionId + '-' + indicatorId;
+    row.innerHTML =
+        '<td><strong>' + name + '</strong></td>' +
+        '<td class="indicator-positive">' + positive + '</td>' +
+        '<td class="indicator-negative">' + negative + '</td>' +
+        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
+            ' name="indicator_score_' + questionId + '_' + indicatorId + '"' +
+            ' placeholder="1–6" required></td>';
+    tbody.appendChild(row);
+
+    // Hide the card in the modal
+    const card = document.getElementById('card-' + questionId + '-' + indicatorId);
+    if (card) card.style.display = 'none';
+
+    // Check if all cards are now hidden
+    const allCards = document.querySelectorAll('#indicator-modal .indicator-card');
+    const allHidden = Array.from(allCards).every(c => c.style.display === 'none');
+    if (allHidden) document.getElementById('no-more-all').style.display = 'block';
+
+    closeModal('indicator-modal');
+}
+
+// Enforce 1-6 range on blur for all score inputs
+document.getElementById('interview-form').addEventListener('blur', function(e) {
+    if (e.target.classList.contains('score-input')) {
+        const val = parseInt(e.target.value);
+        if (e.target.value !== '' && (isNaN(val) || val < 1 || val > 6)) {
+            e.target.setCustomValidity('Score must be between 1 and 6.');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    }
+}, true);
+</script>
 
 {% endblock %}
