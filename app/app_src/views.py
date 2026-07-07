@@ -172,17 +172,13 @@ def add_indicators(request):
         mode = request.POST.get("mode", "add")
 
         pairs = []
-        i = 0
-        while True:
-            pos = request.POST.get(f"positive_{i}", "").strip()
-            neg = request.POST.get(f"negative_{i}", "").strip()
-            if pos == "" and neg == "" and i > 0:
-                break
-            if pos or neg:
-                pairs.append((pos, neg))
-            i += 1
-            if i > 50:
-                break
+        for key in request.POST:
+            if key.startswith("positive_"):
+                idx = key[len("positive_"):]
+                pos = request.POST.get(key, "").strip()
+                neg = request.POST.get(f"negative_{idx}", "").strip()
+                if pos or neg:
+                    pairs.append((pos, neg))
 
         if name and pairs:
             if mode == "replace":
@@ -202,7 +198,7 @@ def add_indicators(request):
 
     return render(request, "indicators/add_indicators.html", {
         "page_title": settings.APPLICATION_NAME + " - Add Indicators",
-        "indicator_names": indicator_names,
+        "indicator_names_json": json.dumps(indicator_names),
         "grouped_indicators": grouped,
     })
 

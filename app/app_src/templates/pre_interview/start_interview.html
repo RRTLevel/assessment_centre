@@ -282,9 +282,11 @@ document.getElementById('interview-form').addEventListener('submit', function(e)
     });
     if (!valid) { e.preventDefault(); return; }
 
-    // Only validate feedback textareas that are visible (assessment box shown)
+    // Only validate feedback textareas whose assessment box is visible
     $('.feedback-textarea').each(function() {
-        if (!$(this).is(':visible')) return true;
+        const qId = this.name.replace('feedback_', '');
+        const box = document.getElementById('assessment-box-' + qId);
+        if (!box || box.style.display === 'none') return true;
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
         if (!content) {
             alert('Please fill in all feedback before submitting.');
