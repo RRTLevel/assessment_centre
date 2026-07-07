@@ -89,18 +89,8 @@
         <div class="box mb-4">
             <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">Interview Assessment</p>
 
-            <div class="table-container" id="indicator-table-wrap" style="display:none;">
-                <table class="score-table" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>Indicator</th>
-                            <th>Positive</th>
-                            <th>Negative</th>
-                            <th>Score (1–6)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="indicator-tbody"></tbody>
-                </table>
+            <div id="indicator-table-wrap" style="display:none;">
+                <div id="indicator-groups-container"></div>
             </div>
 
             <div class="mt-3">
@@ -232,17 +222,36 @@ function closeIndicatorModal() {
     document.getElementById('indicator-modal').classList.remove('is-active');
 }
 
+function groupElemId(name) {
+    return 'ind-group-' + name.replace(/[^a-zA-Z0-9]/g, '_');
+}
+
 function addIndicatorGroup(name) {
     const behaviours = indicatorGroups[name];
     if (!behaviours) return;
 
-    const tbody = document.getElementById('indicator-tbody');
+    const gid = groupElemId(name);
+    if (!document.getElementById(gid)) {
+        const section = document.createElement('div');
+        section.id = gid;
+        section.className = 'mb-4';
+        section.innerHTML =
+            '<p class="has-text-weight-semibold mb-2" style="color:#1800A8;">' + escHtml(name) + '</p>' +
+            '<table class="score-table" style="width:100%;">' +
+            '<thead><tr>' +
+            '<th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
+            '</tr></thead>' +
+            '<tbody id="' + gid + '-tbody"></tbody>' +
+            '</table>';
+        document.getElementById('indicator-groups-container').appendChild(section);
+    }
+
+    const tbody = document.getElementById(gid + '-tbody');
     behaviours.forEach(b => {
         if (document.getElementById('ind-row-' + b.id)) return;
         const row = document.createElement('tr');
         row.id = 'ind-row-' + b.id;
         row.innerHTML =
-            '<td><strong>' + escHtml(name) + '</strong></td>' +
             '<td class="indicator-positive">' + escHtml(b.positive) + '</td>' +
             '<td class="indicator-negative">' + escHtml(b.negative) + '</td>' +
             '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
