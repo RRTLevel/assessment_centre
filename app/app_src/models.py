@@ -131,12 +131,12 @@ class Indicator(models.Model):
     def __str__(self):
         return self.name
 class IndicatorScore(models.Model):
-    result = models.ForeignKey('InterviewResult', on_delete=models.CASCADE, related_name='indicator_scores')
+    application = models.ForeignKey('Application', on_delete=models.CASCADE, related_name='indicator_scores')
     indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
     score = models.IntegerField()
 
     class Meta:
-        unique_together = ('result', 'indicator')
+        unique_together = ('application', 'indicator')
 
 class InterviewResult(models.Model):
     """A scored answer for one applicant (Application) and one interview question."""

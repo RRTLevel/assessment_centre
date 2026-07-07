@@ -472,38 +472,34 @@ def start_interview(request, application_id):
             result_map[question.id] = result
 
         for key, value in request.POST.items():
-            m = re.match(r'^indicator_score_(\d+)_(\d+)$', key)
+            m = re.match(r'^indicator_score_(\d+)$', key)
             if m and value and value.isdigit():
-                q_id = int(m.group(1))
-                ind_id = int(m.group(2))
-                result = result_map.get(q_id)
-                if result:
-                    try:
-                        indicator = Indicator.objects.get(id=ind_id)
-                        IndicatorScore.objects.update_or_create(
-                            result=result,
-                            indicator=indicator,
-                            defaults={"score": int(value)},
-                        )
-                    except Indicator.DoesNotExist:
-                        pass
+                ind_id = int(m.group(1))
+                try:
+                    indicator = Indicator.objects.get(id=ind_id)
+                    IndicatorScore.objects.update_or_create(
+                        application=application,
+                        indicator=indicator,
+                        defaults={"score": int(value)},
+                    )
+                except Indicator.DoesNotExist:
+                    pass
 
         application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
         application.save()
         messages.success(request, f"Interview for {application.user.username} submitted.")
         return redirect("inbox")
 
-    saved = {result.question_id: result for result in application.results.prefetch_related("indicator_scores").all()}
+    saved = {result.question_id: result for result in application.results.all()}
+    saved_indicator_scores = {
+        s.indicator_id: s.score
+        for s in application.indicator_scores.all()
+    }
     question_data = []
     for question in questions:
-        result = saved.get(question.id)
-        saved_scores = {}
-        if result:
-            saved_scores = {s.indicator_id: s.score for s in result.indicator_scores.all()}
         question_data.append({
             "question": question,
-            "result": result,
-            "saved_scores": saved_scores,
+            "result": saved.get(question.id),
         })
 
     indicator_groups = {}
@@ -518,6 +514,7 @@ def start_interview(request, application_id):
         "application": application,
         "question_data": question_data,
         "indicator_groups_json": json.dumps(indicator_groups),
+        "saved_indicator_scores_json": json.dumps(saved_indicator_scores),
     })
 
 

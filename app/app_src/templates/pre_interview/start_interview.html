@@ -65,54 +65,49 @@
                                   name="notes_{{ item.question.id }}"
                                   required>{{ item.result.notes|default:'' }}</textarea>
                     </div>
+                    <div class="field mt-3">
+                        <label class="label is-small">Overall Score (1–6)</label>
+                        <input type="number" min="1" max="6" step="1" class="score-input"
+                               name="overall_score_{{ item.question.id }}" placeholder="1–6" required>
+                    </div>
+                    <div class="field mt-2">
+                        <label class="feedback-label">Feedback</label>
+                        <textarea class="feedback-textarea"
+                                  name="feedback_{{ item.question.id }}"
+                                  id="feedback-{{ item.question.id }}"
+                                  placeholder="Enter feedback for this question...">{{ item.result.feedback|default:'' }}</textarea>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Assessment section for this question -->
-            <div id="assessment-box-{{ item.question.id }}" style="display:none; margin-top:1rem;">
-                <p class="has-text-weight-semibold mb-2" style="color:#1800A8; font-size:0.9rem;">
-                    Assessment
-                </p>
-                <div class="table-container">
-                    <table class="score-table" style="width:100%;">
-                        <thead>
-                            <tr>
-                                <th>Indicator</th>
-                                <th>Positive</th>
-                                <th>Negative</th>
-                                <th>Score (1–6)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-{{ item.question.id }}"></tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3"><strong>Overall Score</strong></td>
-                                <td>
-                                    <input type="number" min="1" max="6" step="1" class="score-input"
-                                           name="overall_score_{{ item.question.id }}" placeholder="1–6" required>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="field mt-3">
-                    <label class="feedback-label">Feedback</label>
-                    <textarea class="feedback-textarea" name="feedback_{{ item.question.id }}"
-                              placeholder="Enter feedback for this question..."
-                              id="feedback-{{ item.question.id }}"></textarea>
-                </div>
-            </div>
-
-            <div class="mt-3">
-                <button type="button" class="submit-btn"
-                        onclick="openIndicatorModal({{ item.question.id }}, '{{ item.question.text|escapejs }}')">
-                    + Add Indicator
-                </button>
             </div>
         </div>
         {% empty %}
             <div class="no-questions">No interview questions available.</div>
         {% endfor %}
+
+        <!-- ── INDICATORS (bottom, interview-level) ── -->
+        <div class="box mb-4">
+            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">Interview Assessment</p>
+
+            <div class="table-container" id="indicator-table-wrap" style="display:none;">
+                <table class="score-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Indicator</th>
+                            <th>Positive</th>
+                            <th>Negative</th>
+                            <th>Score (1–6)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="indicator-tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <button type="button" class="submit-btn" onclick="openIndicatorModal()">
+                    + Add Indicator
+                </button>
+            </div>
+        </div>
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
@@ -129,7 +124,6 @@
                 <button class="delete" aria-label="close" onclick="closeIndicatorModal()"></button>
             </header>
             <section class="modal-card-body" id="indicator-modal-body">
-                <!-- Populated by JS -->
             </section>
         </div>
     </div>
@@ -139,8 +133,6 @@
 
 <script>
 const indicatorGroups = {{ indicator_groups_json|safe }};
-let activeQuestionId = null;
-let activeQuestionText = '';
 
 $(document).ready(function () {
     $('.notes-textarea').summernote({
@@ -153,6 +145,17 @@ $(document).ready(function () {
         placeholder: 'Enter interview notes here...',
         callbacks: { onChange: function(contents) { $(this).val(contents); } }
     });
+
+    $('.feedback-textarea').summernote({
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['misc', ['undo', 'redo']]
+        ],
+        height: 120,
+        placeholder: 'Enter feedback for this question...',
+        callbacks: { onChange: function(contents) { $(this).val(contents); } }
+    });
 });
 
 function toggleAnswers() {
@@ -162,26 +165,23 @@ function toggleAnswers() {
     arrow.innerHTML = el.style.display === 'none' ? '&#9660;' : '&#9650;';
 }
 
-function openIndicatorModal(questionId, questionText) {
-    activeQuestionId = questionId;
-    activeQuestionText = questionText;
-
+function openIndicatorModal() {
     const body = document.getElementById('indicator-modal-body');
     const names = Object.keys(indicatorGroups);
 
     if (names.length === 0) {
         body.innerHTML = '<p class="has-text-grey has-text-centered">No indicators have been created yet.</p>';
     } else {
-        let html = '<p class="is-size-7 has-text-grey mb-3">Select an indicator to add all its behaviour pairs to this question.</p>';
+        let html = '<p class="is-size-7 has-text-grey mb-3">Select an indicator to add its behaviour pairs to the assessment.</p>';
         names.forEach(name => {
             const behaviours = indicatorGroups[name];
             const alreadyAdded = behaviours.every(b =>
-                document.getElementById('row-' + questionId + '-' + b.id)
+                document.getElementById('ind-row-' + b.id)
             );
             html +=
                 '<div class="box mb-3 indicator-card' + (alreadyAdded ? ' has-background-light' : '') + '"' +
                 ' style="cursor:' + (alreadyAdded ? 'default' : 'pointer') + ';"' +
-                (alreadyAdded ? '' : ' onclick="addIndicatorGroup(' + questionId + ', \'' + escJs(name) + '\')"') + '>' +
+                (alreadyAdded ? '' : ' onclick="addIndicatorGroup(\'' + escJs(name) + '\')"') + '>' +
                 '<div style="display:flex; justify-content:space-between; align-items:start;">' +
                 '<div>' +
                 '<p class="has-text-weight-bold">' + escHtml(name) + '</p>' +
@@ -207,46 +207,26 @@ function closeIndicatorModal() {
     document.getElementById('indicator-modal').classList.remove('is-active');
 }
 
-function addIndicatorGroup(questionId, name) {
+function addIndicatorGroup(name) {
     const behaviours = indicatorGroups[name];
     if (!behaviours) return;
 
-    // Show the assessment box for this question if hidden
-    const box = document.getElementById('assessment-box-' + questionId);
-    if (box && box.style.display === 'none') {
-        box.style.display = 'block';
-        // Init Summernote on the feedback textarea now it's visible
-        const fb = document.getElementById('feedback-' + questionId);
-        if (fb && !$(fb).data('summernote')) {
-            $(fb).summernote({
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline']],
-                    ['para', ['ul', 'ol']],
-                    ['misc', ['undo', 'redo']]
-                ],
-                height: 150,
-                placeholder: 'Enter feedback for this question...',
-                callbacks: { onChange: function(contents) { $(this).val(contents); } }
-            });
-        }
-    }
-
-    const tbody = document.getElementById('tbody-' + questionId);
+    const tbody = document.getElementById('indicator-tbody');
     behaviours.forEach(b => {
-        const rowId = 'row-' + questionId + '-' + b.id;
-        if (document.getElementById(rowId)) return;
+        if (document.getElementById('ind-row-' + b.id)) return;
         const row = document.createElement('tr');
-        row.id = rowId;
+        row.id = 'ind-row-' + b.id;
         row.innerHTML =
             '<td><strong>' + escHtml(name) + '</strong></td>' +
             '<td class="indicator-positive">' + escHtml(b.positive) + '</td>' +
             '<td class="indicator-negative">' + escHtml(b.negative) + '</td>' +
             '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
-            ' name="indicator_score_' + questionId + '_' + b.id + '"' +
+            ' name="indicator_score_' + b.id + '"' +
             ' placeholder="1–6" required></td>';
         tbody.appendChild(row);
     });
 
+    document.getElementById('indicator-table-wrap').style.display = 'block';
     closeIndicatorModal();
 }
 
@@ -257,7 +237,6 @@ function escJs(s) {
     return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
-// Blur validation for score inputs
 document.getElementById('interview-form').addEventListener('blur', function(e) {
     if (e.target.classList.contains('score-input')) {
         const val = parseInt(e.target.value);
@@ -269,7 +248,6 @@ document.getElementById('interview-form').addEventListener('blur', function(e) {
     }
 }, true);
 
-// Submit validation — Summernote hides textareas so 'required' won't fire
 document.getElementById('interview-form').addEventListener('submit', function(e) {
     let valid = true;
     $('.notes-textarea').each(function() {
@@ -282,11 +260,7 @@ document.getElementById('interview-form').addEventListener('submit', function(e)
     });
     if (!valid) { e.preventDefault(); return; }
 
-    // Only validate feedback textareas whose assessment box is visible
     $('.feedback-textarea').each(function() {
-        const qId = this.name.replace('feedback_', '');
-        const box = document.getElementById('assessment-box-' + qId);
-        if (!box || box.style.display === 'none') return true;
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
         if (!content) {
             alert('Please fill in all feedback before submitting.');
