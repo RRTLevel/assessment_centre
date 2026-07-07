@@ -68,7 +68,8 @@
                     <div class="field mt-3">
                         <label class="label is-small">Overall Score (1–6)</label>
                         <input type="number" min="1" max="6" step="1" class="score-input"
-                               name="overall_score_{{ item.question.id }}" placeholder="1–6" required>
+                               name="overall_score_{{ item.question.id }}" placeholder="1–6" required
+                               value="{{ item.result.score|default:'' }}">
                     </div>
                     <div class="field mt-2">
                         <label class="feedback-label">Feedback</label>
@@ -133,6 +134,7 @@
 
 <script>
 const indicatorGroups = {{ indicator_groups_json|safe }};
+const savedIndicatorScores = {{ saved_indicator_scores_json|safe }};
 
 $(document).ready(function () {
     $('.notes-textarea').summernote({
@@ -156,6 +158,29 @@ $(document).ready(function () {
         placeholder: 'Enter feedback for this question...',
         callbacks: { onChange: function(contents) { $(this).val(contents); } }
     });
+
+    // Pre-populate saved indicator scores
+    if (Object.keys(savedIndicatorScores).length > 0) {
+        const indToGroup = {};
+        Object.keys(indicatorGroups).forEach(name => {
+            indicatorGroups[name].forEach(b => { indToGroup[b.id] = name; });
+        });
+        const groupsAdded = new Set();
+        Object.keys(savedIndicatorScores).forEach(idStr => {
+            const name = indToGroup[parseInt(idStr)];
+            if (name && !groupsAdded.has(name)) {
+                addIndicatorGroup(name);
+                groupsAdded.add(name);
+            }
+        });
+        Object.keys(savedIndicatorScores).forEach(idStr => {
+            const row = document.getElementById('ind-row-' + idStr);
+            if (row) {
+                const input = row.querySelector('input[type="number"]');
+                if (input) input.value = savedIndicatorScores[idStr];
+            }
+        });
+    }
 });
 
 function toggleAnswers() {

@@ -243,28 +243,6 @@ def create_pack(request):
     })
 
 
-
-    question_data = []
-    for question in questions:
-        form = InterviewResponseForm(instance=saved.get(question.id), prefix=str(question.id))
-        indicators = list(question.indicators.all())
-        rows = []
-
-        for i in range(3):
-            rows.append({
-                "pos": indicators[i].positive if i < len(indicators) else "",
-                "neg": indicators[i].negative if i < len(indicators) else "",
-            })
-
-        question_data.append({"question": question, "form": form, "rows": rows})
-
-    return render(request, "interview/interview.html", {
-        "questions": questions,
-        "question_data": question_data,
-        "interview": True,
-    })
-
-
 @login_required(login_url="/login")
 def interview_save(request):
     if request.method == "POST":
