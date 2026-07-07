@@ -172,7 +172,9 @@ function addPair() {
     row.id = 'pair-' + idx;
     row.innerHTML =
         '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>' +
+        '<label class="field-label" style="margin-bottom:0.2rem;">Positive</label>' +
         '<textarea class="textarea is-small" name="positive_' + idx + '" placeholder="+ Positive behaviour..." rows="2"></textarea>' +
+        '<label class="field-label" style="margin-top:0.4rem; margin-bottom:0.2rem;">Negative</label>' +
         '<textarea class="textarea is-small" name="negative_' + idx + '" placeholder="− Negative behaviour..." rows="2"></textarea>';
     container.appendChild(row);
 }

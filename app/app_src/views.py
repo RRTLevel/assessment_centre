@@ -198,6 +198,7 @@ def add_indicators(request):
 
     return render(request, "indicators/add_indicators.html", {
         "page_title": settings.APPLICATION_NAME + " - Add Indicators",
+        "indicator_names": indicator_names,
         "indicator_names_json": json.dumps(indicator_names),
         "grouped_indicators": grouped,
     })
