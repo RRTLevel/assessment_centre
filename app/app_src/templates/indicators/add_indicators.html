@@ -27,7 +27,9 @@
 .pos-text { color: #2a7d4f; }
 .neg-text { color: #c0392b; }
 .btn-delete-pair { font-size: 0.7rem; padding: 0.2rem 0.45rem; }
-.name-group-actions { display: flex; gap: 0.4rem; }
+.ind-group { margin-bottom: 1.5rem; }
+.ind-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.ind-group-name { font-weight: 700; font-size: 0.95rem; }
 /* Add/replace modal */
 #ar-modal { display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); }
 #ar-modal.active { display: flex; }
@@ -90,45 +92,42 @@
         </div>
 
         {% if grouped_indicators %}
-        <table class="ind-table">
-            <thead>
-                <tr>
-                    <th style="width:18%;">Name</th>
-                    <th style="width:36%;">Positive</th>
-                    <th style="width:36%;">Negative</th>
-                    <th style="width:10%;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for name, pairs in grouped_indicators.items %}
-                {% for ind in pairs %}
-                <tr>
-                    {% if forloop.first %}
-                    <td rowspan="{{ pairs|length }}" style="vertical-align:top; font-weight:700; border-right:2px solid #e0e0e0;">
-                        {{ name }}
-                        <div class="name-group-actions" style="margin-top:0.5rem;">
-                            <form method="POST" style="display:inline;" onsubmit="return confirm('Delete all pairs for {{ name }}?')">
+        {% for name, pairs in grouped_indicators.items %}
+        <div class="ind-group">
+            <div class="ind-group-header">
+                <span class="ind-group-name">{{ name }}</span>
+                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete all pairs for {{ name }}?')">
+                    {% csrf_token %}
+                    <input type="hidden" name="indicator_name" value="{{ name }}">
+                    <button type="submit" name="delete_by_name" class="button is-danger is-small is-outlined">Delete all</button>
+                </form>
+            </div>
+            <table class="ind-table">
+                <thead>
+                    <tr>
+                        <th style="width:44%;">Positive</th>
+                        <th style="width:44%;">Negative</th>
+                        <th style="width:12%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ind in pairs %}
+                    <tr>
+                        <td class="pos-text">{{ ind.positive }}</td>
+                        <td class="neg-text">{{ ind.negative }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;">
                                 {% csrf_token %}
-                                <input type="hidden" name="indicator_name" value="{{ name }}">
-                                <button type="submit" name="delete_by_name" class="button is-danger is-small">Delete all</button>
+                                <input type="hidden" name="indicator_id" value="{{ ind.id }}">
+                                <button type="submit" name="delete_indicator" class="button is-danger is-small btn-delete-pair">✕</button>
                             </form>
-                        </div>
-                    </td>
-                    {% endif %}
-                    <td class="pos-text">{{ ind.positive }}</td>
-                    <td class="neg-text">{{ ind.negative }}</td>
-                    <td>
-                        <form method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="indicator_id" value="{{ ind.id }}">
-                            <button type="submit" name="delete_indicator" class="button is-danger is-small btn-delete-pair">✕</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
         {% else %}
         <p style="color:#888; text-align:center; padding:2rem 0;">No indicators yet. Create one using the form.</p>
         {% endif %}
