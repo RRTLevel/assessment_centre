@@ -4,19 +4,19 @@
 {% block extra_head %}
 <style>
 .indicator-layout { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.5rem 0; }
-.form-card, .table-card { background: var(--card-bg, #fff); border-radius: 8px; border: 1px solid var(--border-color, #e0e0e0); padding: 1.5rem; }
+.form-card, .table-card { background: var(--card-bg, #fff); border-radius: 8px; border: 1px solid var(--border-color, #e0e0e0); padding: 1.5rem; text-align: left; }
 .form-card { width: 380px; flex-shrink: 0; }
 .table-card { flex: 1; overflow-x: auto; }
 .card-heading { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
-.card-heading h2 { font-size: 1rem; font-weight: 700; margin: 0; }
-.card-heading p { font-size: 0.8rem; color: #888; margin: 0; }
-.field-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; display: block; }
+.card-heading h2 { font-size: 1rem; font-weight: 700; margin: 0; text-align: left; }
+.card-heading p { font-size: 0.8rem; color: #888; margin: 0; text-align: left; }
+.field-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; display: block; text-align: left; }
 .name-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1rem; }
 .name-row select, .name-row input { flex: 1; }
-#new-name-wrap { flex: 1; display: none; }
-.pair-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.6rem; }
-.pair-row textarea { flex: 1; resize: vertical; min-height: 60px; }
-.pair-row .remove-btn { flex-shrink: 0; margin-top: 2px; }
+#new-name-wrap { display: none; margin-bottom: 1rem; }
+.pair-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.6rem 0.65rem 0.5rem; position: relative; }
+.pair-row textarea { width: 100%; resize: vertical; min-height: 55px; box-sizing: border-box; }
+.pair-row .remove-btn { position: absolute; top: 0.4rem; right: 0.4rem; }
 .add-pair-btn { font-size: 0.8rem; margin-bottom: 1rem; }
 .save-btn { width: 100%; }
 /* Grouped indicator table */
@@ -172,9 +172,9 @@ function addPair() {
     row.className = 'pair-row';
     row.id = 'pair-' + idx;
     row.innerHTML =
+        '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>' +
         '<textarea class="textarea is-small" name="positive_' + idx + '" placeholder="+ Positive behaviour..." rows="2"></textarea>' +
-        '<textarea class="textarea is-small" name="negative_' + idx + '" placeholder="− Negative behaviour..." rows="2"></textarea>' +
-        '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>';
+        '<textarea class="textarea is-small" name="negative_' + idx + '" placeholder="− Negative behaviour..." rows="2"></textarea>';
     container.appendChild(row);
 }
 
