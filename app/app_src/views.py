@@ -467,10 +467,11 @@ def start_interview(request, application_id):
             if key.startswith('group_score_') and value and value.isdigit():
                 group_name = key[len('group_score_'):]
                 if group_name:
+                    group_notes = request.POST.get(f'group_notes_{group_name}', '')
                     IndicatorGroupScore.objects.update_or_create(
                         application=application,
                         group_name=group_name,
-                        defaults={"score": int(value)},
+                        defaults={"score": int(value), "notes": group_notes},
                     )
 
         application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
@@ -483,10 +484,11 @@ def start_interview(request, application_id):
         s.indicator_id: s.score
         for s in application.indicator_scores.all()
     }
-    saved_group_scores = {
-        s.group_name: s.score
-        for s in application.indicator_group_scores.all()
-    }
+    saved_group_scores = {}
+    saved_group_notes = {}
+    for s in application.indicator_group_scores.all():
+        saved_group_scores[s.group_name] = s.score
+        saved_group_notes[s.group_name] = s.notes
     question_data = []
     for question in questions:
         question_data.append({
@@ -508,6 +510,7 @@ def start_interview(request, application_id):
         "indicator_groups_json": json.dumps(indicator_groups),
         "saved_indicator_scores_json": json.dumps(saved_indicator_scores),
         "saved_group_scores_json": json.dumps(saved_group_scores),
+        "saved_group_notes_json": json.dumps(saved_group_notes),
     })
 
 

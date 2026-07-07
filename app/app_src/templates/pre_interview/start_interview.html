@@ -126,6 +126,7 @@
 const indicatorGroups = {{ indicator_groups_json|safe }};
 const savedIndicatorScores = {{ saved_indicator_scores_json|safe }};
 const savedGroupScores = {{ saved_group_scores_json|safe }};
+const savedGroupNotes = {{ saved_group_notes_json|safe }};
 
 $(document).ready(function () {
     $('.notes-textarea').summernote({
@@ -203,8 +204,8 @@ function openIndicatorModal() {
                 '<p class="has-text-weight-bold">' + escHtml(name) + '</p>' +
                 '<p class="is-size-7 has-text-grey">' + behaviours.length + ' behaviour pair' + (behaviours.length !== 1 ? 's' : '') + '</p>' +
                 behaviours.map(b =>
-                    '<p class="is-size-7 indicator-positive mt-1">+ ' + escHtml(b.positive.slice(0, 80)) + '</p>' +
-                    '<p class="is-size-7 indicator-negative">− ' + escHtml(b.negative.slice(0, 80)) + '</p>'
+                    '<p class="is-size-7 indicator-positive mt-1">+ ' + b.positive.replace(/<[^>]+>/g,'').slice(0, 80) + '</p>' +
+                    '<p class="is-size-7 indicator-negative">− ' + b.negative.replace(/<[^>]+>/g,'').slice(0, 80) + '</p>'
                 ).join('') +
                 '</div>' +
                 (alreadyAdded
@@ -252,10 +253,29 @@ function addIndicatorGroup(name) {
             ' placeholder="1–6" required>' +
             '</td>' +
             '</tr></tfoot>' +
-            '</table>';
+            '</table>' +
+            '<textarea class="textarea is-small mt-2"' +
+            ' name="group_notes_' + escHtml(name) + '"' +
+            ' id="' + gid + '-notes"' +
+            ' placeholder="Notes for ' + escHtml(name) + '..."></textarea>';
         document.getElementById('indicator-groups-container').appendChild(section);
+
+        $('#' + gid + '-notes').summernote({
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline']],
+                ['para', ['ul', 'ol']],
+                ['misc', ['undo', 'redo']]
+            ],
+            height: 100,
+            placeholder: 'Notes for ' + name + '...',
+            callbacks: { onChange: function(contents) { $(this).val(contents); } }
+        });
+
         if (savedGroupScores[name] !== undefined) {
             document.getElementById(gid + '-overall').value = savedGroupScores[name];
+        }
+        if (savedGroupNotes[name]) {
+            $('#' + gid + '-notes').summernote('code', savedGroupNotes[name]);
         }
     }
 
@@ -265,8 +285,8 @@ function addIndicatorGroup(name) {
         const row = document.createElement('tr');
         row.id = 'ind-row-' + b.id;
         row.innerHTML =
-            '<td class="indicator-positive">' + escHtml(b.positive) + '</td>' +
-            '<td class="indicator-negative">' + escHtml(b.negative) + '</td>' +
+            '<td class="indicator-positive">' + b.positive + '</td>' +
+            '<td class="indicator-negative">' + b.negative + '</td>' +
             '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
             ' name="indicator_score_' + b.id + '"' +
             ' placeholder="1–6" required></td>';

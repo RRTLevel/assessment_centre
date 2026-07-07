@@ -142,6 +142,7 @@ class IndicatorGroupScore(models.Model):
     application = models.ForeignKey('Application', on_delete=models.CASCADE, related_name='indicator_group_scores')
     group_name = models.CharField(max_length=100)
     score = models.IntegerField()
+    notes = models.TextField(blank=True, default='')
 
     class Meta:
         unique_together = ('application', 'group_name')

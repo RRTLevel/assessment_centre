@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 <style>
 .indicator-layout { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.5rem 0; }
 .form-card, .table-card { background: var(--card-bg, #fff); border-radius: 8px; border: 1px solid var(--border-color, #e0e0e0); padding: 1.5rem; text-align: left; }
@@ -113,8 +115,8 @@
                 <tbody>
                     {% for ind in pairs %}
                     <tr>
-                        <td class="pos-text">{{ ind.positive }}</td>
-                        <td class="neg-text">{{ ind.negative }}</td>
+                        <td class="pos-text">{{ ind.positive|safe }}</td>
+                        <td class="neg-text">{{ ind.negative|safe }}</td>
                         <td>
                             <form method="POST" style="display:inline;">
                                 {% csrf_token %}
@@ -173,15 +175,30 @@ function addPair() {
     row.innerHTML =
         '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>' +
         '<label class="field-label" style="margin-bottom:0.2rem;">Positive</label>' +
-        '<textarea class="textarea is-small" name="positive_' + idx + '" placeholder="+ Positive behaviour..." rows="2"></textarea>' +
+        '<textarea name="positive_' + idx + '" id="pos-' + idx + '"></textarea>' +
         '<label class="field-label" style="margin-top:0.4rem; margin-bottom:0.2rem;">Negative</label>' +
-        '<textarea class="textarea is-small" name="negative_' + idx + '" placeholder="− Negative behaviour..." rows="2"></textarea>';
+        '<textarea name="negative_' + idx + '" id="neg-' + idx + '"></textarea>';
     container.appendChild(row);
+    const noteOpts = {
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['misc', ['undo', 'redo']]
+        ],
+        height: 80,
+        callbacks: { onChange: function(contents) { $(this).val(contents); } }
+    };
+    $('#pos-' + idx).summernote({...noteOpts, placeholder: '+ Positive behaviour...'});
+    $('#neg-' + idx).summernote({...noteOpts, placeholder: '− Negative behaviour...'});
 }
 
 function removePair(idx) {
     const row = document.getElementById('pair-' + idx);
-    if (row) row.remove();
+    if (row) {
+        $('#pos-' + idx).summernote('destroy');
+        $('#neg-' + idx).summernote('destroy');
+        row.remove();
+    }
 }
 
 function getResolvedName() {
@@ -202,7 +219,9 @@ function handleSave() {
     pairs.forEach(row => {
         const pos = row.querySelector('textarea[name^="positive_"]');
         const neg = row.querySelector('textarea[name^="negative_"]');
-        if ((pos && pos.value.trim()) || (neg && neg.value.trim())) hasPair = true;
+        const posText = pos ? $(pos).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
+        const negText = neg ? $(neg).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
+        if (posText || negText) hasPair = true;
     });
     if (!hasPair) { alert('Please add at least one behaviour pair.'); return; }
 
