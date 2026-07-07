@@ -105,8 +105,9 @@
             <table class="ind-table">
                 <thead>
                     <tr>
-                        <th style="width:50%;">Positive</th>
-                        <th style="width:50%;">Negative</th>
+                        <th style="width:44%;">Positive</th>
+                        <th style="width:44%;">Negative</th>
+                        <th style="width:12%;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,6 +115,13 @@
                     <tr>
                         <td class="pos-text">{{ ind.positive }}</td>
                         <td class="neg-text">{{ ind.negative }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="indicator_id" value="{{ ind.id }}">
+                                <button type="submit" name="delete_indicator" class="button is-danger is-small btn-delete-pair">✕</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
