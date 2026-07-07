@@ -271,13 +271,12 @@ function escJs(s) {
     return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
-document.getElementById('interview-form').addEventListener('blur', function(e) {
-    if (e.target.classList.contains('score-input')) {
-        const val = parseInt(e.target.value);
-        if (e.target.value !== '' && (isNaN(val) || val < 1 || val > 6)) {
-            e.target.setCustomValidity('Score must be between 1 and 6.');
-        } else {
-            e.target.setCustomValidity('');
+document.getElementById('interview-form').addEventListener('input', function(e) {
+    if (e.target.classList.contains('score-input') && e.target.value !== '') {
+        let val = parseInt(e.target.value);
+        if (!isNaN(val)) {
+            if (val > 6) e.target.value = 6;
+            else if (val < 1) e.target.value = 1;
         }
     }
 }, true);
