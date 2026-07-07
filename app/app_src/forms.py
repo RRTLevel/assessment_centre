@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
-from .models import DomainUser, Note, Pack, Application, Category, InterviewResult,  Questions, Indicator
+from .models import DomainUser, Note, Pack, Application, Category, InterviewResult, Questions
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -211,22 +211,3 @@ class InterviewResponseForm(forms.ModelForm):
             ),
         }
 
-class IndicatorForm(forms.ModelForm):
-    class Meta:
-        model = Indicator
-        fields = ["positive", "negative"]
- 
-class IndicatorPairForm(forms.Form):
-    positive = forms.CharField(required=True)
-    negative = forms.CharField(required=True)
-
-
-class IndicatorPairForm(forms.Form):
-    positive = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Positive indicator..."})
-    )
-    negative = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Negative indicator..."})
-    )
