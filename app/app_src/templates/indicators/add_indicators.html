@@ -96,18 +96,17 @@
         <div class="ind-group">
             <div class="ind-group-header">
                 <span class="ind-group-name">{{ name }}</span>
-                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete all pairs for {{ name }}?')">
+                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete indicator \'{{ name }}\'?')">
                     {% csrf_token %}
                     <input type="hidden" name="indicator_name" value="{{ name }}">
-                    <button type="submit" name="delete_by_name" class="button is-danger is-small is-outlined">Delete all</button>
+                    <button type="submit" name="delete_by_name" class="button is-danger is-small is-outlined">Delete indicator</button>
                 </form>
             </div>
             <table class="ind-table">
                 <thead>
                     <tr>
-                        <th style="width:44%;">Positive</th>
-                        <th style="width:44%;">Negative</th>
-                        <th style="width:12%;"></th>
+                        <th style="width:50%;">Positive</th>
+                        <th style="width:50%;">Negative</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,13 +114,6 @@
                     <tr>
                         <td class="pos-text">{{ ind.positive }}</td>
                         <td class="neg-text">{{ ind.negative }}</td>
-                        <td>
-                            <form method="POST" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="indicator_id" value="{{ ind.id }}">
-                                <button type="submit" name="delete_indicator" class="button is-danger is-small btn-delete-pair">✕</button>
-                            </form>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
