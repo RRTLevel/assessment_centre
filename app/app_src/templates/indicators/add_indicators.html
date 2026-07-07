@@ -134,8 +134,62 @@
 
 <script>
 const existingNames = {{ indicator_names_json|safe }};
+const DRAFT_KEY = 'indicator-form-draft';
 
-document.addEventListener('DOMContentLoaded', () => addPair());
+function saveDraft() {
+    const draft = {
+        nameSelect: document.getElementById('name-select').value,
+        newName: document.getElementById('new-name-input').value,
+        pairs: []
+    };
+    document.querySelectorAll('#pairs-container .pair-row').forEach(row => {
+        const posEl = row.querySelector('textarea[name^="positive_"]');
+        const negEl = row.querySelector('textarea[name^="negative_"]');
+        if (posEl && negEl) {
+            draft.pairs.push({
+                pos: $(posEl).summernote('code'),
+                neg: $(negEl).summernote('code'),
+            });
+        }
+    });
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    try {
+        const draft = JSON.parse(raw);
+        const sel = document.getElementById('name-select');
+        if (draft.nameSelect) {
+            sel.value = draft.nameSelect;
+            handleNameSelect(sel);
+        }
+        if (draft.newName) {
+            document.getElementById('new-name-input').value = draft.newName;
+        }
+        if (draft.pairs && draft.pairs.length > 0) {
+            draft.pairs.forEach(pair => {
+                addPair();
+                const idx = pairCount - 1;
+                if (pair.pos) $('#pos-' + idx).summernote('code', pair.pos);
+                if (pair.neg) $('#neg-' + idx).summernote('code', pair.neg);
+            });
+            return true;
+        }
+    } catch(e) {}
+    return false;
+}
+
+function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!restoreDraft()) addPair();
+    document.getElementById('name-select').addEventListener('change', saveDraft);
+    document.getElementById('new-name-input').addEventListener('input', saveDraft);
+});
 
 function handleNameSelect(sel) {
     const newWrap = document.getElementById('new-name-wrap');
@@ -168,7 +222,7 @@ function addPair() {
             ['misc', ['undo', 'redo']]
         ],
         height: 80,
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
+        callbacks: { onChange: function(contents) { $(this).val(contents); saveDraft(); } }
     };
     $('#pos-' + idx).summernote({...opts, placeholder: '+ Positive behaviour...'});
     $('#neg-' + idx).summernote({...opts, placeholder: '− Negative behaviour...'});
@@ -180,6 +234,7 @@ function removePair(idx) {
         $('#pos-' + idx).summernote('destroy');
         $('#neg-' + idx).summernote('destroy');
         row.remove();
+        saveDraft();
     }
 }
 
@@ -216,12 +271,14 @@ function handleSave() {
         document.getElementById('ar-body').textContent = 'Add new pairs alongside the existing ones, or replace them all?';
         document.getElementById('ar-modal').classList.add('active');
     } else {
+        clearDraft();
         document.getElementById('mode-field').value = 'add';
         document.getElementById('indicator-form').submit();
     }
 }
 
 function submitWith(mode) {
+    clearDraft();
     document.getElementById('mode-field').value = mode;
     document.getElementById('ar-modal').classList.remove('active');
     document.getElementById('indicator-form').submit();

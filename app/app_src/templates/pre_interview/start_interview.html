@@ -10,11 +10,14 @@
 <main class="section">
 <div class="container interview-container">
 
-    <div class="interview-header">
-        <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
-        <p class="interview-count">
-            Pack: {{ application.pack.title }} &middot; Total Questions: {{ question_data|length }}
-        </p>
+    <div class="interview-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+            <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
+            <p class="interview-count">
+                Pack: {{ application.pack.title }} &middot; Total Questions: {{ question_data|length }}
+            </p>
+        </div>
+        <span id="autosave-status" style="font-size:0.78rem; color:#888; margin-bottom:0.4rem;"></span>
     </div>
 
     {% if application.pack.description %}
@@ -336,6 +339,38 @@ document.getElementById('interview-form').addEventListener('submit', function(e)
     });
     if (!valid) e.preventDefault();
 });
+
+const AUTOSAVE_URL = "{% url 'autosave_interview' application.application_id %}";
+const autosaveStatus = document.getElementById('autosave-status');
+
+function syncSummernotes() {
+    $('.notes-textarea, .feedback-textarea').each(function() {
+        $(this).val($(this).summernote('code'));
+    });
+    document.querySelectorAll('#indicator-groups-container textarea').forEach(function(ta) {
+        const $ta = $(ta);
+        if ($ta.next('.note-editor').length) {
+            $ta.val($ta.summernote('code'));
+        }
+    });
+}
+
+function autosave() {
+    syncSummernotes();
+    autosaveStatus.textContent = 'Saving…';
+    fetch(AUTOSAVE_URL, { method: 'POST', body: new FormData(document.getElementById('interview-form')) })
+        .then(r => r.json())
+        .then(d => {
+            autosaveStatus.textContent = d.ok ? '✓ Saved' : 'Save failed';
+            setTimeout(() => { autosaveStatus.textContent = ''; }, 3000);
+        })
+        .catch(() => {
+            autosaveStatus.textContent = 'Save failed';
+            setTimeout(() => { autosaveStatus.textContent = ''; }, 3000);
+        });
+}
+
+setInterval(autosave, 30000);
 </script>
 
 {% endblock %}

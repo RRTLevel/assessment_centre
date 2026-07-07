@@ -516,6 +516,61 @@ def start_interview(request, application_id):
 
 @login_required(login_url="/login")
 @group_required(ECD_GROUP, ECAM_GROUP)
+def autosave_interview(request, application_id):
+    if request.method != "POST":
+        return JsonResponse({"ok": False}, status=405)
+
+    application = get_object_or_404(Application, application_id=application_id)
+    questions = Questions.objects.filter(category=application.pack.category)
+
+    overall_scores = []
+    for question in questions:
+        notes = request.POST.get(f"notes_{question.id}", "")
+        feedback = request.POST.get(f"feedback_{question.id}", "")
+        overall_score_raw = request.POST.get(f"overall_score_{question.id}")
+        overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
+        if overall_score is not None:
+            overall_scores.append(overall_score)
+        InterviewResult.objects.update_or_create(
+            application=application,
+            question=question,
+            defaults={"score": overall_score, "notes": notes, "feedback": feedback},
+        )
+
+    for key, value in request.POST.items():
+        m = re.match(r'^indicator_score_(\d+)$', key)
+        if m and value and value.isdigit():
+            try:
+                indicator = Indicator.objects.get(id=int(m.group(1)))
+                IndicatorScore.objects.update_or_create(
+                    application=application,
+                    indicator=indicator,
+                    defaults={"score": int(value)},
+                )
+            except Indicator.DoesNotExist:
+                pass
+
+        if key.startswith('group_score_') and value and value.isdigit():
+            group_name = key[len('group_score_'):]
+            if group_name:
+                IndicatorGroupScore.objects.update_or_create(
+                    application=application,
+                    group_name=group_name,
+                    defaults={
+                        "score": int(value),
+                        "notes": request.POST.get(f'group_notes_{group_name}', ''),
+                    },
+                )
+
+    if overall_scores:
+        application.average_score = round(sum(overall_scores) / len(overall_scores), 2)
+        application.save()
+
+    return JsonResponse({"ok": True})
+
+
+@login_required(login_url="/login")
+@group_required(ECD_GROUP, ECAM_GROUP)
 def inbox_view(request):
     today = datetime.date.today()
     year_param = request.GET.get("year")

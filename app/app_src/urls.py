@@ -92,6 +92,11 @@ urlpatterns = [
         views.start_interview,
         name="start_interview",
     ),
+    path(
+        "interview/<uuid:application_id>/autosave/",
+        views.autosave_interview,
+        name="autosave_interview",
+    ),
 
     # =====================
     # INBOX
