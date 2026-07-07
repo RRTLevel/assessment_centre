@@ -124,14 +124,7 @@ class Questions(models.Model):
         return self.text[:60]
 
 class Indicator(models.Model):
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name="indicators"
-    )
-
     name = models.CharField(max_length=100)
-
     positive = models.TextField()
     negative = models.TextField()
 

@@ -1,148 +1,235 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Indicators</title>
-    {% load static %}
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="{% static 'bulma/css/style.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/add_indicators.css' %}">
-</head>
+{% extends "base.html" %}
+{% load static %}
 
-<body>
-<header>
-    {% include 'includes/title.html' %}
-    {% include 'includes/nav.html' %}
-</header>
+{% block extra_head %}
+<style>
+.indicator-layout { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.5rem 0; }
+.form-card, .table-card { background: var(--card-bg, #fff); border-radius: 8px; border: 1px solid var(--border-color, #e0e0e0); padding: 1.5rem; }
+.form-card { width: 380px; flex-shrink: 0; }
+.table-card { flex: 1; overflow-x: auto; }
+.card-heading { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+.card-heading h2 { font-size: 1rem; font-weight: 700; margin: 0; }
+.card-heading p { font-size: 0.8rem; color: #888; margin: 0; }
+.field-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; display: block; }
+.name-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1rem; }
+.name-row select, .name-row input { flex: 1; }
+#new-name-wrap { flex: 1; display: none; }
+.pair-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.6rem; }
+.pair-row textarea { flex: 1; resize: vertical; min-height: 60px; }
+.pair-row .remove-btn { flex-shrink: 0; margin-top: 2px; }
+.add-pair-btn { font-size: 0.8rem; margin-bottom: 1rem; }
+.save-btn { width: 100%; }
+/* Grouped indicator table */
+.ind-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.ind-table th { background: #f5f5f5; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; }
+.ind-table td { padding: 0.45rem 0.75rem; vertical-align: top; border-bottom: 1px solid #eee; }
+.name-group-row td { background: #f9f9f9; font-weight: 700; font-size: 0.85rem; }
+.pos-text { color: #2a7d4f; }
+.neg-text { color: #c0392b; }
+.btn-delete-pair { font-size: 0.7rem; padding: 0.2rem 0.45rem; }
+.name-group-actions { display: flex; gap: 0.4rem; }
+/* Add/replace modal */
+#ar-modal { display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); }
+#ar-modal.active { display: flex; }
+#ar-box { background: #fff; border-radius: 10px; padding: 1.75rem; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+#ar-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+#ar-box p { font-size: 0.85rem; color: #555; margin-bottom: 1.25rem; }
+.ar-buttons { display: flex; gap: 0.75rem; justify-content: center; }
+</style>
+{% endblock %}
 
-<main class="section">
-<div class="columns indicator-layout">
+{% block content %}
+<div class="indicator-layout">
 
-    <!-- LEFT FORM -->
-    <div class="column is-4">
-        <div class="card-box">
+    <!-- FORM -->
+    <div class="form-card">
+        <div class="card-heading">
+            <div>
+                <h2>Add Indicator</h2>
+                <p>Name, positive &amp; negative behaviour pairs</p>
+            </div>
+        </div>
 
-            <div class="card-header">
-                <div class="icon-circle">+</div>
-                <div>
-                    <h1 class="title">Add Indicator</h1>
-                    <p class="subtitle">Create indicator with category, name, positive & negative</p>
+        <form method="POST" id="indicator-form">
+            {% csrf_token %}
+            <input type="hidden" name="mode" id="mode-field" value="add">
+
+            <label class="field-label">Indicator Name</label>
+            <div class="name-row">
+                <div class="select" style="flex:1;">
+                    <select id="name-select" onchange="handleNameSelect(this)">
+                        <option value="">— Select or create —</option>
+                        <option value="__new__" style="font-weight:bold;">＋ Add New Indicator</option>
+                        {% for name in indicator_names %}
+                        <option value="{{ name }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
+            <div id="new-name-wrap" style="display:none; margin-bottom:1rem;">
+                <input class="input" type="text" id="new-name-input" placeholder="New indicator name...">
+            </div>
+            <input type="hidden" name="indicator_name" id="indicator-name-hidden">
 
-            <form method="POST" class="indicator-form">
-                {% csrf_token %}
+            <label class="field-label" style="margin-top:0.75rem;">Behaviour Pairs</label>
+            <div id="pairs-container"></div>
 
-                <!-- ROW 1 -->
-                <div class="row">
-                    <div>
-                        <label>Name</label>
-                        {{ form.name }}
-                    </div>
+            <button type="button" class="button is-light is-small add-pair-btn" onclick="addPair()">+ Add Pair</button>
 
-                    <div>
-                        <label>Category</label>
-                        {{ form.category }}
-                    </div>
-                </div>
-
-                <!-- ROW 2 -->
-                <div class="row">
-                    <div>
-                        <label>Positive</label>
-                        {{ form.positive }}
-                    </div>
-
-                    <div>
-                        <label>Negative</label>
-                        {{ form.negative }}
-                    </div>
-                </div>
-
-                <!-- SAVE -->
-                <button type="submit" class="btn-primary">
-                    Save Indicator
-                </button>
-            </form>
-
-        </div>
+            <button type="button" class="button is-primary save-btn" onclick="handleSave()">Save Indicator</button>
+        </form>
     </div>
 
-    <!-- RIGHT LIST -->
-    <div class="column">
-        <div class="card-box">
-
-            <div class="card-header">
-                <div class="icon-circle purple">📚</div>
-                <div>
-                    <h2 class="title">Existing Indicators</h2>
-                    <p class="subtitle">All saved indicators grouped by category</p>
-                </div>
+    <!-- TABLE -->
+    <div class="table-card">
+        <div class="card-heading">
+            <div>
+                <h2>Existing Indicators</h2>
+                <p>Grouped by name — each row is one behaviour pair</p>
             </div>
-
-            <table class="indicator-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Positive</th>
-                        <th>Negative</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for indicator in indicators %}
-                    <tr>
-
-                        <td>{{ indicator.name }}</td>
-
-                        <td>
-                            <span class="category-tag">
-                                {{ indicator.category.name }}
-                            </span>
-                        </td>
-
-                        <td>
-                            <div class="positive-box">
-                                {{ indicator.positive }}
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="negative-box">
-                                {{ indicator.negative }}
-                            </div>
-                        </td>
-
-                        <td class="actions">
-                            <a href="?edit={{ indicator.id }}" class="btn-edit">Edit</a>
-
-                            <form method="POST" class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="indicator_id" value="{{ indicator.id }}">
-                                <button type="submit" name="delete_indicator" class="btn-delete">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="empty">No indicators found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-
         </div>
+
+        {% if grouped_indicators %}
+        <table class="ind-table">
+            <thead>
+                <tr>
+                    <th style="width:18%;">Name</th>
+                    <th style="width:36%;">Positive</th>
+                    <th style="width:36%;">Negative</th>
+                    <th style="width:10%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for name, pairs in grouped_indicators.items %}
+                {% for ind in pairs %}
+                <tr>
+                    {% if forloop.first %}
+                    <td rowspan="{{ pairs|length }}" style="vertical-align:top; font-weight:700; border-right:2px solid #e0e0e0;">
+                        {{ name }}
+                        <div class="name-group-actions" style="margin-top:0.5rem;">
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Delete all pairs for {{ name }}?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="indicator_name" value="{{ name }}">
+                                <button type="submit" name="delete_by_name" class="button is-danger is-small">Delete all</button>
+                            </form>
+                        </div>
+                    </td>
+                    {% endif %}
+                    <td class="pos-text">{{ ind.positive }}</td>
+                    <td class="neg-text">{{ ind.negative }}</td>
+                    <td>
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="indicator_id" value="{{ ind.id }}">
+                            <button type="submit" name="delete_indicator" class="button is-danger is-small btn-delete-pair">✕</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888; text-align:center; padding:2rem 0;">No indicators yet. Create one using the form.</p>
+        {% endif %}
     </div>
 
 </div>
-</main>
 
-{% include 'includes/footer.html' %}
-</body>
-</html>
+<!-- Add / Replace modal -->
+<div id="ar-modal">
+    <div id="ar-box">
+        <h3 id="ar-title">Indicator already exists</h3>
+        <p id="ar-body">What would you like to do with the existing behaviour pairs?</p>
+        <div class="ar-buttons">
+            <button class="button is-light" onclick="submitWith('add')">Add to existing</button>
+            <button class="button is-danger" onclick="submitWith('replace')">Replace all</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const existingNames = {{ indicator_names|safe }};
+
+// Initialise with one empty pair
+document.addEventListener('DOMContentLoaded', () => addPair());
+
+function handleNameSelect(sel) {
+    const newWrap = document.getElementById('new-name-wrap');
+    if (sel.value === '__new__') {
+        newWrap.style.display = 'block';
+        document.getElementById('new-name-input').focus();
+    } else {
+        newWrap.style.display = 'none';
+    }
+}
+
+let pairCount = 0;
+function addPair() {
+    const container = document.getElementById('pairs-container');
+    const idx = pairCount++;
+    const row = document.createElement('div');
+    row.className = 'pair-row';
+    row.id = 'pair-' + idx;
+    row.innerHTML =
+        '<textarea class="textarea is-small" name="positive_' + idx + '" placeholder="+ Positive behaviour..." rows="2"></textarea>' +
+        '<textarea class="textarea is-small" name="negative_' + idx + '" placeholder="− Negative behaviour..." rows="2"></textarea>' +
+        '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>';
+    container.appendChild(row);
+}
+
+function removePair(idx) {
+    const row = document.getElementById('pair-' + idx);
+    if (row) row.remove();
+}
+
+function getResolvedName() {
+    const sel = document.getElementById('name-select');
+    if (sel.value === '__new__') {
+        return document.getElementById('new-name-input').value.trim();
+    }
+    return sel.value.trim();
+}
+
+function handleSave() {
+    const name = getResolvedName();
+    if (!name) { alert('Please select or enter an indicator name.'); return; }
+
+    // Check at least one pair has content
+    const pairs = document.querySelectorAll('#pairs-container .pair-row');
+    let hasPair = false;
+    pairs.forEach(row => {
+        const pos = row.querySelector('textarea[name^="positive_"]');
+        const neg = row.querySelector('textarea[name^="negative_"]');
+        if ((pos && pos.value.trim()) || (neg && neg.value.trim())) hasPair = true;
+    });
+    if (!hasPair) { alert('Please add at least one behaviour pair.'); return; }
+
+    document.getElementById('indicator-name-hidden').value = name;
+
+    const isNew = document.getElementById('name-select').value === '__new__';
+    const nameExists = existingNames.includes(name);
+
+    if (!isNew && nameExists) {
+        // Show add/replace modal
+        document.getElementById('ar-title').textContent = '"' + name + '" already has behaviour pairs';
+        document.getElementById('ar-body').textContent = 'Add new pairs alongside the existing ones, or replace them all?';
+        document.getElementById('ar-modal').classList.add('active');
+    } else {
+        document.getElementById('mode-field').value = 'add';
+        document.getElementById('indicator-form').submit();
+    }
+}
+
+function submitWith(mode) {
+    document.getElementById('mode-field').value = mode;
+    document.getElementById('ar-modal').classList.remove('active');
+    document.getElementById('indicator-form').submit();
+}
+
+// Close modal on background click
+document.getElementById('ar-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+</script>
+{% endblock %}

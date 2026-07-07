@@ -19,12 +19,14 @@ from django.views.generic.edit import CreateView
 from django.contrib.auth.models import User
 
 
+import json
+import re
+
 from .forms import (
     AddNoteForm,
     ApplicantForm,
     CategoryForm,
     DomainUserCreationForm,
-    IndicatorForm,
     InterviewResponseForm,
     PackForm,
     QuestionForm,
@@ -33,6 +35,7 @@ from .models import (
     Application,
     Category,
     Indicator,
+    IndicatorScore,
     InterviewResult,
     Note,
     Pack,
@@ -157,19 +160,50 @@ class Custom500View(TemplateView):
 @group_required(ASSESSOR_GROUP)
 def add_indicators(request):
     if request.method == "POST":
-        form = IndicatorForm(request.POST)
-        if form.is_valid():
-            form.save()
+        if "delete_indicator" in request.POST:
+            Indicator.objects.filter(id=request.POST.get("indicator_id")).delete()
             return redirect("add_indicators")
-    else:
-        form = IndicatorForm()
 
-    indicators = Indicator.objects.select_related("category").order_by("category__name", "name")
+        if "delete_by_name" in request.POST:
+            Indicator.objects.filter(name=request.POST.get("indicator_name")).delete()
+            return redirect("add_indicators")
+
+        name = request.POST.get("indicator_name", "").strip()
+        mode = request.POST.get("mode", "add")
+
+        pairs = []
+        i = 0
+        while True:
+            pos = request.POST.get(f"positive_{i}", "").strip()
+            neg = request.POST.get(f"negative_{i}", "").strip()
+            if pos == "" and neg == "" and i > 0:
+                break
+            if pos or neg:
+                pairs.append((pos, neg))
+            i += 1
+            if i > 50:
+                break
+
+        if name and pairs:
+            if mode == "replace":
+                Indicator.objects.filter(name=name).delete()
+            for pos, neg in pairs:
+                Indicator.objects.create(name=name, positive=pos, negative=neg)
+
+        return redirect("add_indicators")
+
+    all_indicators = Indicator.objects.order_by("name", "id")
+    indicator_names = list(
+        Indicator.objects.values_list("name", flat=True).distinct().order_by("name")
+    )
+    grouped = {}
+    for ind in all_indicators:
+        grouped.setdefault(ind.name, []).append(ind)
 
     return render(request, "indicators/add_indicators.html", {
         "page_title": settings.APPLICATION_NAME + " - Add Indicators",
-        "form": form,
-        "indicators": indicators,
+        "indicator_names": indicator_names,
+        "grouped_indicators": grouped,
     })
 
 @login_required(login_url="/login")
@@ -418,10 +452,11 @@ def accepted_applicants(request):
 @group_required(ECD_GROUP, ECAM_GROUP)
 def start_interview(request, application_id):
     application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(category=application.pack.category).prefetch_related("indicators")
+    questions = Questions.objects.filter(category=application.pack.category)
 
     if request.method == "POST":
         overall_scores = []
+        result_map = {}
 
         for question in questions:
             notes = request.POST.get(f"notes_{question.id}", "")
@@ -437,15 +472,24 @@ def start_interview(request, application_id):
                 question=question,
                 defaults={"score": overall_score, "notes": notes, "feedback": feedback},
             )
+            result_map[question.id] = result
 
-            for indicator in question.indicators.all():
-                score_raw = request.POST.get(f"indicator_score_{question.id}_{indicator.id}")
-                if score_raw and score_raw.isdigit():
-                    IndicatorScore.objects.update_or_create(
-                        result=result,
-                        indicator=indicator,
-                        defaults={"score": int(score_raw)},
-                    )
+        for key, value in request.POST.items():
+            m = re.match(r'^indicator_score_(\d+)_(\d+)$', key)
+            if m and value and value.isdigit():
+                q_id = int(m.group(1))
+                ind_id = int(m.group(2))
+                result = result_map.get(q_id)
+                if result:
+                    try:
+                        indicator = Indicator.objects.get(id=ind_id)
+                        IndicatorScore.objects.update_or_create(
+                            result=result,
+                            indicator=indicator,
+                            defaults={"score": int(value)},
+                        )
+                    except Indicator.DoesNotExist:
+                        pass
 
         application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
         application.save()
@@ -456,20 +500,27 @@ def start_interview(request, application_id):
     question_data = []
     for question in questions:
         result = saved.get(question.id)
-        indicators = list(question.indicators.all())
         saved_scores = {}
         if result:
             saved_scores = {s.indicator_id: s.score for s in result.indicator_scores.all()}
         question_data.append({
             "question": question,
             "result": result,
-            "indicators": indicators,
             "saved_scores": saved_scores,
+        })
+
+    indicator_groups = {}
+    for ind in Indicator.objects.order_by("name", "id"):
+        indicator_groups.setdefault(ind.name, []).append({
+            "id": ind.id,
+            "positive": ind.positive,
+            "negative": ind.negative,
         })
 
     return render(request, "pre_interview/start_interview.html", {
         "application": application,
         "question_data": question_data,
+        "indicator_groups_json": json.dumps(indicator_groups),
     })
 
 

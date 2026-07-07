@@ -67,73 +67,52 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Assessment section for this question -->
+            <div id="assessment-box-{{ item.question.id }}" style="display:none; margin-top:1rem;">
+                <p class="has-text-weight-semibold mb-2" style="color:#1800A8; font-size:0.9rem;">
+                    Assessment
+                </p>
+                <div class="table-container">
+                    <table class="score-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Indicator</th>
+                                <th>Positive</th>
+                                <th>Negative</th>
+                                <th>Score (1–6)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-{{ item.question.id }}"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3"><strong>Overall Score</strong></td>
+                                <td>
+                                    <input type="number" min="1" max="6" step="1" class="score-input"
+                                           name="overall_score_{{ item.question.id }}" placeholder="1–6" required>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="field mt-3">
+                    <label class="feedback-label">Feedback</label>
+                    <textarea class="feedback-textarea" name="feedback_{{ item.question.id }}"
+                              placeholder="Enter feedback for this question..."
+                              id="feedback-{{ item.question.id }}"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="button" class="submit-btn"
+                        onclick="openIndicatorModal({{ item.question.id }}, '{{ item.question.text|escapejs }}')">
+                    + Add Indicator
+                </button>
+            </div>
         </div>
         {% empty %}
             <div class="no-questions">No interview questions available.</div>
         {% endfor %}
-
-        <!-- ── ASSESSMENT ── -->
-        <div class="question-card mt-5 mb-4">
-            <h2 class="title is-5 interview-title">Interview Assessment</h2>
-        </div>
-
-        <!-- Dynamically created assessment boxes appear here -->
-        <div id="assessment-container"></div>
-
-        <div class="mb-4">
-            <button type="button" class="submit-btn" onclick="openModal('indicator-modal')">
-                + Add Indicator
-            </button>
-        </div>
-
-        <!-- Single modal with all indicators -->
-        <div class="modal" id="indicator-modal">
-            <div class="modal-background" onclick="closeModal('indicator-modal')"></div>
-            <div class="modal-card">
-                <header class="modal-card-head" style="background:#1800A8;">
-                    <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
-                    <button class="delete" aria-label="close" onclick="closeModal('indicator-modal')"></button>
-                </header>
-                <section class="modal-card-body">
-                    <p class="is-size-7 has-text-grey mb-3">
-                        Select a behavioural indicator to assess. Each indicator includes
-                        positive and negative examples to guide your scoring.
-                    </p>
-                    {% for item in question_data %}
-                    {% if item.indicators %}
-                    <p class="has-text-weight-semibold is-size-7 mb-2" style="color:#1800A8;">
-                        {{ item.question.text|truncatechars:70 }}
-                    </p>
-                    {% for indicator in item.indicators %}
-                    <div class="box mb-3 indicator-card"
-                         id="card-{{ item.question.id }}-{{ indicator.id }}"
-                         style="cursor:pointer;"
-                         onclick="addIndicatorRow(
-                             '{{ item.question.id }}',
-                             '{{ item.question.text|escapejs }}',
-                             '{{ indicator.id }}',
-                             '{{ indicator.name|escapejs }}',
-                             '{{ indicator.positive|escapejs }}',
-                             '{{ indicator.negative|escapejs }}'
-                         )">
-                        <div style="display:flex; justify-content:space-between; align-items:start;">
-                            <div>
-                                <p class="has-text-weight-bold">{{ indicator.name }}</p>
-                                <p class="is-size-7 indicator-positive mt-1">+ {{ indicator.positive|truncatechars:80 }}</p>
-                                <p class="is-size-7 indicator-negative">− {{ indicator.negative|truncatechars:80 }}</p>
-                            </div>
-                            <span class="button is-small is-primary ml-3" style="pointer-events:none;">Add</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endfor %}
-                    <p id="no-more-all" style="display:none;" class="has-text-grey has-text-centered">
-                        All available indicators have been added.
-                    </p>
-                </section>
-            </div>
-        </div>
 
         <div class="submit-section">
             <button type="submit" class="submit-btn">Submit</button>
@@ -141,12 +120,29 @@
 
     </form>
 
+    <!-- Indicator picker modal -->
+    <div class="modal" id="indicator-modal">
+        <div class="modal-background" onclick="closeIndicatorModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head" style="background:#1800A8;">
+                <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
+                <button class="delete" aria-label="close" onclick="closeIndicatorModal()"></button>
+            </header>
+            <section class="modal-card-body" id="indicator-modal-body">
+                <!-- Populated by JS -->
+            </section>
+        </div>
+    </div>
+
 </div>
 </main>
 
 <script>
+const indicatorGroups = {{ indicator_groups_json|safe }};
+let activeQuestionId = null;
+let activeQuestionText = '';
+
 $(document).ready(function () {
-    // Initialise Summernote on all notes textareas
     $('.notes-textarea').summernote({
         toolbar: [
             ['style', ['bold', 'italic', 'underline']],
@@ -155,11 +151,7 @@ $(document).ready(function () {
         ],
         height: 150,
         placeholder: 'Enter interview notes here...',
-        callbacks: {
-            onChange: function (contents) {
-                $(this).val(contents);
-            }
-        }
+        callbacks: { onChange: function(contents) { $(this).val(contents); } }
     });
 });
 
@@ -170,86 +162,102 @@ function toggleAnswers() {
     arrow.innerHTML = el.style.display === 'none' ? '&#9660;' : '&#9650;';
 }
 
-function openModal(id) {
-    document.getElementById(id).classList.add('is-active');
-}
+function openIndicatorModal(questionId, questionText) {
+    activeQuestionId = questionId;
+    activeQuestionText = questionText;
 
-function closeModal(id) {
-    document.getElementById(id).classList.remove('is-active');
-}
+    const body = document.getElementById('indicator-modal-body');
+    const names = Object.keys(indicatorGroups);
 
-function addIndicatorRow(questionId, questionText, indicatorId, name, positive, negative) {
-    if (document.getElementById('row-' + questionId + '-' + indicatorId)) return;
-
-    let box = document.getElementById('assessment-box-' + questionId);
-    if (!box) {
-        const container = document.getElementById('assessment-container');
-        box = document.createElement('div');
-        box.className = 'box mb-4';
-        box.id = 'assessment-box-' + questionId;
-        box.innerHTML =
-            '<p class="has-text-weight-semibold mb-3" style="color:#1800A8;">' +
-                'Assessment — ' + questionText + '</p>' +
-            '<div class="table-container">' +
-                '<table class="score-table" style="width:100%;">' +
-                    '<thead><tr>' +
-                        '<th>Indicator</th><th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
-                    '</tr></thead>' +
-                    '<tbody id="tbody-' + questionId + '"></tbody>' +
-                    '<tfoot><tr>' +
-                        '<td colspan="3"><strong>Overall Score</strong></td>' +
-                        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
-                            ' name="overall_score_' + questionId + '" placeholder="1–6" required></td>' +
-                    '</tr></tfoot>' +
-                '</table>' +
-            '</div>' +
-            '<div class="field mt-3">' +
-                '<label class="feedback-label">Feedback</label>' +
-                '<textarea class="feedback-textarea" name="feedback_' + questionId + '"' +
-                    ' placeholder="Enter feedback for this question..."></textarea>' +
-            '</div>';
-        container.appendChild(box);
-
-        // Initialise Summernote on the feedback textarea now it's in the DOM
-        $(box).find('.feedback-textarea').summernote({
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline']],
-                ['para', ['ul', 'ol']],
-                ['misc', ['undo', 'redo']]
-            ],
-            height: 150,
-            placeholder: 'Enter feedback for this question...',
-            callbacks: {
-                onChange: function (contents) {
-                    $(this).val(contents);
-                }
-            }
+    if (names.length === 0) {
+        body.innerHTML = '<p class="has-text-grey has-text-centered">No indicators have been created yet.</p>';
+    } else {
+        let html = '<p class="is-size-7 has-text-grey mb-3">Select an indicator to add all its behaviour pairs to this question.</p>';
+        names.forEach(name => {
+            const behaviours = indicatorGroups[name];
+            const alreadyAdded = behaviours.every(b =>
+                document.getElementById('row-' + questionId + '-' + b.id)
+            );
+            html +=
+                '<div class="box mb-3 indicator-card' + (alreadyAdded ? ' has-background-light' : '') + '"' +
+                ' style="cursor:' + (alreadyAdded ? 'default' : 'pointer') + ';"' +
+                (alreadyAdded ? '' : ' onclick="addIndicatorGroup(' + questionId + ', \'' + escJs(name) + '\')"') + '>' +
+                '<div style="display:flex; justify-content:space-between; align-items:start;">' +
+                '<div>' +
+                '<p class="has-text-weight-bold">' + escHtml(name) + '</p>' +
+                '<p class="is-size-7 has-text-grey">' + behaviours.length + ' behaviour pair' + (behaviours.length !== 1 ? 's' : '') + '</p>' +
+                behaviours.map(b =>
+                    '<p class="is-size-7 indicator-positive mt-1">+ ' + escHtml(b.positive.slice(0, 80)) + '</p>' +
+                    '<p class="is-size-7 indicator-negative">− ' + escHtml(b.negative.slice(0, 80)) + '</p>'
+                ).join('') +
+                '</div>' +
+                (alreadyAdded
+                    ? '<span class="tag is-light ml-3">Added</span>'
+                    : '<span class="button is-small is-primary ml-3" style="pointer-events:none;">Add</span>'
+                ) +
+                '</div></div>';
         });
+        body.innerHTML = html;
+    }
+
+    document.getElementById('indicator-modal').classList.add('is-active');
+}
+
+function closeIndicatorModal() {
+    document.getElementById('indicator-modal').classList.remove('is-active');
+}
+
+function addIndicatorGroup(questionId, name) {
+    const behaviours = indicatorGroups[name];
+    if (!behaviours) return;
+
+    // Show the assessment box for this question if hidden
+    const box = document.getElementById('assessment-box-' + questionId);
+    if (box && box.style.display === 'none') {
+        box.style.display = 'block';
+        // Init Summernote on the feedback textarea now it's visible
+        const fb = document.getElementById('feedback-' + questionId);
+        if (fb && !$(fb).data('summernote')) {
+            $(fb).summernote({
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline']],
+                    ['para', ['ul', 'ol']],
+                    ['misc', ['undo', 'redo']]
+                ],
+                height: 150,
+                placeholder: 'Enter feedback for this question...',
+                callbacks: { onChange: function(contents) { $(this).val(contents); } }
+            });
+        }
     }
 
     const tbody = document.getElementById('tbody-' + questionId);
-    const row = document.createElement('tr');
-    row.id = 'row-' + questionId + '-' + indicatorId;
-    row.innerHTML =
-        '<td><strong>' + name + '</strong></td>' +
-        '<td class="indicator-positive">' + positive + '</td>' +
-        '<td class="indicator-negative">' + negative + '</td>' +
-        '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
-            ' name="indicator_score_' + questionId + '_' + indicatorId + '"' +
+    behaviours.forEach(b => {
+        const rowId = 'row-' + questionId + '-' + b.id;
+        if (document.getElementById(rowId)) return;
+        const row = document.createElement('tr');
+        row.id = rowId;
+        row.innerHTML =
+            '<td><strong>' + escHtml(name) + '</strong></td>' +
+            '<td class="indicator-positive">' + escHtml(b.positive) + '</td>' +
+            '<td class="indicator-negative">' + escHtml(b.negative) + '</td>' +
+            '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
+            ' name="indicator_score_' + questionId + '_' + b.id + '"' +
             ' placeholder="1–6" required></td>';
-    tbody.appendChild(row);
+        tbody.appendChild(row);
+    });
 
-    const card = document.getElementById('card-' + questionId + '-' + indicatorId);
-    if (card) card.style.display = 'none';
-
-    const allCards = document.querySelectorAll('#indicator-modal .indicator-card');
-    const allHidden = Array.from(allCards).every(c => c.style.display === 'none');
-    if (allHidden) document.getElementById('no-more-all').style.display = 'block';
-
-    closeModal('indicator-modal');
+    closeIndicatorModal();
 }
 
-// Enforce 1-6 range on blur for all score inputs
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJs(s) {
+    return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+// Blur validation for score inputs
 document.getElementById('interview-form').addEventListener('blur', function(e) {
     if (e.target.classList.contains('score-input')) {
         const val = parseInt(e.target.value);
@@ -261,13 +269,25 @@ document.getElementById('interview-form').addEventListener('blur', function(e) {
     }
 }, true);
 
-// Validate notes and feedback are not empty before submit (Summernote hides textareas so 'required' won't fire)
+// Submit validation — Summernote hides textareas so 'required' won't fire
 document.getElementById('interview-form').addEventListener('submit', function(e) {
     let valid = true;
-    $('.notes-textarea, .feedback-textarea').each(function() {
+    $('.notes-textarea').each(function() {
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
         if (!content) {
-            alert('Please fill in all notes and feedback before submitting.');
+            alert('Please fill in all notes before submitting.');
+            valid = false;
+            return false;
+        }
+    });
+    if (!valid) { e.preventDefault(); return; }
+
+    // Only validate feedback textareas that are visible (assessment box shown)
+    $('.feedback-textarea').each(function() {
+        if (!$(this).is(':visible')) return true;
+        const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
+        if (!content) {
+            alert('Please fill in all feedback before submitting.');
             valid = false;
             return false;
         }
