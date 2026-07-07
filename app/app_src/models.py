@@ -138,6 +138,14 @@ class IndicatorScore(models.Model):
     class Meta:
         unique_together = ('application', 'indicator')
 
+class IndicatorGroupScore(models.Model):
+    application = models.ForeignKey('Application', on_delete=models.CASCADE, related_name='indicator_group_scores')
+    group_name = models.CharField(max_length=100)
+    score = models.IntegerField()
+
+    class Meta:
+        unique_together = ('application', 'group_name')
+
 class InterviewResult(models.Model):
     """A scored answer for one applicant (Application) and one interview question."""
 

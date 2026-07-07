@@ -125,6 +125,7 @@
 <script>
 const indicatorGroups = {{ indicator_groups_json|safe }};
 const savedIndicatorScores = {{ saved_indicator_scores_json|safe }};
+const savedGroupScores = {{ saved_group_scores_json|safe }};
 
 $(document).ready(function () {
     $('.notes-textarea').summernote({
@@ -242,8 +243,20 @@ function addIndicatorGroup(name) {
             '<th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
             '</tr></thead>' +
             '<tbody id="' + gid + '-tbody"></tbody>' +
+            '<tfoot><tr style="border-top:2px solid #e0e0e0;">' +
+            '<td colspan="2" style="padding:0.5rem 0.75rem; font-weight:700;">Overall Score</td>' +
+            '<td style="padding:0.4rem 0.75rem;">' +
+            '<input type="number" min="1" max="6" step="1" class="score-input"' +
+            ' name="group_score_' + escHtml(name) + '"' +
+            ' id="' + gid + '-overall"' +
+            ' placeholder="1–6" required>' +
+            '</td>' +
+            '</tr></tfoot>' +
             '</table>';
         document.getElementById('indicator-groups-container').appendChild(section);
+        if (savedGroupScores[name] !== undefined) {
+            document.getElementById(gid + '-overall').value = savedGroupScores[name];
+        }
     }
 
     const tbody = document.getElementById(gid + '-tbody');

@@ -35,6 +35,7 @@ from .models import (
     Application,
     Category,
     Indicator,
+    IndicatorGroupScore,
     IndicatorScore,
     InterviewResult,
     Note,
@@ -463,6 +464,15 @@ def start_interview(request, application_id):
                 except Indicator.DoesNotExist:
                     pass
 
+            if key.startswith('group_score_') and value and value.isdigit():
+                group_name = key[len('group_score_'):]
+                if group_name:
+                    IndicatorGroupScore.objects.update_or_create(
+                        application=application,
+                        group_name=group_name,
+                        defaults={"score": int(value)},
+                    )
+
         application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
         application.save()
         messages.success(request, f"Interview for {application.user.username} submitted.")
@@ -472,6 +482,10 @@ def start_interview(request, application_id):
     saved_indicator_scores = {
         s.indicator_id: s.score
         for s in application.indicator_scores.all()
+    }
+    saved_group_scores = {
+        s.group_name: s.score
+        for s in application.indicator_group_scores.all()
     }
     question_data = []
     for question in questions:
@@ -493,6 +507,7 @@ def start_interview(request, application_id):
         "question_data": question_data,
         "indicator_groups_json": json.dumps(indicator_groups),
         "saved_indicator_scores_json": json.dumps(saved_indicator_scores),
+        "saved_group_scores_json": json.dumps(saved_group_scores),
     })
 
 
