@@ -11,16 +11,14 @@ from django.utils import timezone
 
 from ..models import Application, Questions
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
-from ..services.interviews import interview_questions_with_results, save_interview_submission
+from ..services.interviews import interview_context, save_interview_submission
 
 
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def start_interview(request, application_id):
     application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(
-        category=application.pack.category,
-    ).prefetch_related("indicators")
+    questions = Questions.objects.filter(category=application.pack.category)
 
     if request.method == "POST":
         save_interview_submission(application, questions, request.POST)
@@ -29,7 +27,7 @@ def start_interview(request, application_id):
 
     return render(request, "pre_interview/start_interview.html", {
         "application": application,
-        "question_data": interview_questions_with_results(application, questions),
+        **interview_context(application, questions),
     })
 
 

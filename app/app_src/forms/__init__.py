@@ -7,7 +7,7 @@ Everything is re-exported here so callers can keep using
 from .accounts import ACCOUNT_TYPE_CHOICES, DomainUserChangeForm, DomainUserCreationForm
 from .applications import ApplicantForm, PackForm
 from .notes import AddNoteForm
-from .question_bank import CategoryForm, IndicatorForm, QuestionForm
+from .question_bank import CategoryForm, QuestionForm
 
 __all__ = [
     "ACCOUNT_TYPE_CHOICES",
@@ -16,7 +16,6 @@ __all__ = [
     "CategoryForm",
     "DomainUserChangeForm",
     "DomainUserCreationForm",
-    "IndicatorForm",
     "PackForm",
     "QuestionForm",
 ]

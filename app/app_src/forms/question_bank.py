@@ -1,6 +1,6 @@
 from django import forms
 
-from ..models import Category, Indicator
+from ..models import Category
 
 
 class CategoryForm(forms.ModelForm):
@@ -33,9 +33,3 @@ class QuestionForm(forms.Form):
             for i in range(1, self.QUESTION_COUNT + 1)
             if (text := self.cleaned_data.get(f"question_{i}")) and text.strip()
         ]
-
-
-class IndicatorForm(forms.ModelForm):
-    class Meta:
-        model = Indicator
-        fields = ["positive", "negative"]

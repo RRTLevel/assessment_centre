@@ -26,10 +26,10 @@ class InterviewResult(models.Model):
 
 
 class IndicatorScore(models.Model):
-    """A per-indicator score recorded against one interview result."""
+    """A per-indicator score recorded against one application's interview."""
 
-    result = models.ForeignKey(
-        InterviewResult,
+    application = models.ForeignKey(
+        Application,
         on_delete=models.CASCADE,
         related_name="indicator_scores",
     )
@@ -37,4 +37,20 @@ class IndicatorScore(models.Model):
     score = models.IntegerField()
 
     class Meta:
-        unique_together = ("result", "indicator")
+        unique_together = ("application", "indicator")
+
+
+class IndicatorGroupScore(models.Model):
+    """An overall score and notes for one named indicator group."""
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="indicator_group_scores",
+    )
+    group_name = models.CharField(max_length=100)
+    score = models.IntegerField()
+    notes = models.TextField(blank=True, default="")
+
+    class Meta:
+        unique_together = ("application", "group_name")

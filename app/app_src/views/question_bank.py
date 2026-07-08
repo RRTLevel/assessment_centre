@@ -1,10 +1,13 @@
 """Managing the question bank: categories, questions and indicators."""
 
+import json
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from ..forms import CategoryForm, IndicatorForm, QuestionForm
+from ..forms import CategoryForm, QuestionForm
 from ..models import Category, Indicator, Questions
 from ..permissions import ASSESSOR_GROUP, group_required
 
@@ -87,21 +90,58 @@ def delete_category(request, pk):
 @login_required
 @group_required(ASSESSOR_GROUP)
 def add_indicators(request):
-    if request.method == "POST" and "delete_indicator" in request.POST:
-        Indicator.objects.filter(id=request.POST.get("indicator_id")).delete()
+    """Manage named groups of positive/negative indicator pairs."""
+    if request.method == "POST":
+        if "delete_indicator" in request.POST:
+            Indicator.objects.filter(id=request.POST.get("indicator_id")).delete()
+            return redirect("add_indicators")
+
+        if "delete_by_name" in request.POST:
+            Indicator.objects.filter(name=request.POST.get("indicator_name")).delete()
+            return redirect("add_indicators")
+
+        _save_indicator_group(request.POST)
         return redirect("add_indicators")
 
-    indicator = None
-    if "edit" in request.GET:
-        indicator = get_object_or_404(Indicator, id=request.GET["edit"])
+    all_indicators = Indicator.objects.order_by("name", "id")
+    indicator_names = list(
+        Indicator.objects.values_list("name", flat=True).distinct().order_by("name")
+    )
 
-    form = IndicatorForm(request.POST or None, instance=indicator)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return redirect("add_indicators")
+    grouped = {}
+    for indicator in all_indicators:
+        grouped.setdefault(indicator.name, []).append(indicator)
 
     return render(request, "indicators/add_indicators.html", {
-        "form": form,
-        "indicators": Indicator.objects.all(),
+        "page_title": settings.APPLICATION_NAME + " - Add Indicators",
+        "indicator_names": indicator_names,
+        "indicator_names_json": json.dumps(indicator_names),
+        "grouped_indicators": grouped,
     })
+
+
+def _save_indicator_group(post_data):
+    """Create the submitted positive/negative pairs under one group name.
+
+    In "replace" mode the group's existing pairs are deleted first.
+    """
+    name = post_data.get("indicator_name", "").strip()
+    mode = post_data.get("mode", "add")
+
+    pairs = []
+    for key in post_data:
+        if key.startswith("positive_"):
+            index = key[len("positive_"):]
+            positive = post_data.get(key, "").strip()
+            negative = post_data.get(f"negative_{index}", "").strip()
+            if positive or negative:
+                pairs.append((positive, negative))
+
+    if not name or not pairs:
+        return
+
+    if mode == "replace":
+        Indicator.objects.filter(name=name).delete()
+
+    for positive, negative in pairs:
+        Indicator.objects.create(name=name, positive=positive, negative=negative)

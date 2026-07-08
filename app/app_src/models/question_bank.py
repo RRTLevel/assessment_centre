@@ -22,17 +22,11 @@ class Questions(models.Model):
 
 
 class Indicator(models.Model):
-    """A positive/negative behaviour pair assessors score a question against."""
+    """A positive/negative behaviour pair, grouped under a shared name."""
 
-    question = models.ForeignKey(
-        Questions,
-        on_delete=models.CASCADE,
-        related_name="indicators",
-        null=True,
-        blank=True,
-    )
+    name = models.CharField(max_length=100)
     positive = models.TextField()
     negative = models.TextField()
 
     def __str__(self):
-        return f"{self.positive} / {self.negative}"
+        return self.name
