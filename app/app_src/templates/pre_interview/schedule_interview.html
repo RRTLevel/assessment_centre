@@ -104,22 +104,28 @@
     const datePicker = document.getElementById('date_picker');
     const timePicker = document.getElementById('time_picker');
 
-    function getLocalISOString() {
-        const now = new Date();
-        const offset = now.getTimezoneOffset();
-        const localTime = new Date(now.getTime() - (offset * 60 * 1000));
+    function getLocalISOString(dateObj = new Date()) {
+        const offset = dateObj.getTimezoneOffset();
+        const localTime = new Date(dateObj.getTime() - (offset * 60 * 1000));
         return localTime.toISOString();
     }
 
-    function updateMinDateTime() {
-        const localISO = getLocalISOString();
+    function updateMinMaxDateTime() {
+        const now = new Date();
+        const localISO = getLocalISOString(now);
         const todayStr = localISO.split('T')[0];
         const currentTimeStr = localISO.split('T')[1].substring(0, 5);
 
-        // Prevent selecting past dates
-        datePicker.min = todayStr;
+        // Calculate maximum limit (3 years ahead)
+        const maxDate = new Date();
+        maxDate.setFullYear(now.getFullYear() + 3);
+        const maxDateStr = getLocalISOString(maxDate).split('T')[0];
 
-        // If today is selected, restrict time picker to current/future times
+        // Apply HTML validation limits
+        datePicker.min = todayStr;
+        datePicker.max = maxDateStr;
+
+        // Apply time limits dynamically for today
         if (datePicker.value === todayStr) {
             timePicker.min = currentTimeStr;
         } else {
@@ -127,25 +133,37 @@
         }
     }
 
-    // Run on page load
-    updateMinDateTime();
+    // Set initial minimum/maximum constraints
+    updateMinMaxDateTime();
 
-    // Re-evaluate whenever the date picker changes
-    datePicker.addEventListener('change', updateMinDateTime);
+    // Check rules whenever date changes
+    datePicker.addEventListener('change', updateMinMaxDateTime);
 
-    // Form submission validation
+    // Submission guard against developer tool manual edits
     document.getElementById('interview-schedule-form').addEventListener('submit', function(e) {
-        const localISO = getLocalISOString();
+        const now = new Date();
+        const localISO = getLocalISOString(now);
         const todayStr = localISO.split('T')[0];
         const currentTimeStr = localISO.split('T')[1].substring(0, 5);
+
+        const maxDate = new Date();
+        maxDate.setFullYear(now.getFullYear() + 3);
+        const maxDateStr = getLocalISOString(maxDate).split('T')[0];
 
         const dateVal = datePicker.value;
         const timeVal = timePicker.value;
 
-        // Extra validation fallback for same-day past times
+        // Reject times in the past for today
         if (dateVal === todayStr && timeVal < currentTimeStr) {
             e.preventDefault();
             alert("Please pick a future time for today's interview.");
+            return;
+        }
+
+        // Reject dates beyond 3 years out
+        if (dateVal > maxDateStr) {
+            e.preventDefault();
+            alert("Interviews cannot be scheduled more than 3 years in the future.");
             return;
         }
         
