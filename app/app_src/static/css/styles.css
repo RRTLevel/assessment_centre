@@ -1059,3 +1059,21 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+@media screen and (min-width: 1025px) {
+    .navbar-item.has-dropdown.is-hoverable .navbar-dropdown {
+        display: block !important;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-5px);
+        transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+        transition-delay: 0.2s; /* The magic safety window */
+    }
+
+    .navbar-item.has-dropdown.is-hoverable:hover .navbar-dropdown {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0);
+        transition-delay: 0s; /* Show instantly on hover */
+    }
+}
