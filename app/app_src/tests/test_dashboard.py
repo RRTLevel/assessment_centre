@@ -5,7 +5,9 @@ from django.urls import reverse
 from ..models import Application, Category, InterviewResult, Pack, Questions
 
 
-class CandidateDashboardPdfTest(TestCase):
+class ScoredInterviewFixture:
+    """One candidate with two scored responses across two questions."""
+
     @classmethod
     def setUpTestData(cls):
         cls.admin = User.objects.create_superuser("admin", "a@a.com", "pw")
@@ -43,6 +45,8 @@ class CandidateDashboardPdfTest(TestCase):
     def setUp(self):
         self.client.force_login(self.admin)
 
+
+class CandidateDashboardPdfTest(ScoredInterviewFixture, TestCase):
     def test_dashboard_shows_download_button(self):
         response = self.client.get(reverse("candidate_dashboard"))
         self.assertEqual(response.status_code, 200)
@@ -69,3 +73,20 @@ class CandidateDashboardPdfTest(TestCase):
         response = self.client.get(reverse("candidate_dashboard_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.content.startswith(b"%PDF"))
+
+
+class ResultsPageTest(ScoredInterviewFixture, TestCase):
+    def test_results_page_lists_responses_per_question(self):
+        response = self.client.get(reverse("results"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "2 responses recorded")
+        self.assertContains(response, self.q1.text)
+        self.assertContains(response, self.q2.text)
+        self.assertContains(response, "candidate")
+        self.assertContains(response, "Strong communicator.")
+
+    def test_results_page_empty_state(self):
+        InterviewResult.objects.all().delete()
+        response = self.client.get(reverse("results"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "0 responses recorded")

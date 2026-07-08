@@ -2,10 +2,11 @@
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from ..models import Application
+from ..models import InterviewResult, Questions
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
 from ..services.dashboard import candidate_dashboard_data
 from ..services.pdf import render_candidate_dashboard_pdf
@@ -14,16 +15,28 @@ from ..services.pdf import render_candidate_dashboard_pdf
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def results_view(request):
-    applications = (
-        Application.objects
-        .select_related("user")
-        .prefetch_related("results__question")
-        .order_by("-created_at")
+    """Every interview question with the scored responses recorded against it."""
+    questions = list(
+        Questions.objects
+        .select_related("category")
+        .order_by("id")
+        .prefetch_related(
+            Prefetch(
+                "interviewresult_set",
+                queryset=(
+                    InterviewResult.objects
+                    .select_related("application__user")
+                    .order_by("-updated_at")
+                ),
+                to_attr="responses",
+            )
+        )
     )
 
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
-        "applications": applications,
+        "questions_with_responses": [(question, question.responses) for question in questions],
+        "total_responses": sum(len(question.responses) for question in questions),
     })
 
 
