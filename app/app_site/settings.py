@@ -62,10 +62,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'app_src.contexts.applicationNameContext',
-                'app_src.contexts.applicationVersionContext',
-                'app_src.contexts.applicationEnvironmentContext',
-                'app_src.contexts.navigationPermissionsContext'
+                'app_src.contexts.application_metadata',
+                'app_src.contexts.navigation_permissions',
             ],
         },
     },
@@ -153,6 +151,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")
