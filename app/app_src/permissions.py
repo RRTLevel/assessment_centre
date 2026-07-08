@@ -19,7 +19,7 @@ def user_group_names(user):
 
 def is_admin_user(user):
     return user.is_authenticated and (
-        user.is_superuser or user_group_names(user).__contains__(ADMIN_GROUP)
+        user.is_superuser or ADMIN_GROUP in user_group_names(user)
     )
 
 

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.heatmap {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.heatmap th,
+.heatmap td {
+    padding: 8px 12px;
+    text-align: center;
+    border: 1px solid #e5e5e5;
+}
+
+.heatmap .name {
+    text-align: left;
+    font-weight: 500;
+}
+
+.score.s1 { background: #d73027; color: white; }
+.score.s2 { background: #fc8d59; }
+.score.s3 { background: #fee08b; }
+.score.s4 { background: #d9ef8b; }
+.score.s5 { background: #91cf60; }
+.score.s6 { background: #1a9850; color: white; }
+.score.sx { background: #f5f5f5; color: #999; }
+
+.avg {
+    font-weight: 600;
+    background: #f0f0f0;
+}
+
+.filters {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.filters label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+</style>
+
+<form method="get" class="filters">
+
+    <div>
+        <label>From</label>
+        <input
+            type="date"
+            name="from"
+            value="{{ request.GET.from }}">
+    </div>
+
+    <div>
+        <label>To</label>
+        <input
+            type="date"
+            name="to"
+            value="{{ request.GET.to }}">
+    </div>
+
+    <div>
+        <label>Sort</label>
+        <select name="sort">
+            <option value="">Highest Average</option>
+
+            <option value="highest"
+                {% if request.GET.sort == "highest" %}selected{% endif %}>
+                Highest Score
+            </option>
+
+            <option value="lowest"
+                {% if request.GET.sort == "lowest" %}selected{% endif %}>
+                Lowest Score
+            </option>
+
+            <option value="newest"
+                {% if request.GET.sort == "newest" %}selected{% endif %}>
+                Newest Applications
+            </option>
+
+            <option value="oldest"
+                {% if request.GET.sort == "oldest" %}selected{% endif %}>
+                Oldest Applications
+            </option>
+        </select>
+    </div>
+
+    <button type="submit">Apply</button>
+
+    <a class="button is-small rr-primary"
+       href="{% url 'candidate_dashboard_pdf' %}?{{ request.GET.urlencode }}">
+        Download PDF
+    </a>
+
+</form>
+
+<table class="heatmap">
+    <thead>
+        <tr>
+            <th>Candidate</th>
+            <th>Application Date</th>
+
+            {% for question in questions %}
+                <th title="{{ question.text }}">
+                    Q{{ forloop.counter }}
+                </th>
+            {% endfor %}
+
+            <th>Average</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in rows %}
+            <tr>
+
+                <td class="name">
+                    {{ row.name }}
+                </td>
+
+                <td>
+                    {{ row.date|date:"d M Y" }}
+                </td>
+
+                {% for score in row.cells %}
+                    <td class="score s{{ score|default_if_none:'x' }}">
+                        {{ score|default_if_none:"—" }}
+                    </td>
+                {% endfor %}
+
+                <td class="avg">
+                    {{ row.avg|floatformat:1|default_if_none:"—" }}
+                </td>
+
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="{{ questions|length|add:3 }}">
+                    No results yet.
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
