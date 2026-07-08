@@ -94,6 +94,11 @@
 
     <button type="submit">Apply</button>
 
+    <a class="button is-small rr-primary"
+       href="{% url 'candidate_dashboard_pdf' %}?{{ request.GET.urlencode }}">
+        Download PDF
+    </a>
+
 </form>
 
 <table class="heatmap">
