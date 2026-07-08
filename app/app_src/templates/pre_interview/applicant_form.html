@@ -2,53 +2,69 @@
 
 {% block content %}
 
-<section class="section">
-  <div class="container interview-container">
+<br>
 
-    <!-- HEADER -->
-    <div class="interview-header">
-      <h1 class="title interview-title rr-primary p-3">
-        {{ pack.title }}
-      </h1>
-
-      <p class="interview-count">
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">{{ pack.title }}</h1>
+      <p class="rr-white">
         {{ pack.description }}
       </p>
     </div>
+  </div>
+</section>
 
-    <h2 class="title is-4 text-rr-primary rr-underlined">
+<section class="section">
+  <div class="container interview-container">
+
+    <h2 class="title is-4 text-rr-primary rr-underlined mb-5">
       Pre Interview Questions
     </h2>
 
     <form method="POST">
       {% csrf_token %}
 
-      <!-- QUESTION 1 -->
       {% if pack.pre_interview_question_1 %}
-      <div class="question-card mb-4">
-        <p><strong>{{ pack.pre_interview_question_1 }}</strong></p>
-        {{ form.answer_1 }}
+      <div class="card mb-4">
+        <div class="card-content">
+          <div class="field">
+            <label class="label mb-3">{{ pack.pre_interview_question_1 }}</label>
+            <div class="control">
+              {{ form.answer_1 }}
+            </div>
+          </div>
+        </div>
       </div>
       {% endif %}
 
-      <!-- QUESTION 2 -->
       {% if pack.pre_interview_question_2 %}
-      <div class="question-card mb-4">
-        <p><strong>{{ pack.pre_interview_question_2 }}</strong></p>
-        {{ form.answer_2 }}
+      <div class="card mb-4">
+        <div class="card-content">
+          <div class="field">
+            <label class="label mb-3">{{ pack.pre_interview_question_2 }}</label>
+            <div class="control">
+              {{ form.answer_2 }}
+            </div>
+          </div>
+        </div>
       </div>
       {% endif %}
 
-      <!-- QUESTION 3 -->
       {% if pack.pre_interview_question_3 %}
-      <div class="question-card mb-4">
-        <p><strong>{{ pack.pre_interview_question_3 }}</strong></p>
-        {{ form.answer_3 }}
+      <div class="card mb-4">
+        <div class="card-content">
+          <div class="field">
+            <label class="label mb-3">{{ pack.pre_interview_question_3 }}</label>
+            <div class="control">
+              {{ form.answer_3 }}
+            </div>
+          </div>
+        </div>
       </div>
       {% endif %}
 
-      <!-- SUBMIT -->
-      <div class="submit-section">
+      <div class="submit-section mt-5">
         <button type="submit" class="submit-btn">
           Submit Answers
         </button>
