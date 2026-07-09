@@ -33,6 +33,7 @@ from .forms import (
 )
 from .models import (
     Application,
+    ApplicationPack,
     Category,
     Indicator,
     IndicatorGroupScore,
@@ -392,11 +393,22 @@ def approve_application(request, pk=None, application_id=None):
         if interview_date:
             application.interview_date = interview_date
         application.save()
+
+        selected_ids = request.POST.getlist("interview_packs")
+        application.interview_packs.all().delete()
+        for order, pack_id in enumerate(selected_ids):
+            try:
+                pack = Pack.objects.get(id=int(pack_id))
+                ApplicationPack.objects.create(application=application, pack=pack, order=order)
+            except (Pack.DoesNotExist, ValueError):
+                pass
+
         messages.success(request, f"Application for {application.user.username} approved successfully!")
         return redirect("application_review")
 
     return render(request, "pre_interview/schedule_interview.html", {
         "application": application,
+        "all_packs": Pack.objects.all().order_by("title"),
     })
 
 
@@ -428,34 +440,37 @@ def accepted_applicants(request):
 @group_required(ECD_GROUP, ECAM_GROUP)
 def start_interview(request, application_id):
     application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(category=application.pack.category)
+
+    interview_packs = list(application.interview_packs.select_related('pack__category').order_by('order'))
+    if not interview_packs:
+        ap, _ = ApplicationPack.objects.get_or_create(
+            application=application, pack=application.pack, defaults={'order': 0}
+        )
+        interview_packs = [ap]
 
     if request.method == "POST":
         overall_scores = []
-        result_map = {}
 
-        for question in questions:
-            notes = request.POST.get(f"notes_{question.id}", "")
-            feedback = request.POST.get(f"feedback_{question.id}", "")
-            overall_score_raw = request.POST.get(f"overall_score_{question.id}")
-            overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
-
-            if overall_score is not None:
-                overall_scores.append(overall_score)
-
-            result, _ = InterviewResult.objects.update_or_create(
-                application=application,
-                question=question,
-                defaults={"score": overall_score, "notes": notes, "feedback": feedback},
-            )
-            result_map[question.id] = result
+        for ap in interview_packs:
+            questions = Questions.objects.filter(category=ap.pack.category)
+            for question in questions:
+                notes = request.POST.get(f"notes_{ap.id}_{question.id}", "")
+                feedback = request.POST.get(f"feedback_{ap.id}_{question.id}", "")
+                overall_score_raw = request.POST.get(f"overall_score_{ap.id}_{question.id}")
+                overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
+                if overall_score is not None:
+                    overall_scores.append(overall_score)
+                InterviewResult.objects.update_or_create(
+                    application=application,
+                    question=question,
+                    defaults={"score": overall_score, "notes": notes, "feedback": feedback, "application_pack": ap},
+                )
 
         for key, value in request.POST.items():
             m = re.match(r'^indicator_score_(\d+)$', key)
             if m and value and value.isdigit():
-                ind_id = int(m.group(1))
                 try:
-                    indicator = Indicator.objects.get(id=ind_id)
+                    indicator = Indicator.objects.get(id=int(m.group(1)))
                     IndicatorScore.objects.update_or_create(
                         application=application,
                         indicator=indicator,
@@ -467,11 +482,10 @@ def start_interview(request, application_id):
             if key.startswith('group_score_') and value and value.isdigit():
                 group_name = key[len('group_score_'):]
                 if group_name:
-                    group_notes = request.POST.get(f'group_notes_{group_name}', '')
                     IndicatorGroupScore.objects.update_or_create(
                         application=application,
                         group_name=group_name,
-                        defaults={"score": int(value), "notes": group_notes},
+                        defaults={"score": int(value), "notes": request.POST.get(f'group_notes_{group_name}', '')},
                     )
 
         application.average_score = round(sum(overall_scores) / len(overall_scores), 2) if overall_scores else None
@@ -480,33 +494,34 @@ def start_interview(request, application_id):
         return redirect("inbox")
 
     saved = {result.question_id: result for result in application.results.all()}
-    saved_indicator_scores = {
-        s.indicator_id: s.score
-        for s in application.indicator_scores.all()
-    }
+    pack_data = []
+    total_questions = 0
+    for ap in interview_packs:
+        questions = list(Questions.objects.filter(category=ap.pack.category))
+        total_questions += len(questions)
+        pack_data.append({
+            "ap": ap,
+            "pack": ap.pack,
+            "question_data": [{"question": q, "result": saved.get(q.id)} for q in questions],
+        })
+
+    saved_indicator_scores = {s.indicator_id: s.score for s in application.indicator_scores.all()}
     saved_group_scores = {}
     saved_group_notes = {}
     for s in application.indicator_group_scores.all():
         saved_group_scores[s.group_name] = s.score
         saved_group_notes[s.group_name] = s.notes
-    question_data = []
-    for question in questions:
-        question_data.append({
-            "question": question,
-            "result": saved.get(question.id),
-        })
 
     indicator_groups = {}
     for ind in Indicator.objects.order_by("name", "id"):
         indicator_groups.setdefault(ind.name, []).append({
-            "id": ind.id,
-            "positive": ind.positive,
-            "negative": ind.negative,
+            "id": ind.id, "positive": ind.positive, "negative": ind.negative,
         })
 
     return render(request, "pre_interview/start_interview.html", {
         "application": application,
-        "question_data": question_data,
+        "pack_data": pack_data,
+        "total_questions": total_questions,
         "indicator_groups_json": json.dumps(indicator_groups),
         "saved_indicator_scores_json": json.dumps(saved_indicator_scores),
         "saved_group_scores_json": json.dumps(saved_group_scores),
@@ -521,21 +536,28 @@ def autosave_interview(request, application_id):
         return JsonResponse({"ok": False}, status=405)
 
     application = get_object_or_404(Application, application_id=application_id)
-    questions = Questions.objects.filter(category=application.pack.category)
+    interview_packs = list(application.interview_packs.select_related('pack__category').order_by('order'))
+    if not interview_packs:
+        ap, _ = ApplicationPack.objects.get_or_create(
+            application=application, pack=application.pack, defaults={'order': 0}
+        )
+        interview_packs = [ap]
 
     overall_scores = []
-    for question in questions:
-        notes = request.POST.get(f"notes_{question.id}", "")
-        feedback = request.POST.get(f"feedback_{question.id}", "")
-        overall_score_raw = request.POST.get(f"overall_score_{question.id}")
-        overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
-        if overall_score is not None:
-            overall_scores.append(overall_score)
-        InterviewResult.objects.update_or_create(
-            application=application,
-            question=question,
-            defaults={"score": overall_score, "notes": notes, "feedback": feedback},
-        )
+    for ap in interview_packs:
+        questions = Questions.objects.filter(category=ap.pack.category)
+        for question in questions:
+            notes = request.POST.get(f"notes_{ap.id}_{question.id}", "")
+            feedback = request.POST.get(f"feedback_{ap.id}_{question.id}", "")
+            overall_score_raw = request.POST.get(f"overall_score_{ap.id}_{question.id}")
+            overall_score = int(overall_score_raw) if overall_score_raw and overall_score_raw.isdigit() else None
+            if overall_score is not None:
+                overall_scores.append(overall_score)
+            InterviewResult.objects.update_or_create(
+                application=application,
+                question=question,
+                defaults={"score": overall_score, "notes": notes, "feedback": feedback, "application_pack": ap},
+            )
 
     for key, value in request.POST.items():
         m = re.match(r'^indicator_score_(\d+)$', key)
@@ -556,10 +578,7 @@ def autosave_interview(request, application_id):
                 IndicatorGroupScore.objects.update_or_create(
                     application=application,
                     group_name=group_name,
-                    defaults={
-                        "score": int(value),
-                        "notes": request.POST.get(f'group_notes_{group_name}', ''),
-                    },
+                    defaults={"score": int(value), "notes": request.POST.get(f'group_notes_{group_name}', '')},
                 )
 
     if overall_scores:

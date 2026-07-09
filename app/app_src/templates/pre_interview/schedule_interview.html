@@ -66,7 +66,29 @@
                 {% csrf_token %}
                 
                 <input type="hidden" id="interview_date" name="interview_date">
-                
+
+                <div class="mb-5">
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Interview Packs</p>
+                    <p class="is-size-7 has-text-grey mb-3">Select one or more packs for this interview (up to 3).</p>
+                    {% for pack in all_packs %}
+                    <label class="checkbox mb-2" style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" name="interview_packs" value="{{ pack.id }}"
+                               {% if pack == application.pack %}checked{% endif %}
+                               style="margin-top:3px; flex-shrink:0;">
+                        <span>
+                            <strong>{{ pack.title }}</strong>
+                            {% if pack.description %}
+                            <span class="is-size-7 has-text-grey" style="display:block;">{{ pack.description|truncatechars:80 }}</span>
+                            {% endif %}
+                        </span>
+                    </label>
+                    {% empty %}
+                    <p class="is-size-7 has-text-grey">No packs have been created yet.</p>
+                    {% endfor %}
+                </div>
+
+                <hr style="margin: 1rem 0;">
+
                 <div class="native-calendar-row mb-6">
                     
                     <div class="native-calendar-field">
