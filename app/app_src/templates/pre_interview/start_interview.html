@@ -348,6 +348,7 @@ document.getElementById('interview-form').addEventListener('input', function(e) 
 }, true);
 
 document.getElementById('interview-form').addEventListener('submit', function(e) {
+    syncSummernotes();
     let valid = true;
     $('.notes-textarea').each(function() {
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
@@ -378,9 +379,8 @@ function syncSummernotes() {
         $(this).val($(this).summernote('code'));
     });
     document.querySelectorAll('#indicator-groups-container textarea').forEach(function(ta) {
-        const $ta = $(ta);
-        if ($ta.next('.note-editor').length) {
-            $ta.val($ta.summernote('code'));
+        if ($(ta).data('summernote')) {
+            $(ta).val($(ta).summernote('code'));
         }
     });
 }
