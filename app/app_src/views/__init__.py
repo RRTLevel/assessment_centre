@@ -21,7 +21,7 @@ from .applications import (
     deny_application,
 )
 from .dashboard import candidate_dashboard, candidate_dashboard_pdf, results_view
-from .interviews import inbox_view, start_interview
+from .interviews import autosave_interview, inbox_view, start_interview
 from .pages import (
     Custom404View,
     Custom500View,
@@ -55,6 +55,7 @@ __all__ = [
     "application_review",
     "applications",
     "approve_application",
+    "autosave_interview",
     "candidate_dashboard",
     "candidate_dashboard_pdf",
     "create_category",

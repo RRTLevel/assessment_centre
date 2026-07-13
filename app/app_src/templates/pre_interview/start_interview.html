@@ -3,6 +3,9 @@
 {% block extra_head %}
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+<style>
+.pack-tabs .tabs ul { flex-wrap: wrap; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -10,19 +13,15 @@
 <main class="section">
 <div class="container interview-container">
 
-    <div class="interview-header">
-        <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
-        <p class="interview-count">
-            Pack: {{ application.pack.title }} &middot; Total Questions: {{ question_data|length }}
-        </p>
+    <div class="interview-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+            <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
+            <p class="interview-count">
+                {{ pack_data|length }} pack{{ pack_data|length|pluralize }} &middot; Total Questions: {{ total_questions }}
+            </p>
+        </div>
+        <span id="autosave-status" style="font-size:0.78rem; color:#888; margin-bottom:0.4rem;"></span>
     </div>
-
-    {% if application.pack.description %}
-    <div class="box mb-4">
-        <h2 class="title is-5">Pack Description</h2>
-        <p>{{ application.pack.description }}</p>
-    </div>
-    {% endif %}
 
     <div class="box mb-4">
         <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers()">
@@ -30,62 +29,92 @@
             <span id="answers-arrow" style="margin-left: auto;">&#9660;</span>
         </button>
         <div id="applicant-answers" style="display: none; margin-top: 1rem;">
-            {% if application.pack.pre_interview_question_1 %}
-                <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+            {% with pd=pack_data.0 %}
+            {% if pd.pack.pre_interview_question_1 %}
+                <p><strong>{{ pd.pack.pre_interview_question_1 }}</strong></p>
                 <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
             {% endif %}
-            {% if application.pack.pre_interview_question_2 %}
-                <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+            {% if pd.pack.pre_interview_question_2 %}
+                <p><strong>{{ pd.pack.pre_interview_question_2 }}</strong></p>
                 <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
             {% endif %}
-            {% if application.pack.pre_interview_question_3 %}
-                <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+            {% if pd.pack.pre_interview_question_3 %}
+                <p><strong>{{ pd.pack.pre_interview_question_3 }}</strong></p>
                 <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
             {% endif %}
+            {% endwith %}
         </div>
     </div>
 
     <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
         {% csrf_token %}
 
-        <!-- ── QUESTIONS ── -->
-        {% for item in question_data %}
-        <div class="box mb-4">
-            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
-                Question {{ forloop.counter }} &mdash; {{ application.pack.title }}
-            </p>
-            <div class="question-row">
-                <div class="question-card">
-                    <p class="question-text">{{ item.question.text }}</p>
-                </div>
-                <div class="Score-Box">
-                    <div class="notes_box">
-                        <label class="notes-label" for="notes-{{ item.question.id }}">Notes</label>
-                        <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
-                                  name="notes_{{ item.question.id }}"
-                                  required>{{ item.result.notes|default:'' }}</textarea>
+        <!-- ── PACK TABS (only when multiple packs) ── -->
+        {% if pack_data|length > 1 %}
+        <div class="pack-tabs tabs is-boxed mb-4">
+            <ul>
+                {% for pd in pack_data %}
+                <li id="tab-{{ pd.ap.id }}"{% if forloop.first %} class="is-active"{% endif %}>
+                    <a onclick="switchPack({{ pd.ap.id }})">{{ pd.pack.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- ── PACK SECTIONS ── -->
+        {% for pd in pack_data %}
+        <div id="pack-{{ pd.ap.id }}" class="pack-section"{% if not forloop.first %} style="display:none;"{% endif %}>
+
+            {% if pack_data|length == 1 and pd.pack.description %}
+            <div class="box mb-4">
+                <h2 class="title is-5">Pack Description</h2>
+                <p>{{ pd.pack.description }}</p>
+            </div>
+            {% endif %}
+
+            {% for item in pd.question_data %}
+            <div class="box mb-4">
+                <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
+                    Question {{ forloop.counter }} &mdash; {{ pd.pack.title }}
+                </p>
+                <div class="question-row">
+                    <div class="question-card">
+                        <p class="question-text">{{ item.question.text }}</p>
                     </div>
-                    <div class="field mt-3">
-                        <label class="label is-small">Overall Score (1–6)</label>
-                        <input type="number" min="1" max="6" step="1" class="score-input"
-                               name="overall_score_{{ item.question.id }}" placeholder="1–6" required
-                               value="{{ item.result.score|default:'' }}">
-                    </div>
-                    <div class="field mt-2">
-                        <label class="feedback-label">Feedback</label>
-                        <textarea class="feedback-textarea"
-                                  name="feedback_{{ item.question.id }}"
-                                  id="feedback-{{ item.question.id }}"
-                                  placeholder="Enter feedback for this question...">{{ item.result.feedback|default:'' }}</textarea>
+                    <div class="Score-Box">
+                        <div class="notes_box">
+                            <label class="notes-label">Notes</label>
+                            <textarea class="notes-textarea"
+                                      name="notes_{{ pd.ap.id }}_{{ item.question.id }}"
+                                      id="notes-{{ pd.ap.id }}-{{ item.question.id }}"
+                                      required>{{ item.result.notes|default:'' }}</textarea>
+                        </div>
+                        <div class="field mt-3">
+                            <label class="label is-small">Overall Score (1–6)</label>
+                            <input type="number" min="1" max="6" step="1" class="score-input"
+                                   name="overall_score_{{ pd.ap.id }}_{{ item.question.id }}"
+                                   placeholder="1–6" required
+                                   value="{{ item.result.score|default:'' }}">
+                        </div>
+                        <div class="field mt-2">
+                            <label class="feedback-label">Feedback</label>
+                            <textarea class="feedback-textarea"
+                                      name="feedback_{{ pd.ap.id }}_{{ item.question.id }}"
+                                      id="feedback-{{ pd.ap.id }}-{{ item.question.id }}"
+                                      placeholder="Enter feedback for this question...">{{ item.result.feedback|default:'' }}</textarea>
+                        </div>
                     </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="no-questions">No interview questions available for this pack.</div>
+            {% endfor %}
+
         </div>
-        {% empty %}
-            <div class="no-questions">No interview questions available.</div>
         {% endfor %}
 
-        <!-- ── INDICATORS (bottom, interview-level) ── -->
+        <!-- ── INDICATORS (interview-level, shown once) ── -->
         <div class="box mb-4">
             <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">Interview Assessment</p>
 
@@ -151,7 +180,6 @@ $(document).ready(function () {
         callbacks: { onChange: function(contents) { $(this).val(contents); } }
     });
 
-    // Pre-populate saved indicator scores
     if (Object.keys(savedIndicatorScores).length > 0) {
         const indToGroup = {};
         Object.keys(indicatorGroups).forEach(name => {
@@ -175,6 +203,13 @@ $(document).ready(function () {
     }
 });
 
+function switchPack(packId) {
+    document.querySelectorAll('.pack-section').forEach(s => { s.style.display = 'none'; });
+    document.querySelectorAll('.pack-tabs li').forEach(t => { t.classList.remove('is-active'); });
+    document.getElementById('pack-' + packId).style.display = 'block';
+    document.getElementById('tab-' + packId).classList.add('is-active');
+}
+
 function toggleAnswers() {
     const el = document.getElementById('applicant-answers');
     const arrow = document.getElementById('answers-arrow');
@@ -192,9 +227,7 @@ function openIndicatorModal() {
         let html = '<p class="is-size-7 has-text-grey mb-3">Select an indicator to add its behaviour pairs to the assessment.</p>';
         names.forEach(name => {
             const behaviours = indicatorGroups[name];
-            const alreadyAdded = behaviours.every(b =>
-                document.getElementById('ind-row-' + b.id)
-            );
+            const alreadyAdded = behaviours.every(b => document.getElementById('ind-row-' + b.id));
             html +=
                 '<div class="box mb-3 indicator-card' + (alreadyAdded ? ' has-background-light' : '') + '"' +
                 ' style="cursor:' + (alreadyAdded ? 'default' : 'pointer') + ';"' +
@@ -315,6 +348,7 @@ document.getElementById('interview-form').addEventListener('input', function(e) 
 }, true);
 
 document.getElementById('interview-form').addEventListener('submit', function(e) {
+    syncSummernotes();
     let valid = true;
     $('.notes-textarea').each(function() {
         const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
@@ -336,6 +370,37 @@ document.getElementById('interview-form').addEventListener('submit', function(e)
     });
     if (!valid) e.preventDefault();
 });
+
+const AUTOSAVE_URL = "{% url 'autosave_interview' application.application_id %}";
+const autosaveStatus = document.getElementById('autosave-status');
+
+function syncSummernotes() {
+    $('.notes-textarea, .feedback-textarea').each(function() {
+        $(this).val($(this).summernote('code'));
+    });
+    document.querySelectorAll('#indicator-groups-container textarea').forEach(function(ta) {
+        if ($(ta).data('summernote')) {
+            $(ta).val($(ta).summernote('code'));
+        }
+    });
+}
+
+function autosave() {
+    syncSummernotes();
+    autosaveStatus.textContent = 'Saving…';
+    fetch(AUTOSAVE_URL, { method: 'POST', body: new FormData(document.getElementById('interview-form')) })
+        .then(r => r.json())
+        .then(d => {
+            autosaveStatus.textContent = d.ok ? '✓ Saved' : 'Save failed';
+            setTimeout(() => { autosaveStatus.textContent = ''; }, 3000);
+        })
+        .catch(() => {
+            autosaveStatus.textContent = 'Save failed';
+            setTimeout(() => { autosaveStatus.textContent = ''; }, 3000);
+        });
+}
+
+setInterval(autosave, 30000);
 </script>
 
 {% endblock %}

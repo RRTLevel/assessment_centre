@@ -1,0 +1,17 @@
+/* =========================================================
+   CANDIDATE DASHBOARD — HEATMAP
+   ========================================================= */
+
+.heatmap { border-collapse: collapse; width: 100%; }
+.heatmap th, .heatmap td { padding: 8px 12px; text-align: center; border: 1px solid #e5e5e5; }
+.heatmap .name { text-align: left; font-weight: 500; }
+
+.score.s1 { background: #d73027; color: white; }
+.score.s2 { background: #fc8d59; }
+.score.s3 { background: #fee08b; }
+.score.s4 { background: #d9ef8b; }
+.score.s5 { background: #91cf60; }
+.score.s6 { background: #1a9850; color: white; }
+.score.sx { background: #f5f5f5; color: #999; }
+
+.avg { font-weight: 600; background: #f0f0f0; }
