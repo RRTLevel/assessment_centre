@@ -175,6 +175,11 @@
     cursor: pointer;
 }
 
+.indicator-card-added {
+    background-color: var(--rr-border) !important;
+    opacity: 0.75;
+}
+
 .indicator-positive {
     color: #1a7a1a !important;
     font-weight: 500;

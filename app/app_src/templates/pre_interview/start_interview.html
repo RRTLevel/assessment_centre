@@ -229,7 +229,7 @@ function openIndicatorModal() {
             const behaviours = indicatorGroups[name];
             const alreadyAdded = behaviours.every(b => document.getElementById('ind-row-' + b.id));
             html +=
-                '<div class="box mb-3 indicator-card' + (alreadyAdded ? ' has-background-light' : '') + '"' +
+                '<div class="box mb-3 indicator-card' + (alreadyAdded ? ' indicator-card-added' : '') + '"' +
                 ' style="cursor:' + (alreadyAdded ? 'default' : 'pointer') + ';"' +
                 (alreadyAdded ? '' : ' onclick="addIndicatorGroup(\'' + escJs(name) + '\')"') + '>' +
                 '<div style="display:flex; justify-content:space-between; align-items:start;">' +
