@@ -175,6 +175,26 @@
     cursor: pointer;
 }
 
+.score-input-missing {
+    border-color: #c73636 !important;
+    box-shadow: 0 0 0 2px rgba(199, 54, 54, 0.25) !important;
+}
+
+.score-box-missing {
+    border-color: #c73636 !important;
+    border-left-color: #c73636 !important;
+}
+
+.validation-banner {
+    display: none;
+    background-color: #c73636;
+    color: #fff;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
 .indicator-card-added {
     background-color: var(--rr-border) !important;
     opacity: 0.75;

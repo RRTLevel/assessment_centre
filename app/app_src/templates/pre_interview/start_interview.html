@@ -338,38 +338,81 @@ function escJs(s) {
 }
 
 document.getElementById('interview-form').addEventListener('input', function(e) {
-    if (e.target.classList.contains('score-input') && e.target.value !== '') {
-        let val = parseInt(e.target.value);
-        if (!isNaN(val)) {
-            if (val > 6) e.target.value = 6;
-            else if (val < 1) e.target.value = 1;
+    if (e.target.classList.contains('score-input')) {
+        e.target.classList.remove('score-input-missing');
+        if (e.target.value !== '') {
+            let val = parseInt(e.target.value);
+            if (!isNaN(val)) {
+                if (val > 6) e.target.value = 6;
+                else if (val < 1) e.target.value = 1;
+            }
         }
     }
 }, true);
 
 document.getElementById('interview-form').addEventListener('submit', function(e) {
     syncSummernotes();
-    let valid = true;
-    $('.notes-textarea').each(function() {
-        const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
-        if (!content) {
-            alert('Please fill in all notes before submitting.');
-            valid = false;
-            return false;
-        }
-    });
-    if (!valid) { e.preventDefault(); return; }
 
-    $('.feedback-textarea').each(function() {
-        const content = $(this).summernote('code').replace(/<[^>]+>/g, '').trim();
-        if (!content) {
-            alert('Please fill in all feedback before submitting.');
-            valid = false;
-            return false;
+    // Clear previous highlights
+    document.querySelectorAll('.score-input-missing').forEach(el => el.classList.remove('score-input-missing'));
+
+    let firstMissingInput = null;
+    let firstMissingPackId = null;
+
+    // Check all score inputs (including those in hidden pack tabs)
+    document.querySelectorAll('.score-input[required]').forEach(function(input) {
+        if (!input.value.trim()) {
+            input.classList.add('score-input-missing');
+            if (!firstMissingInput) {
+                firstMissingInput = input;
+                const packSection = input.closest('.pack-section');
+                firstMissingPackId = packSection ? packSection.id.replace('pack-', '') : null;
+            }
         }
     });
-    if (!valid) e.preventDefault();
+
+    if (firstMissingInput) {
+        e.preventDefault();
+        if (firstMissingPackId) switchPack(parseInt(firstMissingPackId));
+        firstMissingInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showValidationBanner('Please fill in all scores before submitting.');
+        return;
+    }
+
+    // Check Summernote notes fields
+    let notesMissing = false;
+    $('.notes-textarea').each(function() {
+        if ($(this).summernote('code').replace(/<[^>]+>/g, '').trim() === '') {
+            $(this).closest('.Score-Box').addClass('score-box-missing');
+            if (!notesMissing) {
+                const packSection = this.closest('.pack-section');
+                const packId = packSection ? packSection.id.replace('pack-', '') : null;
+                if (packId) switchPack(parseInt(packId));
+                notesMissing = true;
+            }
+        }
+    });
+
+    if (notesMissing) {
+        e.preventDefault();
+        showValidationBanner('Please fill in all notes before submitting.');
+        return;
+    }
 });
+
+function showValidationBanner(message) {
+    let banner = document.getElementById('validation-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'validation-banner';
+        banner.className = 'validation-banner';
+        document.getElementById('interview-form').prepend(banner);
+    }
+    banner.textContent = message;
+    banner.style.display = 'block';
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => { banner.style.display = 'none'; }, 5000);
+}
 
 const AUTOSAVE_URL = "{% url 'autosave_interview' application.application_id %}";
 const autosaveStatus = document.getElementById('autosave-status');
