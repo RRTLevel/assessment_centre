@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Note
+
+from ..models import Note
+
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,5 +11,5 @@ class NoteSerializer(serializers.ModelSerializer):
             "title",
             "body",
             "author",
-            "pub_date"
+            "pub_date",
         ]

@@ -10,7 +10,6 @@
     <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
 
     <script src="{% static 'fontawesome/js/all.min.js' %}"></script>
-    <script src="https://unpkg.com"></script>
 
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
@@ -30,7 +29,7 @@
 
     {% block extra_head %}{% endblock %}
 
-    <title>{{ page_title }}</title>
+    <title>{{ page_title|default:application_name }}</title>
 </head>
 
 <body>

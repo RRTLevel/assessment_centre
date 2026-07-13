@@ -1,148 +1,125 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<style>
-.heatmap {
-    border-collapse: collapse;
-    width: 100%;
-}
+<br>
 
-.heatmap th,
-.heatmap td {
-    padding: 8px 12px;
-    text-align: center;
-    border: 1px solid #e5e5e5;
-}
-
-.heatmap .name {
-    text-align: left;
-    font-weight: 500;
-}
-
-.score.s1 { background: #d73027; color: white; }
-.score.s2 { background: #fc8d59; }
-.score.s3 { background: #fee08b; }
-.score.s4 { background: #d9ef8b; }
-.score.s5 { background: #91cf60; }
-.score.s6 { background: #1a9850; color: white; }
-.score.sx { background: #f5f5f5; color: #999; }
-
-.avg {
-    font-weight: 600;
-    background: #f0f0f0;
-}
-
-.filters {
-    display: flex;
-    gap: 15px;
-    align-items: end;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.filters label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 4px;
-}
-</style>
-
-<form method="get" class="filters">
-
-    <div>
-        <label>From</label>
-        <input
-            type="date"
-            name="from"
-            value="{{ request.GET.from }}">
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Candidate Statistics</h1>
+      <p class="rr-white">
+        Analyze overview analytics, historical applications, and dynamic scoring matrices.
+      </p>
     </div>
+  </div>
+</section>
 
-    <div>
-        <label>To</label>
-        <input
-            type="date"
-            name="to"
-            value="{{ request.GET.to }}">
+<main class="section">
+    <div class="container">
+
+        <div class="card mb-5">
+            <div class="card-content">
+                <form method="get">
+                    <div class="columns is-bottom is-vcentered">
+
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">From</label>
+                                <div class="control">
+                                    <input class="input" type="date" name="from" value="{{ request.GET.from }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">To</label>
+                                <div class="control">
+                                    <input class="input" type="date" name="to" value="{{ request.GET.to }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Sort Matrix</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select name="sort">
+                                            <option value="">Highest Average</option>
+                                            <option value="highest" {% if request.GET.sort == "highest" %}selected{% endif %}>Highest Score</option>
+                                            <option value="lowest" {% if request.GET.sort == "lowest" %}selected{% endif %}>Lowest Score</option>
+                                            <option value="newest" {% if request.GET.sort == "newest" %}selected{% endif %}>Newest Applications</option>
+                                            <option value="oldest" {% if request.GET.sort == "oldest" %}selected{% endif %}>Oldest Applications</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column is-narrow">
+                            <div class="buttons">
+                                <button type="submit" class="button rr-secondary">
+                                    Apply Filters
+                                </button>
+                                <a class="button rr-primary" href="{% url 'candidate_dashboard_pdf' %}?{{ request.GET.urlencode }}">
+                                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                                    <span>Download PDF</span>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <div class="table-container">
+                    <table class="table heatmap is-fullwidth is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Application Date</th>
+                                {% for question in questions %}
+                                    <th title="{{ question.text }}" class="has-text-centered">
+                                        Q{{ forloop.counter }}
+                                    </th>
+                                {% endfor %}
+                                <th class="has-text-centered">Average</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td class="has-text-weight-semibold">{{ row.name }}</td>
+                                    <td>{{ row.date|date:"d M Y" }}</td>
+
+                                    {% for score in row.cells %}
+                                        <td class="has-text-centered score s{{ score|default_if_none:'x' }}" style="font-weight: 600;">
+                                            {{ score|default_if_none:"—" }}
+                                        </td>
+                                    {% endfor %}
+
+                                    <td class="has-text-centered avg" style="font-weight: 700;">
+                                        {{ row.avg|floatformat:1|default_if_none:"—" }}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="{{ questions|length|add:3 }}" class="has-text-centered has-text-muted py-5">
+                                        No metrics or records match your query.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
-
-    <div>
-        <label>Sort</label>
-        <select name="sort">
-            <option value="">Highest Average</option>
-
-            <option value="highest"
-                {% if request.GET.sort == "highest" %}selected{% endif %}>
-                Highest Score
-            </option>
-
-            <option value="lowest"
-                {% if request.GET.sort == "lowest" %}selected{% endif %}>
-                Lowest Score
-            </option>
-
-            <option value="newest"
-                {% if request.GET.sort == "newest" %}selected{% endif %}>
-                Newest Applications
-            </option>
-
-            <option value="oldest"
-                {% if request.GET.sort == "oldest" %}selected{% endif %}>
-                Oldest Applications
-            </option>
-        </select>
-    </div>
-
-    <button type="submit">Apply</button>
-
-</form>
-
-<table class="heatmap">
-    <thead>
-        <tr>
-            <th>Candidate</th>
-            <th>Application Date</th>
-
-            {% for question in questions %}
-                <th title="{{ question.text }}">
-                    Q{{ forloop.counter }}
-                </th>
-            {% endfor %}
-
-            <th>Average</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for row in rows %}
-            <tr>
-
-                <td class="name">
-                    {{ row.name }}
-                </td>
-
-                <td>
-                    {{ row.date|date:"d M Y" }}
-                </td>
-
-                {% for score in row.cells %}
-                    <td class="score s{{ score|default_if_none:'x' }}">
-                        {{ score|default_if_none:"—" }}
-                    </td>
-                {% endfor %}
-
-                <td class="avg">
-                    {{ row.avg|floatformat:1|default_if_none:"—" }}
-                </td>
-
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="{{ questions|length|add:3 }}">
-                    No results yet.
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+</main>
 
 {% endblock %}

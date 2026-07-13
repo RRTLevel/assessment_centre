@@ -26,7 +26,7 @@ def link_interview_results(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_src', '0030_indicatorgroupscore_notes'),
+        ('app_src', '0031_alter_interviewresponse_unique_together_and_more'),
     ]
 
     operations = [
