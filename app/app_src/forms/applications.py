@@ -35,6 +35,12 @@ class PackForm(forms.ModelForm):
             "question_2",
             "question_3",
         ]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "input"}),
+            "pre_interview_question_1": forms.TextInput(attrs={"class": "input"}),
+            "pre_interview_question_2": forms.TextInput(attrs={"class": "input"}),
+            "pre_interview_question_3": forms.TextInput(attrs={"class": "input"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
