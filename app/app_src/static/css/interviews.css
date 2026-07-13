@@ -357,6 +357,20 @@ select:focus {
 }
 
 /* =========================================================
+   SCHEDULE INTERVIEW
+   ========================================================= */
+
+.schedule-date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.schedule-date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* =========================================================
    THEME-SPECIFIC GUARDS (INTERVIEW)
    ========================================================= */
 
