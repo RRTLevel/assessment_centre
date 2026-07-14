@@ -8,6 +8,46 @@
         <p class="interview-count">{{ total_responses }} response{{ total_responses|pluralize }} recorded</p>
     </div>
 
+    {% if genre_summary %}
+    <div class="question-card mb-5">
+        <p class="has-text-weight-semibold mb-3" style="color:#1800A8;">Pack Summary</p>
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Pack</th>
+                        <th>Modules</th>
+                        <th>Responses</th>
+                        <th>Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in genre_summary %}
+                    <tr>
+                        <td><span class="tag is-warning is-light">{{ row.genre.name }}</span></td>
+                        <td>
+                            {% for p in row.packs %}
+                            <span class="tag is-info is-light mr-1">{{ p.title }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ row.response_count }}</td>
+                        <td>
+                            {% if row.avg_score is not None %}
+                            <span class="tag is-medium" style="background-color:#1800A8; color:#fff; font-weight:700;">
+                                {{ row.avg_score }}
+                            </span>
+                            {% else %}
+                            <span class="tag is-light has-text-grey">No data</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
     {% if questions_with_responses %}
         {% for question, responses, avg_score in questions_with_responses %}
         <div class="question-card mb-5">

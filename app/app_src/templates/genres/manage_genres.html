@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Manage Packs</h1>
+      <p class="rr-white">A pack groups 3 interview modules together. When scheduling an interview, pick a pack to auto-load all 3 modules at once.</p>
+    </div>
+  </div>
+</section>
+
+<main class="section">
+  <div class="container" style="max-width: 860px;">
+
+    <div class="columns">
+
+      <!-- Create form -->
+      <div class="column is-5">
+        <div class="card">
+          <div class="card-content">
+            <h2 class="title is-5 mb-4" style="color:#1800A8;">Create Pack</h2>
+
+            {% if error %}
+            <div class="notification is-danger is-light mb-4">{{ error }}</div>
+            {% endif %}
+
+            <form method="post">
+              {% csrf_token %}
+              <div class="field">
+                <label class="label">Pack name</label>
+                <div class="control">{{ form.name }}</div>
+                {% if form.name.errors %}<p class="help is-danger">{{ form.name.errors.0 }}</p>{% endif %}
+              </div>
+              <div class="field">
+                <label class="label">Module 1</label>
+                <div class="control">{{ form.pack_1 }}</div>
+              </div>
+              <div class="field">
+                <label class="label">Module 2</label>
+                <div class="control">{{ form.pack_2 }}</div>
+              </div>
+              <div class="field">
+                <label class="label">Module 3</label>
+                <div class="control">{{ form.pack_3 }}</div>
+              </div>
+              <button type="submit" class="button rr-primary mt-3">Save Pack</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing packs -->
+      <div class="column">
+        <div class="card">
+          <div class="card-content">
+            <h2 class="title is-5 mb-4" style="color:#1800A8;">Existing Packs</h2>
+
+            {% if genres %}
+            {% for g in genres %}
+            <div class="box mb-3" style="border-left: 4px solid #1800A8;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <p class="has-text-weight-bold mb-1">{{ g.name }}</p>
+                  <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+                    {% for p in g.packs %}
+                    <span class="tag is-info is-light">{{ p.title }}</span>
+                    {% empty %}
+                    <span class="tag is-light has-text-grey">No modules assigned</span>
+                    {% endfor %}
+                  </div>
+                </div>
+                <form method="post" style="flex-shrink:0; margin-left:0.75rem;">
+                  {% csrf_token %}
+                  <input type="hidden" name="delete_genre" value="1">
+                  <input type="hidden" name="genre_id" value="{{ g.id }}">
+                  <button class="button is-small is-danger is-light" type="submit"
+                          onclick="return confirm('Delete pack {{ g.name }}?')">Delete</button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="has-text-grey">No packs created yet.</p>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+{% endblock %}

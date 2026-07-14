@@ -30,6 +30,7 @@ urlpatterns = [
     path("categories/", views.create_category, name="categories"),
     path("category/delete/<int:pk>/", views.delete_category, name="delete_category"),
     path("add_indicators/", views.add_indicators, name="add_indicators"),
+    path("genres/", views.manage_genres, name="manage_genres"),
 
     # =====================
     # PACKS & APPLICATIONS

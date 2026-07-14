@@ -451,3 +451,163 @@ html[data-theme="dark"] .select select {
     color: var(--rr-input-text) !important;
     border-color: var(--rr-input-border) !important;
 }
+
+/* =========================================================
+   BRAND UTILITIES — DARK MODE AWARE
+   ========================================================= */
+
+/* text-rr-primary / has-text-rr-primary icons/links */
+html[data-theme="dark"] .text-rr-primary,
+html[data-theme="dark"] a.has-text-rr-primary {
+    color: #9b94ff !important;
+}
+
+/* rr-primary button: dark bg makes #10069f nearly invisible */
+html[data-theme="dark"] .button.rr-primary,
+html[data-theme="dark"] a.button.rr-primary {
+    background-color: #4a42d8 !important;
+    color: #fff !important;
+}
+html[data-theme="dark"] .button.rr-primary:hover,
+html[data-theme="dark"] a.button.rr-primary:hover {
+    background-color: #3830c0 !important;
+}
+
+/* Outlined brand buttons */
+.rr-outlined {
+    border-color: #1800A8 !important;
+    color: #1800A8 !important;
+}
+html[data-theme="dark"] .rr-outlined {
+    border-color: #9b94ff !important;
+    color: #9b94ff !important;
+}
+
+/* Brand-coloured text links and headings */
+.rr-brand-text {
+    color: #1800A8;
+}
+html[data-theme="dark"] .rr-brand-text {
+    color: #9b94ff !important;
+}
+
+/* Muted / grey text */
+html[data-theme="dark"] .has-text-grey {
+    color: var(--rr-muted-text) !important;
+}
+
+/* Light buttons — white bg on dark is jarring */
+html[data-theme="dark"] .button.is-light {
+    background-color: var(--rr-surface-bg) !important;
+    color: var(--rr-text) !important;
+    border-color: var(--rr-border) !important;
+}
+
+/* =========================================================
+   BULMA COMPONENT DARK MODE FIXES
+   ========================================================= */
+
+/* Notifications — plain .is-light goes surface-bg; coloured variants get a subtle tint */
+html[data-theme="dark"] .notification.is-light {
+    background-color: var(--rr-surface-bg) !important;
+    color: var(--rr-text) !important;
+}
+html[data-theme="dark"] .notification.is-warning.is-light {
+    background-color: rgba(240, 165, 0, 0.15) !important;
+    color: var(--rr-text) !important;
+}
+html[data-theme="dark"] .notification.is-success.is-light {
+    background-color: rgba(22, 128, 60, 0.15) !important;
+    color: var(--rr-text) !important;
+}
+html[data-theme="dark"] .notification.is-danger.is-light {
+    background-color: rgba(199, 54, 54, 0.15) !important;
+    color: var(--rr-text) !important;
+}
+html[data-theme="dark"] .notification.is-info.is-light {
+    background-color: rgba(39, 108, 218, 0.15) !important;
+    color: var(--rr-text) !important;
+}
+
+/* details / summary */
+html[data-theme="dark"] details,
+html[data-theme="dark"] details > * {
+    background-color: transparent;
+    color: var(--rr-text);
+}
+
+/* Striped table alternating rows */
+html[data-theme="dark"] .table.is-striped tbody tr:not(.is-selected):nth-child(even) td,
+html[data-theme="dark"] .table.is-striped tbody tr:not(.is-selected):nth-child(even) th {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Light tags — keep legible on dark cards */
+html[data-theme="dark"] .tag.is-light {
+    background-color: var(--rr-border) !important;
+    color: var(--rr-text) !important;
+}
+html[data-theme="dark"] .tag.is-success.is-light {
+    background-color: rgba(22, 128, 60, 0.2) !important;
+    color: #6ee79e !important;
+}
+html[data-theme="dark"] .tag.is-info.is-light {
+    background-color: rgba(39, 108, 218, 0.2) !important;
+    color: #93c4ff !important;
+}
+html[data-theme="dark"] .tag.is-warning.is-light {
+    background-color: rgba(240, 165, 0, 0.2) !important;
+    color: #ffd36b !important;
+}
+html[data-theme="dark"] .tag.is-danger.is-light {
+    background-color: rgba(199, 54, 54, 0.2) !important;
+    color: #ff9090 !important;
+}
+
+/* =========================================================
+   SUMMERNOTE DARK MODE
+   ========================================================= */
+
+html[data-theme="dark"] .note-editor.note-frame {
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-toolbar {
+    background-color: var(--rr-surface-bg) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-btn {
+    background-color: var(--rr-surface-bg) !important;
+    color: var(--rr-text) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-btn:hover,
+html[data-theme="dark"] .note-btn:focus {
+    background-color: var(--rr-input-bg) !important;
+    color: var(--rr-text) !important;
+}
+
+html[data-theme="dark"] .note-editing-area,
+html[data-theme="dark"] .note-editable {
+    background-color: var(--rr-input-bg) !important;
+    color: var(--rr-input-text) !important;
+}
+
+html[data-theme="dark"] .note-placeholder {
+    color: var(--rr-muted-text) !important;
+}
+
+html[data-theme="dark"] .note-statusbar {
+    background-color: var(--rr-surface-bg) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-statusbar .note-resizebar {
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-resizebar .note-icon-bar {
+    border-color: var(--rr-muted-text) !important;
+}

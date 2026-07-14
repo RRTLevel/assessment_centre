@@ -7,7 +7,7 @@ Everything is re-exported here so callers can keep using
 from .applications import Application, Pack
 from .interviews import ApplicationPack, IndicatorGroupScore, IndicatorScore, InterviewResult
 from .notes import Note
-from .question_bank import Category, Indicator, Questions
+from .question_bank import Category, Genre, Indicator, Questions
 from .users import DomainUser
 
 __all__ = [
@@ -15,6 +15,7 @@ __all__ = [
     "ApplicationPack",
     "Category",
     "DomainUser",
+    "Genre",
     "Indicator",
     "IndicatorGroupScore",
     "IndicatorScore",

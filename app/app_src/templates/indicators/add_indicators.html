@@ -5,11 +5,15 @@
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 <style>
-.field-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; display: block; text-align: left; }
-.pair-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.6rem 0.65rem 0.5rem; position: relative; }
+.field-label { font-size: 0.78rem; font-weight: 600; color: var(--rr-muted-text); margin-bottom: 0.3rem; display: block; text-align: left; }
+.pair-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; border: 1px solid var(--rr-border); border-radius: 6px; padding: 0.6rem 0.65rem 0.5rem; position: relative; }
 .pair-row .remove-btn { position: absolute; top: 0.4rem; right: 0.4rem; }
+.pair-row-incomplete { border-color: #c73636 !important; }
 .ind-group { margin-bottom: 2rem; }
 .ind-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+.save-error { display: none; background: #c73636; color: #fff; border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 0.75rem; font-weight: 600; font-size: 0.85rem; }
+.draft-banner { display: none; background: rgba(16,6,159,0.08); border: 1px solid #10069f; color: var(--rr-text); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.delete-confirm-strip { display: none; align-items: center; gap: 0.4rem; }
 /* Add/replace modal */
 #ar-modal { display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); }
 #ar-modal.active { display: flex; }
@@ -29,6 +33,11 @@
         <p class="interview-count">Manage indicator names and behaviour pairs</p>
     </div>
 
+    <div id="draft-banner" style="display:none;">
+        <span>Draft restored &mdash; your unsaved pairs have been reloaded.</span>
+        <a href="#" onclick="clearDraftAndReset(); return false;" style="color:#10069f; font-weight:600; white-space:nowrap;">Discard draft</a>
+    </div>
+
     <div class="columns">
 
         <!-- FORM -->
@@ -40,6 +49,8 @@
                 <form method="POST" id="indicator-form">
                     {% csrf_token %}
                     <input type="hidden" name="mode" id="mode-field" value="add">
+
+                    <div id="save-error" class="save-error"></div>
 
                     <label class="field-label">Indicator Name</label>
                     <div class="select is-fullwidth mb-3">
@@ -59,7 +70,7 @@
                     <label class="field-label" style="margin-top:0.75rem;">Behaviour Pairs</label>
                     <div id="pairs-container"></div>
 
-                    <button type="button" class="button is-light is-small mb-3" onclick="addPair()">+ Add Pair</button>
+                    <button type="button" class="button is-small mb-3 rr-primary" onclick="addPair()">+ Add Pair</button>
 
                     <button type="button" class="submit-btn" style="width:100%;" onclick="handleSave()">Save Indicator</button>
                 </form>
@@ -77,10 +88,16 @@
                 <div class="ind-group">
                     <div class="ind-group-header">
                         <span class="has-text-weight-semibold" style="color:#1800A8;">{{ name }}</span>
-                        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete indicator \'{{ name }}\'?')">
+                        <form method="POST" style="display:inline-block;">
                             {% csrf_token %}
                             <input type="hidden" name="indicator_name" value="{{ name }}">
-                            <button type="submit" name="delete_by_name" class="button is-danger is-small is-outlined">Delete indicator</button>
+                            <button type="button" class="button is-danger is-small is-outlined delete-trigger-btn"
+                                    onclick="confirmDelete(this)">Delete indicator</button>
+                            <span class="delete-confirm-strip">
+                                <span class="is-size-7" style="color:var(--rr-text);">Sure?</span>
+                                <button type="submit" name="delete_by_name" class="button is-danger is-small">Yes</button>
+                                <button type="button" class="button is-light is-small" onclick="cancelDelete(this)">Cancel</button>
+                            </span>
                         </form>
                     </div>
                     <table class="score-table" style="width:100%;">
@@ -100,7 +117,9 @@
                                     <form method="POST" style="display:inline;">
                                         {% csrf_token %}
                                         <input type="hidden" name="indicator_id" value="{{ ind.id }}">
-                                        <button type="submit" name="delete_indicator" class="button is-danger is-small">✕</button>
+                                        <button type="submit" name="delete_indicator"
+                                                class="button is-danger is-small"
+                                                aria-label="Delete pair" title="Delete pair">✕</button>
                                     </form>
                                 </td>
                             </tr>
@@ -135,6 +154,24 @@
 <script>
 const existingNames = {{ indicator_names_json|safe }};
 const DRAFT_KEY = 'indicator-form-draft';
+
+function showSaveError(msg) {
+    const el = document.getElementById('save-error');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function confirmDelete(triggerBtn) {
+    triggerBtn.style.display = 'none';
+    triggerBtn.parentElement.querySelector('.delete-confirm-strip').style.display = 'inline-flex';
+}
+
+function cancelDelete(cancelBtn) {
+    const strip = cancelBtn.parentElement;
+    strip.style.display = 'none';
+    strip.parentElement.querySelector('.delete-trigger-btn').style.display = '';
+}
 
 function saveDraft() {
     const draft = {
@@ -175,6 +212,8 @@ function restoreDraft() {
                 if (pair.pos) $('#pos-' + idx).summernote('code', pair.pos);
                 if (pair.neg) $('#neg-' + idx).summernote('code', pair.neg);
             });
+            const banner = document.getElementById('draft-banner');
+            banner.style.display = 'flex';
             return true;
         }
     } catch(e) {}
@@ -183,6 +222,21 @@ function restoreDraft() {
 
 function clearDraft() {
     localStorage.removeItem(DRAFT_KEY);
+}
+
+function clearDraftAndReset() {
+    clearDraft();
+    document.getElementById('draft-banner').style.display = 'none';
+    document.getElementById('name-select').value = '';
+    handleNameSelect(document.getElementById('name-select'));
+    document.getElementById('new-name-input').value = '';
+    document.querySelectorAll('#pairs-container .pair-row').forEach(row => {
+        const idx = row.id.replace('pair-', '');
+        $('#pos-' + idx).summernote('destroy');
+        $('#neg-' + idx).summernote('destroy');
+        row.remove();
+    });
+    addPair();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -209,7 +263,7 @@ function addPair() {
     row.className = 'pair-row';
     row.id = 'pair-' + idx;
     row.innerHTML =
-        '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>' +
+        '<button type="button" class="button is-light is-small remove-btn" aria-label="Remove pair" title="Remove pair" onclick="removePair(' + idx + ')">✕</button>' +
         '<label class="field-label" style="margin-bottom:0.2rem;">Positive</label>' +
         '<textarea name="positive_' + idx + '" id="pos-' + idx + '"></textarea>' +
         '<label class="field-label" style="margin-top:0.4rem; margin-bottom:0.2rem;">Negative</label>' +
@@ -248,18 +302,30 @@ function getResolvedName() {
 
 function handleSave() {
     const name = getResolvedName();
-    if (!name) { alert('Please select or enter an indicator name.'); return; }
+    if (!name) { showSaveError('Please select or enter an indicator name.'); return; }
+
+    // Clear previous incomplete highlights
+    document.querySelectorAll('.pair-row-incomplete').forEach(r => r.classList.remove('pair-row-incomplete'));
 
     const pairs = document.querySelectorAll('#pairs-container .pair-row');
-    let hasPair = false;
+    let hasValidPair = false;
+    let hasIncompletePair = false;
+
     pairs.forEach(row => {
         const pos = row.querySelector('textarea[name^="positive_"]');
         const neg = row.querySelector('textarea[name^="negative_"]');
         const posText = pos ? $(pos).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
         const negText = neg ? $(neg).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
-        if (posText || negText) hasPair = true;
+        if (posText && negText) {
+            hasValidPair = true;
+        } else if (posText || negText) {
+            hasIncompletePair = true;
+            row.classList.add('pair-row-incomplete');
+        }
     });
-    if (!hasPair) { alert('Please add at least one behaviour pair.'); return; }
+
+    if (hasIncompletePair) { showSaveError('Each pair needs both a positive and a negative behaviour.'); return; }
+    if (!hasValidPair) { showSaveError('Please add at least one behaviour pair.'); return; }
 
     document.getElementById('indicator-name-hidden').value = name;
 
@@ -286,6 +352,10 @@ function submitWith(mode) {
 
 document.getElementById('ar-modal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('active');
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('ar-modal').classList.remove('active');
 });
 </script>
 {% endblock %}
