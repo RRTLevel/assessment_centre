@@ -42,6 +42,22 @@
 
                         <div class="column">
                             <div class="field">
+                                <label class="label">Year</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select name="year">
+                                            <option value="">All Years</option>
+                                            {% for yr in years %}
+                                            <option value="{{ yr }}" {% if selected_year == yr|stringformat:"s" %}selected{% endif %}>{{ yr }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column">
+                            <div class="field">
                                 <label class="label">Sort Matrix</label>
                                 <div class="control">
                                     <div class="select is-fullwidth">
@@ -114,6 +130,20 @@
                                 </tr>
                             {% endfor %}
                         </tbody>
+                        {% if rows %}
+                        <tfoot>
+                            <tr style="border-top: 2px solid var(--rr-border);">
+                                <td class="has-text-weight-bold" style="color:#1800A8;">Q Average</td>
+                                <td></td>
+                                {% for avg in col_avgs %}
+                                <td class="has-text-centered has-text-weight-bold" style="color:#1800A8;">
+                                    {{ avg|default:"—" }}
+                                </td>
+                                {% endfor %}
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
                     </table>
                 </div>
             </div>

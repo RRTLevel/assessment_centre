@@ -48,6 +48,40 @@
     </div>
     {% endif %}
 
+    {% if indicator_group_summary %}
+    <div class="question-card mb-5">
+        <p class="has-text-weight-semibold mb-3" style="color:#1800A8;">Indicator Summary</p>
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Indicator Group</th>
+                        <th>Responses</th>
+                        <th>Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in indicator_group_summary %}
+                    <tr>
+                        <td><span class="tag is-info is-light">{{ row.group_name }}</span></td>
+                        <td>{{ row.response_count }}</td>
+                        <td>
+                            {% if row.avg_score is not None %}
+                            <span class="tag is-medium" style="background-color:#1800A8; color:#fff; font-weight:700;">
+                                {{ row.avg_score|floatformat:1 }}
+                            </span>
+                            {% else %}
+                            <span class="tag is-light has-text-grey">No data</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
     {% if questions_with_responses %}
         {% for question, responses, avg_score in questions_with_responses %}
         <div class="question-card mb-5">
@@ -79,8 +113,8 @@
                     <tr>
                         <td>{{ response.application.user.username }}</td>
                         <td>{{ response.score|default_if_none:"—" }}</td>
-                        <td>{{ response.notes|default:"—" }}</td>
-                        <td>{{ response.feedback|default:"—" }}</td>
+                        <td>{{ response.notes|striptags|default:"—" }}</td>
+                        <td>{{ response.feedback|striptags|default:"—" }}</td>
                         <td>{{ response.updated_at|date:"d M Y H:i" }}</td>
                     </tr>
                     {% endfor %}

@@ -2,14 +2,14 @@
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Prefetch, Q
+from django.db.models import Avg, Count, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from ..models import Genre, InterviewResult, Questions
+from ..models import Genre, IndicatorGroupScore, InterviewResult, Questions
 
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
-from ..services.dashboard import candidate_dashboard_data
+from ..services.dashboard import available_years, candidate_dashboard_data
 from ..services.pdf import render_candidate_dashboard_pdf
 
 
@@ -52,26 +52,40 @@ def results_view(request):
             "response_count": count,
         })
 
+    # #113 — Indicator group summary table
+    indicator_group_summary = (
+        IndicatorGroupScore.objects
+        .values("group_name")
+        .annotate(avg_score=Avg("score"), response_count=Count("id"))
+        .order_by("group_name")
+    )
+
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
         "questions_with_responses": [(question, question.responses, question.avg_score) for question in questions],
         "total_responses": sum(len(question.responses) for question in questions),
         "genre_summary": genre_summary,
+        "indicator_group_summary": indicator_group_summary,
     })
 
 
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard(request):
-    questions, rows = candidate_dashboard_data(
+    year = request.GET.get("year")
+    questions, rows, col_avgs = candidate_dashboard_data(
         date_from=request.GET.get("from"),
         date_to=request.GET.get("to"),
         sort=request.GET.get("sort"),
+        year=year,
     )
 
     return render(request, "statistics_dashboard/candidate_dashboard.html", {
         "questions": questions,
         "rows": rows,
+        "col_avgs": col_avgs,
+        "years": available_years(),
+        "selected_year": year,
     })
 
 
@@ -81,10 +95,11 @@ def candidate_dashboard_pdf(request):
     date_from = request.GET.get("from")
     date_to = request.GET.get("to")
 
-    questions, rows = candidate_dashboard_data(
+    questions, rows, col_avgs = candidate_dashboard_data(
         date_from=date_from,
         date_to=date_to,
         sort=request.GET.get("sort"),
+        year=request.GET.get("year"),
     )
 
     pdf = render_candidate_dashboard_pdf(questions, rows, date_from, date_to)

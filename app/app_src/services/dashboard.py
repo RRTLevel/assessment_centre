@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Avg, Prefetch
+from django.db.models.functions import ExtractYear
 
 from ..models import Application, InterviewResult, Questions
 
@@ -15,12 +16,24 @@ SORT_OPTIONS = {
 DEFAULT_SORT = "-avg"
 
 
-def candidate_dashboard_data(date_from=None, date_to=None, sort=None):
+def available_years():
+    """Distinct years in which applications were created, newest first."""
+    return list(
+        Application.objects
+        .annotate(year=ExtractYear("created_at"))
+        .values_list("year", flat=True)
+        .distinct()
+        .order_by("-year")
+    )
+
+
+def candidate_dashboard_data(date_from=None, date_to=None, sort=None, year=None):
     """Build the dashboard heatmap: one row per interviewed candidate.
 
-    Returns ``(questions, rows)`` where each row has the candidate's name,
-    latest application, per-question scores (aligned with ``questions``)
-    and their average score.
+    Returns ``(questions, rows, col_avgs)`` where each row has the candidate's
+    name, latest application, per-question scores (aligned with ``questions``)
+    and their average score. ``col_avgs`` is one average per question column
+    across all shown rows.
     """
     questions = list(Questions.objects.order_by("id"))
 
@@ -30,6 +43,9 @@ def candidate_dashboard_data(date_from=None, date_to=None, sort=None):
         .distinct()
         .annotate(avg=Avg("application__results__score"))
     )
+
+    if year:
+        users = users.filter(application__created_at__year=year)
 
     if date_from:
         users = users.filter(application__created_at__date__gte=date_from)
@@ -75,4 +91,10 @@ def candidate_dashboard_data(date_from=None, date_to=None, sort=None):
             "application": application,
         })
 
-    return questions, rows
+    # Per-column averages across all shown rows (#28)
+    col_avgs = []
+    for i in range(len(questions)):
+        scores = [r["cells"][i] for r in rows if r["cells"][i] is not None]
+        col_avgs.append(round(sum(scores) / len(scores), 1) if scores else None)
+
+    return questions, rows, col_avgs
