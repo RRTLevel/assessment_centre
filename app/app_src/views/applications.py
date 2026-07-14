@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ..forms import ApplicantForm, PackForm
-from ..models import Application, Pack
+from ..models import Application, ApplicationPack, Pack
 from ..permissions import ASSESSOR_GROUP, ECAM_GROUP, ECD_GROUP, group_required
 
 
@@ -83,11 +83,22 @@ def approve_application(request, application_id):
         if interview_date:
             application.interview_date = interview_date
         application.save()
+
+        selected_ids = request.POST.getlist("interview_packs")
+        application.interview_packs.all().delete()
+        for order, pack_id in enumerate(selected_ids):
+            try:
+                pack = Pack.objects.get(id=int(pack_id))
+                ApplicationPack.objects.create(application=application, pack=pack, order=order)
+            except (Pack.DoesNotExist, ValueError):
+                pass
+
         messages.success(request, f"Application for {application.user.username} approved successfully!")
         return redirect("application_review")
 
     return render(request, "pre_interview/schedule_interview.html", {
         "application": application,
+        "all_packs": Pack.objects.all().order_by("title"),
     })
 
 
