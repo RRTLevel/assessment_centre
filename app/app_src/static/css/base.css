@@ -449,3 +449,51 @@ html[data-theme="dark"] .select select {
     color: var(--rr-input-text) !important;
     border-color: var(--rr-input-border) !important;
 }
+
+/* =========================================================
+   SUMMERNOTE DARK MODE
+   ========================================================= */
+
+html[data-theme="dark"] .note-editor.note-frame {
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-toolbar {
+    background-color: var(--rr-surface-bg) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-btn {
+    background-color: var(--rr-surface-bg) !important;
+    color: var(--rr-text) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-btn:hover,
+html[data-theme="dark"] .note-btn:focus {
+    background-color: var(--rr-input-bg) !important;
+    color: var(--rr-text) !important;
+}
+
+html[data-theme="dark"] .note-editing-area,
+html[data-theme="dark"] .note-editable {
+    background-color: var(--rr-input-bg) !important;
+    color: var(--rr-input-text) !important;
+}
+
+html[data-theme="dark"] .note-placeholder {
+    color: var(--rr-muted-text) !important;
+}
+
+html[data-theme="dark"] .note-statusbar {
+    background-color: var(--rr-surface-bg) !important;
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-statusbar .note-resizebar {
+    border-color: var(--rr-border) !important;
+}
+
+html[data-theme="dark"] .note-resizebar .note-icon-bar {
+    border-color: var(--rr-muted-text) !important;
+}
