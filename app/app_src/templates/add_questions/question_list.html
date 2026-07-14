@@ -14,7 +14,7 @@
         {% if questions %}
         {% for q in questions %}
         <div class="box" style="margin-bottom: 10px;">
-            <p>{{ q.text }}</p>
+            <p>{{ q.text|safe }}</p>
             <small>Category: {{ q.category.name }}</small>
 
             <form method="post" action="{% url 'delete_question' q.pk %}" style="margin-top:10px;">

@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+{% endblock %}
+
 {% block content %}
 
 <br>
@@ -50,9 +55,9 @@
                             <label class="label">Description</label>
                             <div class="control">
                                 <textarea
-                                    class="textarea"
+                                    class="textarea richtext"
+                                    data-placeholder="Describe this Category..."
                                     name="description"
-                                    placeholder="Describe this Category..."
                                 ></textarea>
                             </div>
                         </div>
@@ -99,7 +104,7 @@
                                 {% for category in categories %}
                                 <tr>
                                     <td><strong>{{ category.name }}</strong></td>
-                                    <td>{{ category.description }}</td>
+                                    <td>{{ category.description|safe }}</td>
                                     <td>
                                         <span class="tag is-info is-light">
                                             {{ category.q_count }}
@@ -108,10 +113,10 @@
                                     <td class="has-text-right">
                                         <form method="post"
                                               action="{% url 'delete_category' category.id %}"
-                                              style="display:inline;"
-                                              onsubmit="return confirm('Delete this Category?')">
+                                              style="display:inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="button is-small is-danger is-light">
+                                            <button type="submit" class="button is-small is-danger is-light"
+                                                    data-confirm="Delete this Category?">
                                                 Delete
                                             </button>
                                         </form>
@@ -131,5 +136,7 @@
     </div>
 
 </div>
+
+
 
 {% endblock %}

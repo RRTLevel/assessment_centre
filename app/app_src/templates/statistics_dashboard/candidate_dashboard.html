@@ -81,9 +81,10 @@
                         <thead>
                             <tr>
                                 <th>Candidate</th>
+                                <th>Group</th>
                                 <th>Application Date</th>
                                 {% for question in questions %}
-                                    <th title="{{ question.text }}" class="has-text-centered">
+                                    <th title="{{ question.text|striptags }}" class="has-text-centered">
                                         Q{{ forloop.counter }}
                                     </th>
                                 {% endfor %}
@@ -94,6 +95,7 @@
                             {% for row in rows %}
                                 <tr>
                                     <td class="has-text-weight-semibold">{{ row.name }}</td>
+                                    <td>{{ row.group }}</td>
                                     <td>{{ row.date|date:"d M Y" }}</td>
 
                                     {% for score in row.cells %}
@@ -108,7 +110,7 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="{{ questions|length|add:3 }}" class="has-text-centered has-text-muted py-5">
+                                    <td colspan="{{ questions|length|add:4 }}" class="has-text-centered has-text-muted py-5">
                                         No metrics or records match your query.
                                     </td>
                                 </tr>

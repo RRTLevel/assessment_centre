@@ -1,23 +1,26 @@
 from django import forms
 
-from ..models import Application, Pack, Questions
+from ..models import Application, Pack, Question
+from .question_bank import has_visible_text
 
 
 class PackForm(forms.ModelForm):
+    # Convenience pickers: selecting a bank question copies its text into the
+    # matching pre-interview question editor (see the create-pack page script).
     question_1 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_1"}),
     )
 
     question_2 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_2"}),
     )
 
     question_3 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_3"}),
     )
@@ -35,11 +38,12 @@ class PackForm(forms.ModelForm):
             "question_2",
             "question_3",
         ]
+        # "richtext" textareas are replaced by the Summernote editor.
         widgets = {
-            "title": forms.TextInput(attrs={"class": "input"}),
-            "pre_interview_question_1": forms.TextInput(attrs={"class": "input"}),
-            "pre_interview_question_2": forms.TextInput(attrs={"class": "input"}),
-            "pre_interview_question_3": forms.TextInput(attrs={"class": "input"}),
+            "description": forms.Textarea(attrs={"class": "textarea richtext", "rows": 4}),
+            "pre_interview_question_1": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
+            "pre_interview_question_2": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
+            "pre_interview_question_3": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -54,13 +58,27 @@ class PackForm(forms.ModelForm):
                 category_id = None
 
         if category_id:
-            questions = Questions.objects.filter(category_id=category_id)
+            questions = Question.objects.filter(category_id=category_id)
         else:
-            questions = Questions.objects.all()
+            questions = Question.objects.all()
 
         self.fields["question_1"].queryset = questions
         self.fields["question_2"].queryset = questions
         self.fields["question_3"].queryset = questions
+
+    def _clean_richtext(self, field_name):
+        """Blank out editor leftovers like "<p><br></p>" for optional fields."""
+        value = self.cleaned_data.get(field_name, "")
+        return value if has_visible_text(value) else ""
+
+    def clean_pre_interview_question_1(self):
+        return self._clean_richtext("pre_interview_question_1")
+
+    def clean_pre_interview_question_2(self):
+        return self._clean_richtext("pre_interview_question_2")
+
+    def clean_pre_interview_question_3(self):
+        return self._clean_richtext("pre_interview_question_3")
 
 
 class ApplicantForm(forms.ModelForm):

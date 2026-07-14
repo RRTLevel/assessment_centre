@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block extra_head %}
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
@@ -34,7 +33,9 @@
 
       <div class="card-content">
 
-        <form method="POST">
+        <!-- novalidate: required fields hidden behind the rich text editor
+             cannot be focused by browser validation; the server validates. -->
+        <form method="POST" novalidate id="pack-form">
           {% csrf_token %}
 
           {% for field in form %}
@@ -75,103 +76,6 @@
   </div>
 </section>
 
-<script>
-$(document).ready(function () {
-    $('#id_description').summernote({
-        placeholder: 'Describe this pack...',
-        tabsize: 2,
-        height: 200,
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['para', ['ul', 'ol']],
-            ['insert', ['link']],
-            ['view', ['fullscreen']],
-        ],
-    });
 
-    $('form').on('submit', function () {
-        $('#id_description').val($('#id_description').summernote('code'));
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const categorySelect = document.querySelector("#id_category");
-
-    const q1 = document.querySelector("#id_question_1");
-    const q2 = document.querySelector("#id_question_2");
-    const q3 = document.querySelector("#id_question_3");
-
-    if (!categorySelect || !q1 || !q2 || !q3) return;
-
-    function reset(select, message) {
-        select.innerHTML = "";
-
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = message;
-        select.appendChild(option);
-    }
-
-    function fill(select, data) {
-        select.innerHTML = "";
-
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = "Select a question";
-        select.appendChild(defaultOption);
-
-        data.forEach(q => {
-            const option = document.createElement("option");
-            option.value = q.id;
-            option.textContent = q.text;
-            select.appendChild(option);
-        });
-    }
-
-    // initial state
-    reset(q1, "Select category first");
-    reset(q2, "Select category first");
-    reset(q3, "Select category first");
-
-    categorySelect.addEventListener("change", function () {
-
-        const categoryId = this.value;
-
-        if (!categoryId) {
-            reset(q1, "Select category first");
-            reset(q2, "Select category first");
-            reset(q3, "Select category first");
-            return;
-        }
-
-        reset(q1, "Loading...");
-        reset(q2, "Loading...");
-        reset(q3, "Loading...");
-
-        fetch(`/ajax/load-questions/?category=${encodeURIComponent(categoryId)}`)
-            .then(res => {
-                if (!res.ok) throw new Error("Network error");
-                return res.json();
-            })
-            .then(data => {
-
-                fill(q1, data);
-                fill(q2, data);
-                fill(q3, data);
-
-            })
-            .catch(err => {
-                console.error(err);
-
-                reset(q1, "Error loading questions");
-                reset(q2, "Error loading questions");
-                reset(q3, "Error loading questions");
-            });
-
-    });
-
-});
-</script>
 
 {% endblock %}

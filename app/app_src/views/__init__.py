@@ -12,13 +12,15 @@ from .accounts import (
 )
 from .applications import (
     accepted_applicants,
-    applicant_form,
+    applicant_form_group,
     application_detail,
     application_review,
     applications,
     approve_application,
     create_pack,
     deny_application,
+    group_list,
+    select_packs,
 )
 from .dashboard import candidate_dashboard, candidate_dashboard_pdf, results_view
 from .interviews import autosave_interview, inbox_view, start_interview
@@ -50,7 +52,7 @@ __all__ = [
     "accepted_applicants",
     "add_indicators",
     "add_question",
-    "applicant_form",
+    "applicant_form_group",
     "application_detail",
     "application_review",
     "applications",
@@ -64,10 +66,12 @@ __all__ = [
     "delete_question",
     "deny_application",
     "documentation_view",
+    "group_list",
     "help_view",
     "inbox_view",
     "load_questions",
     "question_list",
     "results_view",
+    "select_packs",
     "start_interview",
 ]
