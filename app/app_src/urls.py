@@ -82,4 +82,8 @@ urlpatterns = [
     # =====================
     path("404/", views.Custom404View.as_view(), name="404"),
     path("500/", views.Custom500View.as_view(), name="500"),
+
+    path("select-packs/", views.select_packs, name="select_packs"),
+    path("groups/", views.group_list, name="group_list"),
+    path("apply/group/<int:group_id>/<int:step>/", views.applicant_form_group, name="applicant_form_group"),
 ]

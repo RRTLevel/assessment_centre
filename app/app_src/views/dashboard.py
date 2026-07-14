@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from ..models import InterviewResult, Questions
+from ..models import InterviewResult, Question
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
 from ..services.dashboard import candidate_dashboard_data
 from ..services.pdf import render_candidate_dashboard_pdf
@@ -16,8 +16,9 @@ from ..services.pdf import render_candidate_dashboard_pdf
 @group_required(ECD_GROUP, ECAM_GROUP)
 def results_view(request):
     """Every interview question with the scored responses recorded against it."""
+
     questions = list(
-        Questions.objects
+        Question.objects
         .select_related("category")
         .order_by("id")
         .prefetch_related(
@@ -25,7 +26,7 @@ def results_view(request):
                 "interviewresult_set",
                 queryset=(
                     InterviewResult.objects
-                    .select_related("application__user")
+                    .select_related("application__user", "application__group", "application__pack")
                     .order_by("-updated_at")
                 ),
                 to_attr="responses",
@@ -35,14 +36,16 @@ def results_view(request):
 
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
-        "questions_with_responses": [(question, question.responses) for question in questions],
-        "total_responses": sum(len(question.responses) for question in questions),
+        "questions_with_responses": [(q, q.responses) for q in questions],
+        "total_responses": sum(len(q.responses) for q in questions),
     })
 
 
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard(request):
+    """Main grouped dashboard (user + group)."""
+
     questions, rows = candidate_dashboard_data(
         date_from=request.GET.get("from"),
         date_to=request.GET.get("to"),
@@ -58,6 +61,8 @@ def candidate_dashboard(request):
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard_pdf(request):
+    """PDF export of grouped dashboard."""
+
     date_from = request.GET.get("from")
     date_to = request.GET.get("to")
 

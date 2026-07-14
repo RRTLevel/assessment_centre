@@ -18,13 +18,16 @@
 <section class="section">
     <div class="container">
 
-        {% if applications %}
+        {% if grouped_applications %}
         <div class="table-container">
+
             <table class="table is-fullwidth is-striped is-hoverable is-align-middle">
+
                 <thead class="rr-secondary">
                     <tr>
                         <th>User</th>
                         <th>ID</th>
+                        <th>Group</th>
                         <th>Status / Interview Date</th>
                         <th>Answers</th>
                         <th>Created</th>
@@ -32,86 +35,139 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    {% for application in applications %}
-                    <tr>
-                        <td>
-                            <strong>{{ application.user.username }}</strong>
-                        </td>
+<tbody>
 
-                        <td>
-                            <span class="tag is-light">
-                                {{ application.application_id }}
-                            </span>
-                        </td>
+{% for apps in grouped_applications %}
 
-                        <td>
-                            <!-- VISUAL STATUS & CALENDAR DATE TRACKER -->
-                            {% if application.status == 'Accepted' %}
-                                <span class="tag is-success mb-1">Accepted</span>
-                                {% if application.interview_date %}
-                                    <div class="is-size-7 has-text-weight-semibold">
-                                        🗓️ {{ application.interview_date|date:"M d, Y g:i a" }}
-                                    </div>
-                                {% endif %}
-                            {% elif application.status == 'Denied' %}
-                                <span class="tag is-danger">Denied</span>
-                            {% else %}
-                                <span class="tag is-warning">Pending</span>
-                            {% endif %}
-                        </td>
+    {% with application=apps.0 %}
 
-                        <td>
-                            <div>
-                                <p><strong>Q1:</strong> {{ application.answer_1 }}</p>
-                                <p><strong>Q2:</strong> {{ application.answer_2 }}</p>
-                                <p><strong>Q3:</strong> {{ application.answer_3 }}</p>
-                            </div>
-                        </td>
+    <tr>
 
-                        <td>
-                            {{ application.created_at }}
-                        </td>
+        <td>
+            <strong>{{ application.user.username }}</strong>
+        </td>
 
-                        <td>
-                            <div class="buttons are-small">
+        <td>
+            {{ application.group.name }}
+        </td>
 
-                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW -->
-                                <a href="{% url 'approve_application' application.application_id %}" class="button is-success is-outlined">
-                                    Accept
-                                </a>
+        <td>
+            {% if application.status == "Accepted" %}
+                <span class="tag is-success">
+                    Accepted
+                </span>
+            {% elif application.status == "Denied" %}
+                <span class="tag is-danger">
+                    Denied
+                </span>
+            {% else %}
+                <span class="tag is-warning">
+                    Pending
+                </span>
+            {% endif %}
+        </td>
 
-                                <!-- DENY -->
-                                <form method="post" action="{% url 'deny_application' application.application_id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button class="button is-danger is-outlined">
-                                        Deny
-                                    </button>
-                                </form>
+        <td>
 
-                                <!-- VIEW MORE BUTTON -->
-                                <a class="button is-link is-light is-small"
-                                    href="{% url 'application_detail' application.application_id %}">
-                                    View More
-                                </a>
+            {% for app in apps %}
 
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                <div class="mb-3">
+
+                    <strong>
+                        {{ app.pack.title }}
+                    </strong>
+
+                    <p>
+                        <strong>Q1:</strong>
+                        {{ app.answer_1 }}
+                    </p>
+
+                    <p>
+                        <strong>Q2:</strong>
+                        {{ app.answer_2 }}
+                    </p>
+
+                    <p>
+                        <strong>Q3:</strong>
+                        {{ app.answer_3 }}
+                    </p>
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+        </td>
+
+        <td>
+            {{ application.created_at|date:"d M Y H:i" }}
+        </td>
+
+        <td>
+
+            <div class="buttons are-small">
+
+                <a href="{% url 'approve_application' application.application_id %}"
+                   class="button is-success is-outlined">
+                    Accept
+                </a>
+
+
+                <form method="post"
+                      action="{% url 'deny_application' application.application_id %}">
+                    {% csrf_token %}
+
+                    <button class="button is-danger is-outlined">
+                        Deny
+                    </button>
+
+                </form>
+
+
+                <a class="button is-link is-light"
+                   href="{% url 'application_detail' application.application_id %}">
+                    View More
+                </a>
+
+            </div>
+
+        </td>
+
+    </tr>
+
+    {% endwith %}
+
+{% empty %}
+
+    <tr>
+        <td colspan="7" class="has-text-centered">
+            No applications found.
+        </td>
+    </tr>
+
+{% endfor %}
+
+</tbody>
 
             </table>
+
         </div>
+
 
         <div class="box">
-            <a class="" href="{% url 'accepted_applicants' %}">View Accepted Applicants</a>
+            <a href="{% url 'accepted_applicants' %}">
+                View Accepted Applicants
+            </a>
         </div>
 
+
         {% else %}
-        <div class="notification is-warning is-light">
-            No applications found.
-        </div>
+
+            <div class="notification is-warning is-light">
+                No applications found.
+            </div>
+
         {% endif %}
 
     </div>

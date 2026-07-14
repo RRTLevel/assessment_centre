@@ -8,10 +8,25 @@
 </style>
 {% endblock %}
 
+
 {% block content %}
 
 <main class="section">
-<div class="container interview-container">
+    <div class="container interview-container">
+
+
+        {% if application %}
+
+
+        <div class="interview-header">
+
+            <h1 class="title interview-title">
+                Interview — {{ application.user.username }}
+            </h1>
+
+            <p class="interview-count">
+                Group: {{ application.group.name }} · Packs: {{ applications|length }}
+            </p>
 
     <div class="interview-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
         <div>
@@ -23,7 +38,6 @@
         <span id="autosave-status" style="font-size:0.78rem; color:#888; margin-bottom:0.4rem;"></span>
     </div>
 
-<<<<<<< HEAD
     {% if application.pack.description %}
     <div class="box mb-4">
         <h2 class="title is-5">Pack Description</h2>
@@ -31,15 +45,12 @@
     </div>
     {% endif %}
 
-=======
->>>>>>> develop
     <div class="box mb-4">
         <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers()">
             <span>Pre Interview Answers</span>
             <span id="answers-arrow" style="margin-left: auto;">&#9660;</span>
         </button>
         <div id="applicant-answers" style="display: none; margin-top: 1rem;">
-<<<<<<< HEAD
             {% if application.pack.pre_interview_question_1 %}
                 <p><strong>{{ application.pack.pre_interview_question_1|safe }}</strong></p>
                 <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
@@ -50,7 +61,6 @@
             {% endif %}
             {% if application.pack.pre_interview_question_3 %}
                 <p><strong>{{ application.pack.pre_interview_question_3|safe }}</strong></p>
-=======
             {% with pd=pack_data.0 %}
             {% if pd.pack.pre_interview_question_1 %}
                 <p><strong>{{ pd.pack.pre_interview_question_1 }}</strong></p>
@@ -62,23 +72,98 @@
             {% endif %}
             {% if pd.pack.pre_interview_question_3 %}
                 <p><strong>{{ pd.pack.pre_interview_question_3 }}</strong></p>
->>>>>>> develop
                 <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
             {% endif %}
             {% endwith %}
         </div>
-    </div>
 
-    <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
-        {% csrf_token %}
 
-<<<<<<< HEAD
+
+        {% for app in applications %}
+
+
+        {% if app.pack.description %}
+
         <!-- ── QUESTIONS ── -->
         {% for item in question_data %}
         <div class="box mb-4">
-            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">
-                Question {{ forloop.counter }} &mdash; {{ application.pack.title }}
+
+            <h2 class="title is-5">
+                {{ app.pack.title }}
+            </h2>
+
+            <p>
+                {{ app.pack.description }}
             </p>
+
+        </div>
+
+        {% endif %}
+
+
+
+
+        <div class="box mb-4">
+
+            <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers('answers-{{ app.id }}')">
+
+                Pre Interview Answers ({{ app.pack.title }})
+
+            </button>
+
+
+
+            <div id="answers-{{ app.id }}" style="display:none; margin-top:1rem;">
+
+
+                {% if app.pack.pre_interview_question_1 %}
+
+                <p>
+                    <strong>{{ app.pack.pre_interview_question_1 }}</strong>
+                </p>
+
+                <p>
+                    {{ app.answer_1|default:"—" }}
+                </p>
+
+                {% endif %}
+
+
+
+                {% if app.pack.pre_interview_question_2 %}
+
+                <p>
+                    <strong>{{ app.pack.pre_interview_question_2 }}</strong>
+                </p>
+
+                <p>
+                    {{ app.answer_2|default:"—" }}
+                </p>
+
+                {% endif %}
+
+
+
+                {% if app.pack.pre_interview_question_3 %}
+
+                <p>
+                    <strong>{{ app.pack.pre_interview_question_3 }}</strong>
+                </p>
+
+                <p>
+                    {{ app.answer_3|default:"—" }}
+                </p>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+
+        {% endfor %}
+
             <div class="question-row">
                 <div class="question-card">
                     <p class="question-text">{{ item.question.text|safe }}</p>
@@ -89,7 +174,6 @@
                         <textarea id="notes-{{ item.question.id }}" class="notes-textarea"
                                   name="notes_{{ item.question.id }}"
                                   required>{{ item.result.notes|default:'' }}</textarea>
-=======
         <!-- ── PACK TABS (only when multiple packs) ── -->
         {% if pack_data|length > 1 %}
         <div class="pack-tabs tabs is-boxed mb-4">
@@ -122,7 +206,6 @@
                 <div class="question-row">
                     <div class="question-card">
                         <p class="question-text">{{ item.question.text }}</p>
->>>>>>> develop
                     </div>
                     <div class="Score-Box">
                         <div class="notes_box">
@@ -160,89 +243,390 @@
         <div class="box mb-4">
             <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">Interview Assessment</p>
 
-            <div id="indicator-table-wrap" style="display:none;">
-                <div id="indicator-groups-container"></div>
-            </div>
 
-            <div class="mt-3">
-                <button type="button" class="submit-btn" onclick="openIndicatorModal()">
-                    + Add Indicator
-                </button>
-            </div>
-        </div>
 
-        <div class="submit-section">
-            <button type="submit" class="submit-btn">Submit</button>
-        </div>
 
-    </form>
 
-    <!-- Indicator picker modal -->
-    <div class="modal" id="indicator-modal">
-        <div class="modal-background" onclick="closeIndicatorModal()"></div>
-        <div class="modal-card">
-            <header class="modal-card-head" style="background:#1800A8;">
-                <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
-                <button class="delete" aria-label="close" onclick="closeIndicatorModal()"></button>
-            </header>
-            <section class="modal-card-body" id="indicator-modal-body">
-            </section>
-        </div>
-    </div>
+        <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
 
+            {% csrf_token %}
+
+
+
+            {% for app in applications %}
+
+
+            <div class="box mb-4">
+
+
+                <h3 class="title is-5">
+                    {{ app.pack.title }}
+                </h3>
+
+
+
+               {% for item in question_data %}
+
+<div class="box mb-3">
+    <p class="has-text-weight-semibold">
+        {{ item.question.text }}
+    </p>
+
+    <textarea name="notes_{{ item.application.id }}_{{ item.question.id }}"
+              class="notes-textarea"></textarea>
+
+    <input type="number"
+           name="score_{{ item.application.id }}_{{ item.question.id }}"
+           min="1"
+           max="6"
+           class="score-input">
+
+    <textarea name="feedback_{{ item.application.id }}_{{ item.question.id }}"
+              class="feedback-textarea"></textarea>
 </div>
+
+{% endfor %}
+
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+
+
+
+            <div class="box mb-4">
+
+
+                <p class="has-text-weight-semibold mb-3" style="color:#1800A8;">
+
+                    Interview Assessment
+
+                </p>
+
+
+
+                <div id="indicator-table-wrap" style="display:none;">
+
+                    <div id="indicator-groups-container"></div>
+
+                </div>
+
+
+
+                <button type="button" class="submit-btn" onclick="openIndicatorModal()">
+
+                    + Add Indicator
+
+                </button>
+
+
+            </div>
+
+
+
+
+
+            <div class="submit-section">
+
+                <button type="submit" class="submit-btn">
+
+                    Submit
+
+                </button>
+
+            </div>
+
+
+
+        </form>
+
+
+
+
+        <!-- MODAL -->
+
+
+        <div class="modal" id="indicator-modal">
+
+
+            <div class="modal-background" onclick="closeIndicatorModal()"></div>
+
+
+
+            <div class="modal-card">
+
+
+                <header class="modal-card-head" style="background:#1800A8;">
+
+
+                    <p class="modal-card-title" style="color:white;">
+
+                        Add Indicator
+
+                    </p>
+
+
+                    <button class="delete" onclick="closeIndicatorModal()">
+
+                    </button>
+
+
+                </header>
+
+
+
+                <section class="modal-card-body" id="indicator-modal-body">
+
+                </section>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        {% else %}
+
+
+        <div class="notification is-danger">
+
+            No application found.
+
+        </div>
+
+
+        {% endif %}
+
+
+
+    </div>
 </main>
 
+
+
+
+
 <script>
-const indicatorGroups = {{ indicator_groups_json|safe }};
-const savedIndicatorScores = {{ saved_indicator_scores_json|safe }};
-const savedGroupScores = {{ saved_group_scores_json|safe }};
-const savedGroupNotes = {{ saved_group_notes_json|safe }};
 
-$(document).ready(function () {
-    $('.notes-textarea').summernote({
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline']],
-            ['para', ['ul', 'ol']],
-            ['misc', ['undo', 'redo']]
-        ],
-        height: 150,
-        placeholder: 'Enter interview notes here...',
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
-    });
 
-    $('.feedback-textarea').summernote({
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline']],
-            ['para', ['ul', 'ol']],
-            ['misc', ['undo', 'redo']]
-        ],
-        height: 120,
-        placeholder: 'Enter feedback for this question...',
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
-    });
+    const indicatorGroups = {{ indicator_groups_json| safe }};
+
+
+
+    function toggleAnswers(id) {
+
+        const el = document.getElementById(id);
+
+        el.style.display =
+            el.style.display === "none"
+                ?
+                "block"
+                :
+                "none";
+
+    }
+
+
+
+
+
+    $(document).ready(function () {
+
+
+        $('.notes-textarea').summernote({
+
+            height: 150,
+
+            toolbar: [
+
+                ['style', ['bold', 'italic', 'underline']],
+
+                ['para', ['ul', 'ol']]
+
+            ]
 
     if (Object.keys(savedIndicatorScores).length > 0) {
         const indToGroup = {};
         Object.keys(indicatorGroups).forEach(name => {
             indicatorGroups[name].forEach(b => { indToGroup[b.id] = name; });
         });
-        const groupsAdded = new Set();
-        Object.keys(savedIndicatorScores).forEach(idStr => {
-            const name = indToGroup[parseInt(idStr)];
-            if (name && !groupsAdded.has(name)) {
-                addIndicatorGroup(name);
-                groupsAdded.add(name);
-            }
+
+
+
+
+        $('.feedback-textarea').summernote({
+
+            height: 120,
+
+            toolbar: [
+
+                ['style', ['bold', 'italic', 'underline']],
+
+                ['para', ['ul', 'ol']]
+
+            ]
+
         });
-        Object.keys(savedIndicatorScores).forEach(idStr => {
-            const row = document.getElementById('ind-row-' + idStr);
-            if (row) {
-                const input = row.querySelector('input[type="number"]');
-                if (input) input.value = savedIndicatorScores[idStr];
-            }
+
+
+    });
+
+
+
+
+
+
+
+    function openIndicatorModal() {
+
+
+        const body =
+            document.getElementById(
+                'indicator-modal-body'
+            );
+
+
+
+        body.innerHTML = "";
+
+
+
+        Object.keys(indicatorGroups).forEach(name => {
+
+
+            body.innerHTML += `
+
+<div class="box"
+onclick="addIndicatorGroup('${name}')"
+style="cursor:pointer">
+
+<strong>${name}</strong>
+
+</div>
+
+`;
+
         });
+
+
+
+        document
+            .getElementById('indicator-modal')
+            .classList.add('is-active');
+
+
     }
+
+
+
+
+
+    function closeIndicatorModal() {
+
+        document
+            .getElementById('indicator-modal')
+            .classList.remove('is-active');
+
+    }
+
+
+
+
+
+
+
+    function addIndicatorGroup(name) {
+
+
+        const behaviours =
+            indicatorGroups[name];
+
+
+        if (!behaviours)
+            return;
+
+
+
+        const container =
+            document.getElementById(
+                'indicator-groups-container'
+            );
+
+
+
+        let html = `
+
+<div class="mb-4">
+
+<p class="has-text-weight-semibold">
+${name}
+</p>
+
+
+<table class="table is-fullwidth">
+
+
+<thead>
+
+<tr>
+
+<th>Positive</th>
+
+<th>Negative</th>
+
+<th>Score</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+`;
+
+
+
+        behaviours.forEach(b => {
+
+
+            html += `
+
+<tr>
+
+<td>${b.positive}</td>
+
+<td>${b.negative}</td>
+
+
+<td>
+
+<input type="number"
+
+name="indicator_score_${b.id}"
+
+min="1"
+
+max="6"
+
+class="score-input">
+
+</td>
+
+
+</tr>
+
+
+`;
+
 });
 
 function switchPack(packId) {
@@ -289,84 +673,124 @@ function openIndicatorModal() {
                 ) +
                 '</div></div>';
         });
-        body.innerHTML = html;
+
+
+
+        html += `
+
+</tbody>
+
+</table>
+
+</div>
+
+`;
+
+
+
+        container.innerHTML += html;
+
+
+        document
+            .getElementById('indicator-table-wrap')
+            .style.display = "block";
+
+
+        closeIndicatorModal();
+
+
     }
 
-    document.getElementById('indicator-modal').classList.add('is-active');
-}
 
-function closeIndicatorModal() {
-    document.getElementById('indicator-modal').classList.remove('is-active');
-}
 
-function groupElemId(name) {
-    return 'ind-group-' + name.replace(/[^a-zA-Z0-9]/g, '_');
-}
 
-function addIndicatorGroup(name) {
-    const behaviours = indicatorGroups[name];
-    if (!behaviours) return;
 
-    const gid = groupElemId(name);
-    if (!document.getElementById(gid)) {
-        const section = document.createElement('div');
-        section.id = gid;
-        section.className = 'mb-4';
-        section.innerHTML =
-            '<p class="has-text-weight-semibold mb-2" style="color:#1800A8;">' + escHtml(name) + '</p>' +
-            '<table class="score-table" style="width:100%;">' +
-            '<thead><tr>' +
-            '<th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
-            '</tr></thead>' +
-            '<tbody id="' + gid + '-tbody"></tbody>' +
-            '<tfoot><tr style="border-top:2px solid #e0e0e0;">' +
-            '<td colspan="2" style="padding:0.5rem 0.75rem; font-weight:700;">Overall Score</td>' +
-            '<td style="padding:0.4rem 0.75rem;">' +
-            '<input type="number" min="1" max="6" step="1" class="score-input"' +
-            ' name="group_score_' + escHtml(name) + '"' +
-            ' id="' + gid + '-overall"' +
-            ' placeholder="1–6" required>' +
-            '</td>' +
-            '</tr></tfoot>' +
-            '</table>' +
-            '<textarea class="textarea is-small mt-2"' +
-            ' name="group_notes_' + escHtml(name) + '"' +
-            ' id="' + gid + '-notes"' +
-            ' placeholder="Notes for ' + escHtml(name) + '..."></textarea>';
-        document.getElementById('indicator-groups-container').appendChild(section);
 
-        $('#' + gid + '-notes').summernote({
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline']],
-                ['para', ['ul', 'ol']],
-                ['misc', ['undo', 'redo']]
-            ],
-            height: 100,
-            placeholder: 'Notes for ' + name + '...',
-            callbacks: { onChange: function(contents) { $(this).val(contents); } }
+
+    document
+        .getElementById('interview-form')
+        ?.addEventListener('submit', function (e) {
+
+
+
+            let valid = true;
+
+
+
+            $('.notes-textarea').each(function () {
+
+
+                if (!$(this)
+                    .summernote('code')
+                    .replace(/<[^>]+>/g, '')
+                    .trim()) {
+
+
+                    alert(
+                        'Fill all notes'
+                    );
+
+
+                    valid = false;
+
+
+                    return false;
+
+
+                }
+
+
+            });
+
+
+
+            if (!valid) {
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+
+
+
+            $('.feedback-textarea').each(function () {
+
+
+                if (!$(this)
+                    .summernote('code')
+                    .replace(/<[^>]+>/g, '')
+                    .trim()) {
+
+
+                    alert(
+                        'Fill all feedback'
+                    );
+
+
+                    valid = false;
+
+
+                    return false;
+
+
+                }
+
+
+            });
+
+
+
+            if (!valid)
+
+                e.preventDefault();
+
+
+
         });
 
-        if (savedGroupScores[name] !== undefined) {
-            document.getElementById(gid + '-overall').value = savedGroupScores[name];
-        }
-        if (savedGroupNotes[name]) {
-            $('#' + gid + '-notes').summernote('code', savedGroupNotes[name]);
-        }
-    }
 
-    const tbody = document.getElementById(gid + '-tbody');
-    behaviours.forEach(b => {
-        if (document.getElementById('ind-row-' + b.id)) return;
-        const row = document.createElement('tr');
-        row.id = 'ind-row-' + b.id;
-        row.innerHTML =
-            '<td class="indicator-positive">' + b.positive + '</td>' +
-            '<td class="indicator-negative">' + b.negative + '</td>' +
-            '<td><input type="number" min="1" max="6" step="1" class="score-input"' +
-            ' name="indicator_score_' + b.id + '"' +
-            ' placeholder="1–6" required></td>';
-        tbody.appendChild(row);
-    });
 
     document.getElementById('indicator-table-wrap').style.display = 'block';
     closeIndicatorModal();
@@ -444,5 +868,7 @@ function autosave() {
 
 setInterval(autosave, 30000);
 </script>
+
+
 
 {% endblock %}

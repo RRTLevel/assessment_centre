@@ -1,7 +1,10 @@
 from django import forms
 from django.utils.html import strip_tags
 
+from django import forms
 from ..models import Category
+from app_src.models import Pack
+
 
 
 def has_visible_text(html):
@@ -12,7 +15,7 @@ def has_visible_text(html):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "description"]
+        fields = ["name"]
 
     def clean_description(self):
         """Treat editor leftovers like "<p><br></p>" as an empty description."""
@@ -20,9 +23,8 @@ class CategoryForm(forms.ModelForm):
         return description if has_visible_text(description) else ""
 
 
-class QuestionForm(forms.Form):
-    """Add up to five questions to a category in one submission."""
 
+class QuestionForm(forms.Form):
     QUESTION_COUNT = 5
 
     # "richtext" textareas are replaced by the Summernote editor. All fields are
@@ -35,11 +37,22 @@ class QuestionForm(forms.Form):
     question_5 = forms.CharField(required=False, widget=forms.Textarea(attrs={"class": "textarea richtext", "rows": 3}))
 
     category = forms.ModelChoiceField(
-        required=False,
         queryset=Category.objects.all(),
         widget=forms.Select(attrs={"class": "select"}),
     )
 
+    pack = forms.ModelChoiceField(
+        required=False,
+        queryset=Pack.objects.all(),
+        widget=forms.Select(attrs={"class": "select"}),
+    )
+
+    def question_texts(self):
+        return [
+            text.strip()
+            for i in range(1, self.QUESTION_COUNT + 1)
+            if (text := self.cleaned_data.get(f"question_{i}")) and text.strip()
+        ]
     def clean(self):
         """At least one question is required (fields are individually optional
         so the editor-hidden originals don't trip browser validation)."""

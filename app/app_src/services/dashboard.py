@@ -1,78 +1,89 @@
 """Query logic behind the candidate performance dashboard and its PDF export."""
 
-from django.contrib.auth.models import User
-from django.db.models import Avg, Prefetch
+from collections import defaultdict
 
-from ..models import Application, InterviewResult, Questions
+from django.db.models import Prefetch
 
-SORT_OPTIONS = {
-    "highest": "-avg",
-    "lowest": "avg",
-    "newest": "-application__created_at",
-    "oldest": "application__created_at",
-}
-
-DEFAULT_SORT = "-avg"
+from ..models import Application, InterviewResult, Question
 
 
 def candidate_dashboard_data(date_from=None, date_to=None, sort=None):
-    """Build the dashboard heatmap: one row per interviewed candidate.
-
-    Returns ``(questions, rows)`` where each row has the candidate's name,
-    latest application, per-question scores (aligned with ``questions``)
-    and their average score.
     """
-    questions = list(Questions.objects.order_by("id"))
+    Build the dashboard heatmap: one row per interviewed candidate (group-based).
 
-    users = (
-        User.objects
-        .filter(application__results__isnull=False)
-        .distinct()
-        .annotate(avg=Avg("application__results__score"))
-    )
+    Each row represents:
+        - One user
+        - One group (collection of packs)
+        - Combined results across ALL packs in that group
+    """
 
-    if date_from:
-        users = users.filter(application__created_at__date__gte=date_from)
+    # 🔹 All questions (columns)
+    questions = list(Question.objects.order_by("id"))
 
-    if date_to:
-        users = users.filter(application__created_at__date__lte=date_to)
-
-    users = users.order_by(SORT_OPTIONS.get(sort, DEFAULT_SORT))
-
-    # Latest application per user, with its results, in a single query each
-    # (instead of two queries per candidate).
+    # 🔹 Get ALL applications that have interview results
     applications = (
         Application.objects
-        .filter(user__in=users)
-        .select_related("pack")
+        .filter(results__isnull=False)
+        .select_related("user", "group", "pack")
         .prefetch_related(
             Prefetch(
                 "results",
                 queryset=InterviewResult.objects.select_related("question").order_by("question_id"),
             )
         )
-        .order_by("user_id", "-created_at")
     )
 
-    latest_application = {}
-    for application in applications:
-        latest_application.setdefault(application.user_id, application)
+    # 🔹 Optional date filters
+    if date_from:
+        applications = applications.filter(created_at__date__gte=date_from)
+
+    if date_to:
+        applications = applications.filter(created_at__date__lte=date_to)
+
+    # 🔹 GROUP applications by (user, group)
+    grouped = defaultdict(list)
+
+    for app in applications:
+        key = (app.user_id, app.group_id)
+        grouped[key].append(app)
 
     rows = []
 
-    for user in users:
-        application = latest_application.get(user.id)
+    # 🔹 Build dashboard rows
+    for (user_id, group_id), apps in grouped.items():
+        user = apps[0].user
+        group = apps[0].group
 
+        # Collect scores across ALL packs
         scores = {}
-        if application:
-            scores = {result.question_id: result.score for result in application.results.all()}
+        all_scores = []
+
+        for app in apps:
+            for result in app.results.all():
+                if result.score is not None:
+                    scores[result.question_id] = result.score
+                    all_scores.append(result.score)
+
+        # Calculate average score across packs
+        avg = round(sum(all_scores) / len(all_scores), 2) if all_scores else None
 
         rows.append({
             "name": user.username,
-            "date": application.created_at if application else None,
+            "group": group.name,
+            "date": max(app.created_at for app in apps),
             "cells": [scores.get(question.id) for question in questions],
-            "avg": user.avg,
-            "application": application,
+            "avg": avg,
+            "applications": apps,  # useful for drill-down later
         })
+
+    # 🔹 Sorting
+    if sort == "lowest":
+        rows.sort(key=lambda r: (r["avg"] is None, r["avg"]))
+    elif sort == "newest":
+        rows.sort(key=lambda r: r["date"], reverse=True)
+    elif sort == "oldest":
+        rows.sort(key=lambda r: r["date"])
+    else:  # default = highest
+        rows.sort(key=lambda r: (r["avg"] is None, r["avg"]), reverse=True)
 
     return questions, rows

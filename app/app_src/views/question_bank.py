@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.html import strip_tags
 
 from ..forms import CategoryForm, QuestionForm
-from ..models import Category, Indicator, Questions
+from ..models import Category, Indicator, Question
 from ..permissions import ASSESSOR_GROUP, group_required
 
 
@@ -21,11 +21,11 @@ def add_question(request):
     if request.method == "POST" and form.is_valid():
         category = form.cleaned_data["category"]
         for text in form.question_texts():
-            Questions.objects.create(text=text, category=category)
+            Question.objects.create(text=text, category=category)
 
         return redirect("add_questions")
 
-    questions = Questions.objects.select_related("category").order_by("-id")
+    questions = Question.objects.select_related("category").order_by("-id")
     return render(request, "add_questions/add_questions.html", {
         "form": form,
         "questions": questions,
@@ -36,7 +36,7 @@ def add_question(request):
 @login_required
 @group_required(ASSESSOR_GROUP)
 def question_list(request):
-    questions = Questions.objects.select_related("category").order_by("-id")
+    questions = Question.objects.select_related("category").order_by("-id")
     return render(request, "add_questions/question_list.html", {
         "questions": questions,
         "add_question": True,
@@ -46,7 +46,7 @@ def question_list(request):
 @login_required
 @group_required(ASSESSOR_GROUP)
 def delete_question(request, pk):
-    question = get_object_or_404(Questions, pk=pk)
+    question = get_object_or_404(Question, pk=pk)
     if request.method == "POST":
         question.delete()
     return redirect("question_list")
@@ -60,6 +60,8 @@ def load_questions(request):
     if not category_id:
         return JsonResponse([], safe=False)
 
+    questions = Question.objects.filter(category_id=category_id).values("id", "text")
+    return JsonResponse(list(questions), safe=False)
     # Question text is rich HTML; <option> labels can only show plain text.
     questions = Questions.objects.filter(category_id=category_id)
     data = [{"id": q.id, "text": strip_tags(q.text)} for q in questions]
