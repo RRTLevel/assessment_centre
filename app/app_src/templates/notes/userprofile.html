@@ -15,7 +15,6 @@
 
                             <header class="header title is-4"> User Profile </header>
 
-                            <div class="field my-4">
                             <div class="field my-4 profile-setting">
                                 <label class="label">Username</label>
                                 <div class="profile-setting-value">
@@ -135,9 +134,8 @@
                                 </div>
                             </form>
 
-                            <!-- Teammate Added Feature: Danger Zone Delete Button -->
                             <div class="field mt-5">
-                                <button type="button" class="button is-danger" onclick="openDeleteModal()">
+                                <button type="button" class="button is-danger" data-open-modal="deleteModal">
                                     Delete Account
                                 </button>
                             </div>
@@ -150,14 +148,13 @@
     </div>
 </section>
 
-<!-- Teammate Added Feature: Delete Account Modal Overlay -->
 <div id="deleteModal" class="modal">
-    <div class="modal-background" onclick="closeDeleteModal()"></div>
+    <div class="modal-background"></div>
 
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Delete Account</p>
-            <button class="delete" type="button" onclick="closeDeleteModal()"></button>
+            <button class="delete" type="button" data-close-modal></button>
         </header>
 
         <form method="post" action="{% url 'delete_account' %}">
@@ -187,78 +184,12 @@
                 <button type="submit" class="button is-danger">
                     Confirm Delete
                 </button>
-                <button type="button" class="button" onclick="closeDeleteModal()">
+                <button type="button" class="button" data-close-modal>
                     Cancel
                 </button>
             </footer>
         </form>
     </div>
 </div>
-
-<!-- Scripts for Passwords and Modal Functionality -->
-<script>
-    // Eye toggles for passwords
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function () {
-            const targetId = this.getAttribute('data-target');
-            const passwordInput = document.getElementById(targetId);
-            const toggleIcon = this.querySelector('.toggle-icon');
-
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-
-            toggleIcon.classList.toggle('fa-eye');
-            toggleIcon.classList.toggle('fa-eye-slash');
-        });
-    });
-
-    // Delete Modal controls
-    function openDeleteModal() {
-        document.getElementById('deleteModal').classList.add('is-active');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('is-active');
-    }
-
-    const themeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    function activeThemeForPreference(preference) {
-        if (preference === 'system') {
-            return themeQuery.matches ? 'dark' : 'light';
-        }
-
-        return preference;
-    }
-
-    function applyThemePreference(preference) {
-        const activeTheme = activeThemeForPreference(preference);
-
-        localStorage.setItem('siteTheme', preference);
-        document.documentElement.dataset.theme = activeTheme;
-        document.documentElement.dataset.themePreference = preference;
-    }
-
-    const savedTheme = localStorage.getItem('siteTheme') || 'system';
-    const selectedTheme = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
-
-    if (selectedTheme) {
-        selectedTheme.checked = true;
-    }
-
-    document.querySelectorAll('input[name="theme"]').forEach(input => {
-        input.addEventListener('change', function () {
-            applyThemePreference(this.value);
-        });
-    });
-
-    themeQuery.addEventListener('change', function () {
-        const preference = localStorage.getItem('siteTheme') || 'system';
-
-        if (preference === 'system') {
-            applyThemePreference(preference);
-        }
-    });
-</script>
 
 {% endblock %}

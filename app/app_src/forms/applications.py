@@ -1,11 +1,12 @@
 from django import forms
 
 from ..models import Application, Pack, Question
-from ..models import Application, Pack, Questions
 from .question_bank import has_visible_text
 
 
 class PackForm(forms.ModelForm):
+    # Convenience pickers: selecting a bank question copies its text into the
+    # matching pre-interview question editor (see the create-pack page script).
     question_1 = forms.ModelChoiceField(
         queryset=Question.objects.none(),
         required=False,
@@ -29,6 +30,7 @@ class PackForm(forms.ModelForm):
         fields = [
             "title",
             "description",
+            "category",
             "pre_interview_question_1",
             "pre_interview_question_2",
             "pre_interview_question_3",

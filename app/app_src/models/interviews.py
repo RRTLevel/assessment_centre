@@ -1,13 +1,15 @@
 from django.db import models
 
-from .applications import Application
-from .question_bank import Indicator, Question
 from .applications import Application, Pack
-from .question_bank import Indicator, Questions
+from .question_bank import Indicator, Question
 
 
 class ApplicationPack(models.Model):
-    """An assessment pack assigned to a specific application, with ordering."""
+    """A pack chosen for one application's interview, with ordering.
+
+    Rows are created when the interview is scheduled (or default to the
+    submission's packs) and hang off the submission's primary Application.
+    """
 
     application = models.ForeignKey(
         Application,
@@ -26,13 +28,16 @@ class ApplicationPack(models.Model):
 
 
 class InterviewResult(models.Model):
+    """Score, notes and feedback recorded for one question in one interview."""
+
     application = models.ForeignKey(
         Application,
         on_delete=models.CASCADE,
-        related_name="results",  # ← THIS is critical
+        related_name="results",
     )
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     score = models.IntegerField(null=True, blank=True)
+    # Rich text (HTML) entered via the Summernote editor.
     notes = models.TextField(blank=True, default="")
     feedback = models.TextField(blank=True, default="")
     updated_at = models.DateTimeField(auto_now=True)
@@ -49,25 +54,19 @@ class InterviewResult(models.Model):
 
 
 class IndicatorScore(models.Model):
-    """
-    A per-indicator score recorded against one application's interview.
-    """
+    """A per-behaviour-pair score recorded against one application's interview."""
 
     application = models.ForeignKey(
         Application,
         on_delete=models.CASCADE,
         related_name="indicator_scores",
     )
-
     indicator = models.ForeignKey(
         Indicator,
         on_delete=models.CASCADE,
         related_name="scores",
     )
-
-    score = models.PositiveSmallIntegerField(
-        help_text="Score from 1–6"
-    )
+    score = models.PositiveSmallIntegerField(help_text="Score from 1–6")
 
     class Meta:
         unique_together = ("application", "indicator")
@@ -77,26 +76,17 @@ class IndicatorScore(models.Model):
 
 
 class IndicatorGroupScore(models.Model):
-    """
-    An overall score and notes for one named indicator group.
-    """
+    """An overall score and notes for one named indicator group."""
 
     application = models.ForeignKey(
         Application,
         on_delete=models.CASCADE,
         related_name="indicator_group_scores",
     )
-
     group_name = models.CharField(max_length=100)
-
-    score = models.PositiveSmallIntegerField(
-        help_text="Score from 1–6"
-    )
-
-    notes = models.TextField(
-        blank=True,
-        default=""
-    )
+    score = models.PositiveSmallIntegerField(help_text="Score from 1–6")
+    # Rich text (HTML) entered via the Summernote editor.
+    notes = models.TextField(blank=True, default="")
 
     class Meta:
         unique_together = ("application", "group_name")

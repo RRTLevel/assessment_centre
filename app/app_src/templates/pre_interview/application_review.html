@@ -48,7 +48,13 @@
         </td>
 
         <td>
-            {{ application.group.name }}
+            <span class="is-size-7" title="{{ application.application_id }}">
+                {{ application.application_id|truncatechars:9 }}
+            </span>
+        </td>
+
+        <td>
+            {% if application.group %}{{ application.group.name }}{% else %}{{ application.pack.title }}{% endif %}
         </td>
 
         <td>

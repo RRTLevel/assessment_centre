@@ -57,7 +57,7 @@
 </td>
 
 <td>
-    {{ application.group.name }}
+    {% if application.group %}{{ application.group.name }}{% else %}{{ application.pack.title }}{% endif %}
 </td>
 
 <td>

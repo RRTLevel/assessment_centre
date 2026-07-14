@@ -56,8 +56,8 @@
                             <div class="control">
                                 <textarea
                                     class="textarea richtext"
+                                    data-placeholder="Describe this Category..."
                                     name="description"
-                                    placeholder="Describe this Category..."
                                 ></textarea>
                             </div>
                         </div>
@@ -113,10 +113,10 @@
                                     <td class="has-text-right">
                                         <form method="post"
                                               action="{% url 'delete_category' category.id %}"
-                                              style="display:inline;"
-                                              onsubmit="return confirm('Delete this Category?')">
+                                              style="display:inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="button is-small is-danger is-light">
+                                            <button type="submit" class="button is-small is-danger is-light"
+                                                    data-confirm="Delete this Category?">
                                                 Delete
                                             </button>
                                         </form>
@@ -137,20 +137,6 @@
 
 </div>
 
-<script>
-$(document).ready(function () {
-    $('.richtext').summernote({
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline']],
-            ['color', ['forecolor']],
-            ['para', ['ul', 'ol']],
-            ['misc', ['undo', 'redo']]
-        ],
-        height: 100,
-        placeholder: 'Describe this Category...',
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
-    });
-});
-</script>
+
 
 {% endblock %}

@@ -7,7 +7,7 @@ urlpatterns = [
     # =====================
     # HOME & STATIC PAGES
     # =====================
-    path("", views.HomeView.as_view(), name="home"),
+    path("", views.HomeView, name="home"),
     path("documentation/", views.documentation_view, name="documentation"),
     path("help/", views.help_view, name="help"),
 
@@ -21,7 +21,7 @@ urlpatterns = [
     path("delete-account/", views.DeleteAccountView.as_view(), name="delete_account"),
 
     # =====================
-    # QUESTION BANK
+    # QUESTION BANK & INDICATORS
     # =====================
     path("add_questions/", views.add_question, name="add_questions"),
     path("questions/", views.question_list, name="question_list"),
@@ -32,11 +32,17 @@ urlpatterns = [
     path("add_indicators/", views.add_indicators, name="add_indicators"),
 
     # =====================
-    # PACKS & APPLICATIONS
+    # PACKS, GROUPS & APPLICATIONS
     # =====================
     path("create-pack/", views.create_pack, name="create_pack"),
+    path("select-packs/", views.select_packs, name="select_packs"),
+    path("groups/", views.group_list, name="group_list"),
     path("applications/", views.applications, name="applications"),
-    path("applicant-form/<int:pack_id>/", views.applicant_form, name="applicant_form"),
+    path(
+        "apply/group/<int:group_id>/<int:step>/",
+        views.applicant_form_group,
+        name="applicant_form_group",
+    ),
     path("application-review/", views.application_review, name="application_review"),
     path(
         "application-review/<uuid:application_id>/",
@@ -59,7 +65,11 @@ urlpatterns = [
     # INTERVIEWS & INBOX
     # =====================
     path("interview/<uuid:application_id>/", views.start_interview, name="start_interview"),
-    path("interview/<uuid:application_id>/autosave/", views.autosave_interview, name="autosave_interview"),
+    path(
+        "interview/<uuid:application_id>/autosave/",
+        views.autosave_interview,
+        name="autosave_interview",
+    ),
     path("inbox/", views.inbox_view, name="inbox"),
 
     # =====================
@@ -82,8 +92,4 @@ urlpatterns = [
     # =====================
     path("404/", views.Custom404View.as_view(), name="404"),
     path("500/", views.Custom500View.as_view(), name="500"),
-
-    path("select-packs/", views.select_packs, name="select_packs"),
-    path("groups/", views.group_list, name="group_list"),
-    path("apply/group/<int:group_id>/<int:step>/", views.applicant_form_group, name="applicant_form_group"),
 ]

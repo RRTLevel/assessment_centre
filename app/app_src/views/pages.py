@@ -11,24 +11,9 @@ from ..forms import AddNoteForm
 from ..models import Note
 
 
-class HomeView(LoginRequiredMixin, CreateView):
-    form_class = AddNoteForm
-    model = Note
-    template_name = "notes/notes.html"
+def HomeView(request):
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["home"] = True
-        context["notes"] = Note.objects.order_by("-pub_date")[:5]
-        context["page_title"] = settings.APPLICATION_NAME + " - Notes"
-        return context
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("home")
+    return render(request, "home.html")
 
 
 def documentation_view(request):

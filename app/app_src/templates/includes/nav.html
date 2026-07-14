@@ -36,13 +36,17 @@
                         {% endif %}
                         {% if can_see_add_question %}
                         <a class="navbar-item" href="{% url 'add_questions' %}">Add Questions</a>
+                        <a class="navbar-item" href="{% url 'add_indicators' %}">Add Indicators</a>
                         {% endif %}
                         {% if can_see_create_category %}
                         <a class="navbar-item" href="{% url 'categories' %}">Create Category</a>
                         {% endif %}
                         {% if can_see_applications %}
+                        <a class="navbar-item" href="{% url 'select_packs' %}">Create Pack Group</a>
+                        <a class="navbar-item" href="{% url 'group_list' %}">Pack Groups</a>
                         <a class="navbar-item" href="{% url 'application_review' %}">Application Review</a>
                         <a class="navbar-item" href="{% url 'accepted_applicants' %}">Accepted Applicants</a>
+                        <a class="navbar-item" href="{% url 'results' %}">Interview Results</a>
                         <a class="navbar-item" href="{% url 'candidate_dashboard' %}">Candidate Statistics</a>
                         {% endif %}
                         <a class="navbar-item" href="{% url 'help' %}">Help</a>
@@ -96,19 +100,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-        navbarBurgers.forEach(el => {
-            el.addEventListener('click', () => {
-                const target = el.dataset.target;
-                const targetEl = document.getElementById(target);
-
-                el.classList.toggle('is-active');
-                targetEl.classList.toggle('is-active');
-            });
-        });
-    });
-</script>

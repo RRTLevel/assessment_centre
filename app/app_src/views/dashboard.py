@@ -2,50 +2,32 @@
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from ..models import InterviewResult, Question
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
-from ..services.dashboard import candidate_dashboard_data
+from ..services.dashboard import candidate_dashboard_data, interview_results_by_candidate
 from ..services.pdf import render_candidate_dashboard_pdf
 
 
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def results_view(request):
-    """Every interview question with the scored responses recorded against it."""
-
-    questions = list(
-        Question.objects
-        .select_related("category")
-        .order_by("id")
-        .prefetch_related(
-            Prefetch(
-                "interviewresult_set",
-                queryset=(
-                    InterviewResult.objects
-                    .select_related("application__user", "application__group", "application__pack")
-                    .order_by("-updated_at")
-                ),
-                to_attr="responses",
-            )
-        )
-    )
+    """Interview results per candidate submission, organised by pack: the
+    scores, notes and feedback recorded per question plus the indicator
+    assessment."""
+    candidates = interview_results_by_candidate()
 
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
-        "questions_with_responses": [(q, q.responses) for q in questions],
-        "total_responses": sum(len(q.responses) for q in questions),
+        "candidates": candidates,
     })
 
 
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard(request):
-    """Main grouped dashboard (user + group)."""
-
+    """Heatmap of question scores, one row per interviewed submission."""
     questions, rows = candidate_dashboard_data(
         date_from=request.GET.get("from"),
         date_to=request.GET.get("to"),
@@ -61,8 +43,7 @@ def candidate_dashboard(request):
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard_pdf(request):
-    """PDF export of grouped dashboard."""
-
+    """PDF export of the dashboard heatmap plus per-candidate detail pages."""
     date_from = request.GET.get("from")
     date_to = request.GET.get("to")
 

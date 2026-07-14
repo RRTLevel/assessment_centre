@@ -11,6 +11,11 @@
       <p class="rr-white">
         {{ pack.description|safe }}
       </p>
+      {% if group %}
+      <p class="rr-white mt-2">
+        <strong>{{ group.name }}</strong> — Pack {{ step|add:1 }} of {{ total }}
+      </p>
+      {% endif %}
     </div>
   </div>
 </section>

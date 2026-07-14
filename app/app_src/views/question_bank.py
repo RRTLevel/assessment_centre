@@ -1,9 +1,8 @@
 """Managing the question bank: categories, questions and indicators."""
 
-import json
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.html import strip_tags
@@ -60,11 +59,10 @@ def load_questions(request):
     if not category_id:
         return JsonResponse([], safe=False)
 
-    questions = Question.objects.filter(category_id=category_id).values("id", "text")
-    return JsonResponse(list(questions), safe=False)
-    # Question text is rich HTML; <option> labels can only show plain text.
-    questions = Questions.objects.filter(category_id=category_id)
-    data = [{"id": q.id, "text": strip_tags(q.text)} for q in questions]
+    # Question text is rich HTML; <option> labels can only show plain text,
+    # so the page script gets both (the HTML fills the pack's editors).
+    questions = Question.objects.filter(category_id=category_id)
+    data = [{"id": q.id, "text": strip_tags(q.text), "html": q.text} for q in questions]
     return JsonResponse(data, safe=False)
 
 
@@ -79,7 +77,7 @@ def create_category(request):
 
     return render(request, "pre_interview/create_category.html", {
         "form": form,
-        "categories": Category.objects.all(),
+        "categories": Category.objects.annotate(q_count=Count("questions")),
     })
 
 
@@ -120,7 +118,6 @@ def add_indicators(request):
     return render(request, "indicators/add_indicators.html", {
         "page_title": settings.APPLICATION_NAME + " - Add Indicators",
         "indicator_names": indicator_names,
-        "indicator_names_json": json.dumps(indicator_names),
         "grouped_indicators": grouped,
     })
 

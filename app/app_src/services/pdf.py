@@ -4,6 +4,9 @@ import io
 from xml.sax.saxutils import escape
 
 from django.utils import timezone
+from django.utils.html import strip_tags
+
+from ..models import Application
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -72,16 +75,20 @@ def render_candidate_dashboard_pdf(questions, rows, date_from=None, date_to=None
     elements.extend(_question_key(questions, styles))
 
     for row in rows:
-        if row["application"] is not None:
-            elements.extend(_candidate_page(row, styles))
+        elements.extend(_candidate_page(row, styles))
 
     doc.build(elements)
     return buffer.getvalue()
 
 
+def _plain(rich_text):
+    """Escape rich (Summernote HTML) text down to a plain PDF-safe string."""
+    return escape(strip_tags(rich_text or ""))
+
+
 def _heatmap_table(questions, rows):
     """The summary table: one row per candidate, one coloured cell per score."""
-    header = ["Candidate", "Application Date"]
+    header = ["Candidate", "Group", "Application Date"]
     header += [f"Q{i}" for i in range(1, len(questions) + 1)]
     header.append("Average")
 
@@ -90,6 +97,7 @@ def _heatmap_table(questions, rows):
     for row in rows:
         line = [
             row["name"],
+            row["group"],
             row["date"].strftime("%d %b %Y") if row["date"] else "—",
         ]
         line += ["—" if score is None else str(score) for score in row["cells"]]
@@ -109,7 +117,7 @@ def _heatmap_table(questions, rows):
     ]
 
     for row_index, row in enumerate(rows, start=1):
-        for column_index, score in enumerate(row["cells"], start=2):
+        for column_index, score in enumerate(row["cells"], start=3):
             background, text = SCORE_COLOURS.get(score, NO_SCORE_COLOURS)
             cell = (column_index, row_index)
             table_style.append(("BACKGROUND", cell, cell, colors.HexColor(background)))
@@ -129,7 +137,7 @@ def _question_key(questions, styles):
 
     for index, question in enumerate(questions, start=1):
         elements.append(Paragraph(
-            f"Q{index}: {escape(question.text)}",
+            f"Q{index}: {_plain(question.text)}",
             styles["Normal"],
         ))
 
@@ -137,38 +145,49 @@ def _question_key(questions, styles):
 
 
 def _candidate_page(row, styles):
-    """One detail page per candidate: their pre-interview answers, then each
-    interview question they answered with the score, notes and feedback."""
+    """One detail page per candidate: their pre-interview answers for every
+    pack of the submission, then each interview question they answered with
+    the score, notes and feedback."""
     application = row["application"]
+    submission_rows = (
+        Application.objects
+        .filter(application_id=application.application_id)
+        .select_related("pack")
+        .order_by("id")
+    )
 
     elements = [
         PageBreak(),
         Paragraph(escape(row["name"]), styles["Heading1"]),
     ]
 
-    summary = f"Applied {row['date'].strftime('%d %b %Y')}"
+    summary = f"Group: {escape(row['group'])} — Applied {row['date'].strftime('%d %b %Y')}"
     if row["avg"] is not None:
         summary += f" — Average score: {row['avg']:.1f}"
     elements.append(Paragraph(summary, styles["Normal"]))
 
-    pack = application.pack
-    pre_interview = [
-        (pack.pre_interview_question_1, application.answer_1),
-        (pack.pre_interview_question_2, application.answer_2),
-        (pack.pre_interview_question_3, application.answer_3),
-    ]
-    pre_interview = [(question, answer) for question, answer in pre_interview if question and answer]
+    for submission in submission_rows:
+        pack = submission.pack
+        pre_interview = [
+            (pack.pre_interview_question_1, submission.answer_1),
+            (pack.pre_interview_question_2, submission.answer_2),
+            (pack.pre_interview_question_3, submission.answer_3),
+        ]
+        pre_interview = [(question, answer) for question, answer in pre_interview if question and answer]
 
-    if pre_interview:
-        elements.append(Spacer(1, 8))
-        elements.append(Paragraph("Pre-Interview Answers", styles["Heading3"]))
+        if pre_interview:
+            elements.append(Spacer(1, 8))
+            elements.append(Paragraph(
+                f"Pre-Interview Answers — {escape(pack.title)}",
+                styles["Heading3"],
+            ))
 
-        for question_text, answer in pre_interview:
-            elements.append(KeepTogether([
-                Paragraph(f"<b>{escape(question_text)}</b>", styles["Normal"]),
-                Paragraph(escape(answer), styles["Normal"]),
-                Spacer(1, 6),
-            ]))
+            for question_text, answer in pre_interview:
+                elements.append(KeepTogether([
+                    Paragraph(f"<b>{_plain(question_text)}</b>", styles["Normal"]),
+                    Paragraph(escape(answer), styles["Normal"]),
+                    Spacer(1, 6),
+                ]))
 
     answered = [
         result for result in application.results.all()
@@ -189,7 +208,9 @@ def _candidate_page(row, styles):
 
 def _result_block(result, styles):
     """A single question's heading, score badge, notes and feedback."""
-    heading = f"<b>{escape(result.question.text)}</b>"
+    heading = f"<b>{_plain(result.question.text)}</b>"
+    if result.application_pack:
+        heading = f"[{escape(result.application_pack.pack.title)}] {heading}"
     if result.score is not None:
         background, text = SCORE_COLOURS.get(result.score, NO_SCORE_COLOURS)
         heading += (
@@ -202,10 +223,10 @@ def _result_block(result, styles):
     block = [Paragraph(heading, styles["Normal"])]
 
     if result.notes:
-        block.append(Paragraph(f"<b>Notes:</b> {escape(result.notes)}", styles["Normal"]))
+        block.append(Paragraph(f"<b>Notes:</b> {_plain(result.notes)}", styles["Normal"]))
 
     if result.feedback:
-        block.append(Paragraph(f"<b>Feedback:</b> {escape(result.feedback)}", styles["Normal"]))
+        block.append(Paragraph(f"<b>Feedback:</b> {_plain(result.feedback)}", styles["Normal"]))
 
     block.append(Spacer(1, 8))
     return KeepTogether(block)

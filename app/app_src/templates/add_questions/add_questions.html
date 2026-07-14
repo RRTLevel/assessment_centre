@@ -106,7 +106,7 @@
                                         {% csrf_token %}
 
                                         <button class="button is-small is-danger is-light"
-                                                onclick="return confirm('Delete this question?')">
+                                                data-confirm="Delete this question?">
                                             Delete
                                         </button>
                                     </form>
@@ -123,33 +123,5 @@
 
     </div>
 </main>
-
-<script>
-$(document).ready(function () {
-    $('.richtext').summernote({
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline']],
-            ['color', ['forecolor']],
-            ['para', ['ul', 'ol']],
-            ['misc', ['undo', 'redo']]
-        ],
-        height: 100,
-        placeholder: 'Enter question...',
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
-    });
-
-    document.getElementById('questions-form').addEventListener('submit', function (e) {
-        let hasQuestion = false;
-        $('.richtext').each(function () {
-            const content = $(this).summernote('code').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-            if (content) hasQuestion = true;
-        });
-        if (!hasQuestion) {
-            alert('Please enter at least one question.');
-            e.preventDefault();
-        }
-    });
-});
-</script>
 
 {% endblock %}
