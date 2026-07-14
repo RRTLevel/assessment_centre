@@ -35,7 +35,7 @@
               <li><a href="#results">Results Page</a></li>
               <li><a href="#packs">Creating Packs</a></li>
               <li><a href="#questions">Managing Questions</a></li>
-              <li><a href="#categories">Categories &amp; Genres</a></li>
+              <li><a href="#categories">Categories &amp; Packs</a></li>
             </ul>
           </div>
         </div>
@@ -75,12 +75,13 @@
                 <li><strong>Home</strong> — your dashboard (staff see stats and recent applications; candidates see their own application)</li>
                 <li><strong>Applications</strong> — apply for a role (candidates) or review submitted applications (staff)</li>
                 <li><strong>Inbox</strong> — accepted applicants ready to be interviewed</li>
-                <li><strong>Results</strong> — interview scores and genre summary (staff only)</li>
+                <li><strong>Results</strong> — interview scores and pack summary (staff only)</li>
                 <li><strong>Candidate Dashboard</strong> — performance table across all candidates (staff only)</li>
                 <li><strong>Questions &gt; Add Question</strong> — add interview questions to the bank</li>
                 <li><strong>Questions &gt; View Questions</strong> — see all existing questions</li>
                 <li><strong>Questions &gt; Indicators</strong> — manage behavioural indicator pairs</li>
-                <li><strong>Create Pack</strong> — set up a new application pack for a role</li>
+                <li><strong>Create Module</strong> — set up a new interview module for a role</li>
+                <li><strong>More &gt; Packs</strong> — group 3 modules into a named pack for quick scheduling</li>
                 <li><strong>Create Category</strong> — add question categories</li>
                 <li><strong>Your username</strong> (top right) — account settings</li>
                 <li><strong>Dark/light toggle</strong> (top right) — switch between themes</li>
@@ -138,11 +139,11 @@
           <div class="card-content">
             <h4 class="title is-4">Applying for a Role</h4>
             <div class="my-3 is-size-6">
-              <p>The applications page lists all available packs. Each pack is linked to a role and contains up to three pre-interview questions for candidates to answer before their interview.</p>
+              <p>The applications page lists all available modules. Each module is linked to a role and contains up to three pre-interview questions for candidates to answer before their interview.</p>
               <br>
               <p><strong>To submit a pre-interview form:</strong></p>
               <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Find the relevant pack on the applications page</li>
+                <li>Find the relevant module on the applications page</li>
                 <li>Click <strong>Open Pre-Interview Form</strong></li>
                 <li>Answer the questions provided</li>
                 <li>Click <strong>Submit</strong></li>
@@ -184,11 +185,12 @@
               <br>
               <ol style="list-style: decimal; padding-left: 1.5rem;">
                 <li>Go to <strong>Inbox</strong> in the navigation bar</li>
-                <li>Find the accepted candidate</li>
-                <li>Click <strong>Schedule Interview</strong></li>
-                <li>Select the date and time using the date and time fields</li>
-                <li>Click <strong>Schedule</strong> to confirm</li>
+                <li>Find the accepted candidate and click <strong>Schedule Interview</strong></li>
+                <li>Use the <strong>Quick-select by Pack</strong> dropdown to auto-select all 3 modules in a pack at once — or tick modules individually</li>
+                <li>Select the date and time, then click <strong>Confirm &amp; Accept</strong></li>
               </ol>
+              <br>
+              <p><strong>Packs and Modules:</strong> A <strong>Pack</strong> is a named programme (e.g. Early Careers 2026) that groups exactly 3 interview <strong>Modules</strong> together. Selecting a pack at scheduling time loads all 3 modules as tabs on the interview page. You can manage packs under <strong>More &gt; Packs</strong> in the nav.</p>
               <br>
               <p>The interview date will appear on the candidate's home page and on the interview card in the Inbox.</p>
             </div>
@@ -206,7 +208,7 @@
               <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
                 <li>Open the interview for the candidate from the Inbox</li>
                 <li>Work through each question tab — ask the question, then fill in Notes, Score, and Feedback</li>
-                <li>If you want contextual guidance, click the <strong>?</strong> button (bottom-left) to toggle one-liner hints next to each field</li>
+                <li>Click the <strong>?</strong> button (bottom-left) to open the interview guide overlay — it explains the Pack/Module structure, scoring scale, and what to write in each field</li>
                 <li>Add behavioural indicators at the bottom once all questions are done (see Behavioural Indicators below)</li>
                 <li>Click <strong>Submit</strong> when finished — all fields will be validated before submission</li>
               </ol>
@@ -263,7 +265,7 @@
             <div class="my-3 is-size-6">
               <p>The results page gives a full view of all interview scores recorded in the system.</p>
               <br>
-              <p><strong>Genre summary table</strong> — at the top of the page, if questions have been tagged with a genre, this table shows the average score and total response count per behavioural genre. Use this to see which areas candidates are generally performing well or poorly in across all interviews.</p>
+              <p><strong>Pack summary table</strong> — at the top of the page, this table shows the average score and total response count per pack. Use this to see how candidates are performing across different interview programmes.</p>
               <br>
               <p><strong>Per-question breakdown</strong> — each question is listed as a card showing:</p>
               <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
@@ -276,23 +278,23 @@
           </div>
         </div>
 
-        <!-- Packs -->
+        <!-- Modules -->
         <div class="card mb-4" id="packs">
           <div class="card-content">
-            <h4 class="title is-4">Creating Application Packs (Staff)</h4>
+            <h4 class="title is-4">Creating Interview Modules (Staff)</h4>
             <div class="my-3 is-size-6">
-              <p>A pack represents a role. It contains a description, a category (which links the pack to its interview questions), and up to three pre-interview questions for candidates to answer when applying.</p>
+              <p>A <strong>module</strong> represents a themed section of an interview. It has a title, description, a category (which links it to its interview questions), and up to three pre-interview questions for candidates to answer when applying.</p>
               <br>
-              <p><strong>To create a pack:</strong></p>
+              <p><strong>To create a module:</strong></p>
               <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Click <strong>Create Pack</strong> in the navigation bar</li>
-                <li>Enter a title and description for the role</li>
-                <li>Select the category — this determines which interview questions will be used when interviewing candidates who apply for this pack</li>
+                <li>Click <strong>Create Module</strong> in the navigation bar</li>
+                <li>Enter a title and description</li>
+                <li>Select the category — this determines which interview questions appear in this module</li>
                 <li>Add up to three pre-interview questions</li>
-                <li>Click <strong>Save</strong></li>
+                <li>Click <strong>Save Module</strong></li>
               </ol>
               <br>
-              <p>The pack will immediately appear on the applications page for candidates to apply to.</p>
+              <p>The module will appear on the applications page for candidates to apply to, and can be grouped into a <strong>Pack</strong> for multi-module interviews.</p>
             </div>
           </div>
         </div>
@@ -302,14 +304,13 @@
           <div class="card-content">
             <h4 class="title is-4">Managing Interview Questions (Staff)</h4>
             <div class="my-3 is-size-6">
-              <p>Interview questions are the questions asked during a live interview session. They are grouped by category and optionally tagged with a genre.</p>
+              <p>Interview questions are the questions asked during a live interview session. They are grouped by category, which links them to the relevant module.</p>
               <br>
               <p><strong>To add questions:</strong></p>
               <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
                 <li>Go to <strong>Questions &gt; Add Question</strong></li>
                 <li>Enter up to five questions (only the first is required)</li>
-                <li>Select a <strong>Category</strong> — questions will appear in any interview linked to a pack using this category</li>
-                <li>Optionally select a <strong>Genre</strong> to tag the question with a behavioural area (e.g. Communication, Teamwork) — this feeds into the genre summary on the results page</li>
+                <li>Select a <strong>Category</strong> — questions will appear in any interview that uses a module with this category</li>
                 <li>Click <strong>Save Questions</strong></li>
               </ol>
               <br>
@@ -318,18 +319,18 @@
           </div>
         </div>
 
-        <!-- Categories & Genres -->
+        <!-- Categories & Packs -->
         <div class="card mb-4" id="categories">
           <div class="card-content">
-            <h4 class="title is-4">Categories &amp; Genres (Staff)</h4>
+            <h4 class="title is-4">Categories &amp; Packs (Staff)</h4>
             <div class="my-3 is-size-6">
-              <p><strong>Categories</strong> link packs to their interview questions. A pack is assigned one category, and all questions in that category will appear in the interview for any candidate who applies to that pack.</p>
+              <p><strong>Categories</strong> link modules to their interview questions. A module is assigned one category, and all questions in that category will appear in the interview for that module.</p>
               <br>
               <p>To create a new category, click <strong>Create Category</strong> in the nav bar, enter a name and optional description, and save.</p>
               <br>
-              <p><strong>Genres</strong> are a separate concept — they tag individual questions with a behavioural area (e.g. Communication, Safety Awareness, Teamwork). Unlike categories, genres don't affect which questions appear in an interview. They're used to group results on the results page so you can see how candidates perform across different behavioural areas.</p>
+              <p><strong>Packs</strong> group exactly 3 modules together into a named interview programme. When scheduling an interview, selecting a pack auto-ticks its 3 modules — the interviewer then switches between them as tabs during the live session.</p>
               <br>
-              <p>Genres are managed through the admin panel or by contact with a system administrator. Once created, they appear as options when adding questions.</p>
+              <p>To create a pack, go to <strong>More &gt; Packs</strong> in the nav, enter a name, select 3 modules, and save.</p>
             </div>
           </div>
         </div>
