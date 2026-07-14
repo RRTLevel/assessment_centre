@@ -20,9 +20,10 @@ class Pack(models.Model):
         blank=True,
     )
 
-    pre_interview_question_1 = models.CharField(max_length=255, blank=True, null=True)
-    pre_interview_question_2 = models.CharField(max_length=255, blank=True, null=True)
-    pre_interview_question_3 = models.CharField(max_length=255, blank=True, null=True)
+    # Rich text (HTML) entered via the Summernote editor.
+    pre_interview_question_1 = models.TextField(blank=True, null=True)
+    pre_interview_question_2 = models.TextField(blank=True, null=True)
+    pre_interview_question_3 = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

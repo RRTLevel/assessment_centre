@@ -31,7 +31,7 @@
           <br>
 
           <p class="mb-4">
-            {{ pack.description }}
+            {{ pack.description|safe }}
           </p>
           <small class="has-text-grey">
             Created: {{ pack.created_at|date:"d M Y" }}

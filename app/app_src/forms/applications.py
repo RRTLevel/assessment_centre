@@ -1,6 +1,7 @@
 from django import forms
 
 from ..models import Application, Pack, Questions
+from .question_bank import has_visible_text
 
 
 class PackForm(forms.ModelForm):
@@ -35,6 +36,13 @@ class PackForm(forms.ModelForm):
             "question_2",
             "question_3",
         ]
+        # "richtext" textareas are replaced by the Summernote editor.
+        widgets = {
+            "description": forms.Textarea(attrs={"class": "textarea richtext", "rows": 4}),
+            "pre_interview_question_1": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
+            "pre_interview_question_2": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
+            "pre_interview_question_3": forms.Textarea(attrs={"class": "textarea richtext", "rows": 2}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,6 +63,20 @@ class PackForm(forms.ModelForm):
         self.fields["question_1"].queryset = questions
         self.fields["question_2"].queryset = questions
         self.fields["question_3"].queryset = questions
+
+    def _clean_richtext(self, field_name):
+        """Blank out editor leftovers like "<p><br></p>" for optional fields."""
+        value = self.cleaned_data.get(field_name, "")
+        return value if has_visible_text(value) else ""
+
+    def clean_pre_interview_question_1(self):
+        return self._clean_richtext("pre_interview_question_1")
+
+    def clean_pre_interview_question_2(self):
+        return self._clean_richtext("pre_interview_question_2")
+
+    def clean_pre_interview_question_3(self):
+        return self._clean_richtext("pre_interview_question_3")
 
 
 class ApplicantForm(forms.ModelForm):

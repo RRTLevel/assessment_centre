@@ -20,7 +20,7 @@
     {% if application.pack.description %}
     <div class="box mb-4">
         <h2 class="title is-5">Pack Description</h2>
-        <p>{{ application.pack.description }}</p>
+        <p>{{ application.pack.description|safe }}</p>
     </div>
     {% endif %}
 
@@ -31,15 +31,15 @@
         </button>
         <div id="applicant-answers" style="display: none; margin-top: 1rem;">
             {% if application.pack.pre_interview_question_1 %}
-                <p><strong>{{ application.pack.pre_interview_question_1 }}</strong></p>
+                <p><strong>{{ application.pack.pre_interview_question_1|safe }}</strong></p>
                 <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
             {% endif %}
             {% if application.pack.pre_interview_question_2 %}
-                <p><strong>{{ application.pack.pre_interview_question_2 }}</strong></p>
+                <p><strong>{{ application.pack.pre_interview_question_2|safe }}</strong></p>
                 <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
             {% endif %}
             {% if application.pack.pre_interview_question_3 %}
-                <p><strong>{{ application.pack.pre_interview_question_3 }}</strong></p>
+                <p><strong>{{ application.pack.pre_interview_question_3|safe }}</strong></p>
                 <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
             {% endif %}
         </div>
@@ -56,7 +56,7 @@
             </p>
             <div class="question-row">
                 <div class="question-card">
-                    <p class="question-text">{{ item.question.text }}</p>
+                    <p class="question-text">{{ item.question.text|safe }}</p>
                 </div>
                 <div class="Score-Box">
                     <div class="notes_box">
