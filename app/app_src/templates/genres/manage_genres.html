@@ -7,8 +7,8 @@
 <section class="hero rr-primary">
   <div class="hero-body">
     <div class="container">
-      <h1 class="title rr-white">Manage Genres</h1>
-      <p class="rr-white">A genre groups 3 interview packs together. When scheduling an interview, pick a genre to auto-load all 3 packs at once.</p>
+      <h1 class="title rr-white">Manage Packs</h1>
+      <p class="rr-white">A pack groups 3 interview modules together. When scheduling an interview, pick a pack to auto-load all 3 modules at once.</p>
     </div>
   </div>
 </section>
@@ -22,7 +22,7 @@
       <div class="column is-5">
         <div class="card">
           <div class="card-content">
-            <h2 class="title is-5 mb-4" style="color:#1800A8;">Create Genre</h2>
+            <h2 class="title is-5 mb-4" style="color:#1800A8;">Create Pack</h2>
 
             {% if error %}
             <div class="notification is-danger is-light mb-4">{{ error }}</div>
@@ -31,33 +31,33 @@
             <form method="post">
               {% csrf_token %}
               <div class="field">
-                <label class="label">Genre name</label>
+                <label class="label">Pack name</label>
                 <div class="control">{{ form.name }}</div>
                 {% if form.name.errors %}<p class="help is-danger">{{ form.name.errors.0 }}</p>{% endif %}
               </div>
               <div class="field">
-                <label class="label">Pack 1</label>
+                <label class="label">Module 1</label>
                 <div class="control">{{ form.pack_1 }}</div>
               </div>
               <div class="field">
-                <label class="label">Pack 2</label>
+                <label class="label">Module 2</label>
                 <div class="control">{{ form.pack_2 }}</div>
               </div>
               <div class="field">
-                <label class="label">Pack 3</label>
+                <label class="label">Module 3</label>
                 <div class="control">{{ form.pack_3 }}</div>
               </div>
-              <button type="submit" class="button rr-primary mt-3">Save Genre</button>
+              <button type="submit" class="button rr-primary mt-3">Save Pack</button>
             </form>
           </div>
         </div>
       </div>
 
-      <!-- Existing genres -->
+      <!-- Existing packs -->
       <div class="column">
         <div class="card">
           <div class="card-content">
-            <h2 class="title is-5 mb-4" style="color:#1800A8;">Existing Genres</h2>
+            <h2 class="title is-5 mb-4" style="color:#1800A8;">Existing Packs</h2>
 
             {% if genres %}
             {% for g in genres %}
@@ -69,7 +69,7 @@
                     {% for p in g.packs %}
                     <span class="tag is-info is-light">{{ p.title }}</span>
                     {% empty %}
-                    <span class="tag is-light has-text-grey">No packs assigned</span>
+                    <span class="tag is-light has-text-grey">No modules assigned</span>
                     {% endfor %}
                   </div>
                 </div>
@@ -78,13 +78,13 @@
                   <input type="hidden" name="delete_genre" value="1">
                   <input type="hidden" name="genre_id" value="{{ g.id }}">
                   <button class="button is-small is-danger is-light" type="submit"
-                          onclick="return confirm('Delete genre {{ g.name }}?')">Delete</button>
+                          onclick="return confirm('Delete pack {{ g.name }}?')">Delete</button>
                 </form>
               </div>
             </div>
             {% endfor %}
             {% else %}
-            <p class="has-text-grey">No genres created yet.</p>
+            <p class="has-text-grey">No packs created yet.</p>
             {% endif %}
 
           </div>

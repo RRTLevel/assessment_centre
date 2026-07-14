@@ -32,12 +32,12 @@
 
                     <div class="navbar-dropdown">
                         {% if can_see_create_pack %}
-                        <a class="navbar-item" href="{% url 'create_pack' %}">Create Pack</a>
+                        <a class="navbar-item" href="{% url 'create_pack' %}">Create Module</a>
                         {% endif %}
                         {% if can_see_add_question %}
                         <a class="navbar-item" href="{% url 'add_questions' %}">Add Questions</a>
                         <a class="navbar-item" href="{% url 'add_indicators' %}">Indicators</a>
-                        <a class="navbar-item" href="{% url 'manage_genres' %}">Genres</a>
+                        <a class="navbar-item" href="{% url 'manage_genres' %}">Packs</a>
                         {% endif %}
                         {% if can_see_create_category %}
                         <a class="navbar-item" href="{% url 'categories' %}">Create Category</a>

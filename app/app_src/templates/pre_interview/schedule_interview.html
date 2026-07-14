@@ -20,11 +20,11 @@
 
                 {% if genres %}
                 <div class="mb-4">
-                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Quick-select by Genre</p>
-                    <p class="is-size-7 has-text-grey mb-2">Pick a genre to auto-select its 3 packs below.</p>
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Quick-select by Pack</p>
+                    <p class="is-size-7 has-text-grey mb-2">Pick a pack to auto-select its 3 modules below.</p>
                     <div class="select is-fullwidth">
                         <select id="genre-picker">
-                            <option value="">— Choose a genre —</option>
+                            <option value="">— Choose a pack —</option>
                             {% for g in genres %}
                             <option value="{{ g.id }}">{{ g.name }}</option>
                             {% endfor %}
@@ -34,8 +34,8 @@
                 {% endif %}
 
                 <div class="mb-5">
-                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Interview Packs</p>
-                    <p class="is-size-7 has-text-grey mb-3">Select up to 3 packs for this interview, or use the genre picker above.</p>
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Interview Modules</p>
+                    <p class="is-size-7 has-text-grey mb-3">Select up to 3 modules for this interview, or use the pack picker above.</p>
                     {% for pack in all_packs %}
                     <label class="checkbox mb-2" style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
                         <input type="checkbox" name="interview_packs" value="{{ pack.id }}"
@@ -89,7 +89,7 @@
 </section>
 
 <script>
-    // Genre quick-picker — auto-checks the genre's 3 packs and unchecks everything else
+    // Pack quick-picker — auto-checks the pack's 3 modules and unchecks everything else
     const GENRES = {{ genres_json|safe }};
     const genrePicker = document.getElementById('genre-picker');
     if (genrePicker) {
