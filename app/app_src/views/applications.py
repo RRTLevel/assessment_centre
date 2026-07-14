@@ -1,11 +1,13 @@
 """Packs, applicant submissions and application review."""
 
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from ..forms import ApplicantForm, PackForm
-from ..models import Application, ApplicationPack, Pack
+from ..models import Application, ApplicationPack, Genre, Pack
 from ..permissions import ASSESSOR_GROUP, ECAM_GROUP, ECD_GROUP, group_required
 
 
@@ -96,9 +98,20 @@ def approve_application(request, application_id):
         messages.success(request, f"Application for {application.user.username} approved successfully!")
         return redirect("application_review")
 
+    genres = Genre.objects.select_related("pack_1", "pack_2", "pack_3").order_by("name")
+    genres_data = [
+        {
+            "id": g.id,
+            "name": g.name,
+            "pack_ids": [p.id for p in g.packs()],
+        }
+        for g in genres
+    ]
     return render(request, "pre_interview/schedule_interview.html", {
         "application": application,
         "all_packs": Pack.objects.all().order_by("title"),
+        "genres": genres,
+        "genres_json": json.dumps(genres_data),
     })
 
 

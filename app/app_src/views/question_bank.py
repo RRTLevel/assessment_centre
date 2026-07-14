@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from ..forms import CategoryForm, QuestionForm
-from ..models import Category, Indicator, Questions
+from ..forms import CategoryForm, GenreForm, QuestionForm
+from ..models import Category, Genre, Indicator, Questions
 from ..permissions import ASSESSOR_GROUP, group_required
 
 
@@ -145,3 +145,29 @@ def _save_indicator_group(post_data):
 
     for positive, negative in pairs:
         Indicator.objects.create(name=name, positive=positive, negative=negative)
+
+
+@login_required
+@group_required(ASSESSOR_GROUP)
+def manage_genres(request):
+    """Create and delete interview genres (each bundles 3 packs)."""
+    error = None
+    if request.method == "POST":
+        if "delete_genre" in request.POST:
+            Genre.objects.filter(id=request.POST.get("genre_id")).delete()
+            return redirect("manage_genres")
+
+        form = GenreForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manage_genres")
+        else:
+            error = "Please fix the errors below."
+    else:
+        form = GenreForm()
+
+    return render(request, "genres/manage_genres.html", {
+        "form": form,
+        "genres": Genre.objects.select_related("pack_1", "pack_2", "pack_3").all(),
+        "error": error,
+    })
