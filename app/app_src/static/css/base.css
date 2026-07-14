@@ -391,16 +391,18 @@ a.navbar-item.is-active {
    ========================================================= */
 
 .title {
+.card-box .title {
     font-size: 18px;
     font-weight: 700;
     margin: 0;
 }
 
 .subtitle {
+.card-box .subtitle {
     font-size: 13px;
     color: #777;
     margin: 2px 0 0 0;
-}
+
 
 /* =========================================================
    THEME-SPECIFIC GUARDS
