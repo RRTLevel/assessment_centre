@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+<style>
+.field-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; display: block; text-align: left; }
+.pair-row { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.6rem 0.65rem 0.5rem; position: relative; }
+.pair-row .remove-btn { position: absolute; top: 0.4rem; right: 0.4rem; }
+.ind-group { margin-bottom: 2rem; }
+.ind-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+/* Add/replace modal */
+#ar-modal { display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); }
+#ar-modal.active { display: flex; }
+#ar-box { background: var(--rr-surface-bg); border-radius: 10px; padding: 1.75rem; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+#ar-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+#ar-box p { font-size: 0.85rem; color: var(--rr-muted-text); margin-bottom: 1.25rem; }
+.ar-buttons { display: flex; gap: 0.75rem; justify-content: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="section">
+<div class="container" style="max-width: 1100px;">
+
+    <div class="interview-header">
+        <h1 class="title interview-title">Indicators</h1>
+        <p class="interview-count">Manage indicator names and behaviour pairs</p>
+    </div>
+
+    <div class="columns">
+
+        <!-- FORM -->
+        <div class="column is-4">
+            <div class="box">
+                <p class="has-text-weight-semibold mb-1" style="color: #1800A8;">Add Indicator</p>
+                <p class="is-size-7 has-text-grey mb-4">Name, positive &amp; negative behaviour pairs</p>
+
+                <form method="POST" id="indicator-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="mode" id="mode-field" value="add">
+
+                    <label class="field-label">Indicator Name</label>
+                    <div class="select is-fullwidth mb-3">
+                        <select id="name-select" onchange="handleNameSelect(this)">
+                            <option value="">— Select or create —</option>
+                            <option value="__new__" style="font-weight:bold;">＋ Add New Indicator</option>
+                            {% for name in indicator_names %}
+                            <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="new-name-wrap" style="display:none; margin-bottom:1rem;">
+                        <input class="input" type="text" id="new-name-input" placeholder="New indicator name...">
+                    </div>
+                    <input type="hidden" name="indicator_name" id="indicator-name-hidden">
+
+                    <label class="field-label" style="margin-top:0.75rem;">Behaviour Pairs</label>
+                    <div id="pairs-container"></div>
+
+                    <button type="button" class="button is-light is-small mb-3" onclick="addPair()">+ Add Pair</button>
+
+                    <button type="button" class="submit-btn" style="width:100%;" onclick="handleSave()">Save Indicator</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="column">
+            <div class="box">
+                <p class="has-text-weight-semibold mb-1" style="color: #1800A8;">Existing Indicators</p>
+                <p class="is-size-7 has-text-grey mb-4">Grouped by name — each row is one behaviour pair</p>
+
+                {% if grouped_indicators %}
+                {% for name, pairs in grouped_indicators.items %}
+                <div class="ind-group">
+                    <div class="ind-group-header">
+                        <span class="has-text-weight-semibold" style="color:#1800A8;">{{ name }}</span>
+                        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete indicator \'{{ name }}\'?')">
+                            {% csrf_token %}
+                            <input type="hidden" name="indicator_name" value="{{ name }}">
+                            <button type="submit" name="delete_by_name" class="button is-danger is-small is-outlined">Delete indicator</button>
+                        </form>
+                    </div>
+                    <table class="score-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th style="width:44%;">Positive</th>
+                                <th style="width:44%;">Negative</th>
+                                <th style="width:12%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ind in pairs %}
+                            <tr>
+                                <td class="indicator-positive" style="text-align:left;">{{ ind.positive|safe }}</td>
+                                <td class="indicator-negative" style="text-align:left;">{{ ind.negative|safe }}</td>
+                                <td>
+                                    <form method="POST" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="indicator_id" value="{{ ind.id }}">
+                                        <button type="submit" name="delete_indicator" class="button is-danger is-small">✕</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="has-text-grey has-text-centered" style="padding: 2rem 0;">No indicators yet. Create one using the form.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</main>
+
+<!-- Add / Replace modal -->
+<div id="ar-modal">
+    <div id="ar-box">
+        <h3 id="ar-title">Indicator already exists</h3>
+        <p id="ar-body">What would you like to do with the existing behaviour pairs?</p>
+        <div class="ar-buttons">
+            <button class="button is-light" onclick="submitWith('add')">Add to existing</button>
+            <button class="button is-danger" onclick="submitWith('replace')">Replace all</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const existingNames = {{ indicator_names_json|safe }};
+const DRAFT_KEY = 'indicator-form-draft';
+
+function saveDraft() {
+    const draft = {
+        nameSelect: document.getElementById('name-select').value,
+        newName: document.getElementById('new-name-input').value,
+        pairs: []
+    };
+    document.querySelectorAll('#pairs-container .pair-row').forEach(row => {
+        const posEl = row.querySelector('textarea[name^="positive_"]');
+        const negEl = row.querySelector('textarea[name^="negative_"]');
+        if (posEl && negEl) {
+            draft.pairs.push({
+                pos: $(posEl).summernote('code'),
+                neg: $(negEl).summernote('code'),
+            });
+        }
+    });
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    try {
+        const draft = JSON.parse(raw);
+        const sel = document.getElementById('name-select');
+        if (draft.nameSelect) {
+            sel.value = draft.nameSelect;
+            handleNameSelect(sel);
+        }
+        if (draft.newName) {
+            document.getElementById('new-name-input').value = draft.newName;
+        }
+        if (draft.pairs && draft.pairs.length > 0) {
+            draft.pairs.forEach(pair => {
+                addPair();
+                const idx = pairCount - 1;
+                if (pair.pos) $('#pos-' + idx).summernote('code', pair.pos);
+                if (pair.neg) $('#neg-' + idx).summernote('code', pair.neg);
+            });
+            return true;
+        }
+    } catch(e) {}
+    return false;
+}
+
+function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!restoreDraft()) addPair();
+    document.getElementById('name-select').addEventListener('change', saveDraft);
+    document.getElementById('new-name-input').addEventListener('input', saveDraft);
+});
+
+function handleNameSelect(sel) {
+    const newWrap = document.getElementById('new-name-wrap');
+    if (sel.value === '__new__') {
+        newWrap.style.display = 'block';
+        document.getElementById('new-name-input').focus();
+    } else {
+        newWrap.style.display = 'none';
+    }
+}
+
+let pairCount = 0;
+function addPair() {
+    const container = document.getElementById('pairs-container');
+    const idx = pairCount++;
+    const row = document.createElement('div');
+    row.className = 'pair-row';
+    row.id = 'pair-' + idx;
+    row.innerHTML =
+        '<button type="button" class="button is-light is-small remove-btn" onclick="removePair(' + idx + ')">✕</button>' +
+        '<label class="field-label" style="margin-bottom:0.2rem;">Positive</label>' +
+        '<textarea name="positive_' + idx + '" id="pos-' + idx + '"></textarea>' +
+        '<label class="field-label" style="margin-top:0.4rem; margin-bottom:0.2rem;">Negative</label>' +
+        '<textarea name="negative_' + idx + '" id="neg-' + idx + '"></textarea>';
+    container.appendChild(row);
+    const opts = {
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['para', ['ul', 'ol']],
+            ['misc', ['undo', 'redo']]
+        ],
+        height: 80,
+        callbacks: { onChange: function(contents) { $(this).val(contents); saveDraft(); } }
+    };
+    $('#pos-' + idx).summernote({...opts, placeholder: '+ Positive behaviour...'});
+    $('#neg-' + idx).summernote({...opts, placeholder: '− Negative behaviour...'});
+}
+
+function removePair(idx) {
+    const row = document.getElementById('pair-' + idx);
+    if (row) {
+        $('#pos-' + idx).summernote('destroy');
+        $('#neg-' + idx).summernote('destroy');
+        row.remove();
+        saveDraft();
+    }
+}
+
+function getResolvedName() {
+    const sel = document.getElementById('name-select');
+    if (sel.value === '__new__') {
+        return document.getElementById('new-name-input').value.trim();
+    }
+    return sel.value.trim();
+}
+
+function handleSave() {
+    const name = getResolvedName();
+    if (!name) { alert('Please select or enter an indicator name.'); return; }
+
+    const pairs = document.querySelectorAll('#pairs-container .pair-row');
+    let hasPair = false;
+    pairs.forEach(row => {
+        const pos = row.querySelector('textarea[name^="positive_"]');
+        const neg = row.querySelector('textarea[name^="negative_"]');
+        const posText = pos ? $(pos).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
+        const negText = neg ? $(neg).summernote('code').replace(/<[^>]+>/g, '').trim() : '';
+        if (posText || negText) hasPair = true;
+    });
+    if (!hasPair) { alert('Please add at least one behaviour pair.'); return; }
+
+    document.getElementById('indicator-name-hidden').value = name;
+
+    const isNew = document.getElementById('name-select').value === '__new__';
+    const nameExists = existingNames.includes(name);
+
+    if (!isNew && nameExists) {
+        document.getElementById('ar-title').textContent = '"' + name + '" already has behaviour pairs';
+        document.getElementById('ar-body').textContent = 'Add new pairs alongside the existing ones, or replace them all?';
+        document.getElementById('ar-modal').classList.add('active');
+    } else {
+        clearDraft();
+        document.getElementById('mode-field').value = 'add';
+        document.getElementById('indicator-form').submit();
+    }
+}
+
+function submitWith(mode) {
+    clearDraft();
+    document.getElementById('mode-field').value = mode;
+    document.getElementById('ar-modal').classList.remove('active');
+    document.getElementById('indicator-form').submit();
+}
+
+document.getElementById('ar-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+</script>
+{% endblock %}

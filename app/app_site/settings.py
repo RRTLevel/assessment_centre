@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
 
 # Set the application Name, Version and Environment
 APPLICATION_NAME = "Rolls Royce"
-APPLICATION_VERSION = "ersion: x"
+APPLICATION_VERSION = "1.21.2"
 APPLICATION_ENVIRONMENT = os.getenv("APPLICATION_ENVIRONMENT", default="local")
 
 # A list representing the host/domain names to serve to
@@ -62,9 +62,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'app_src.contexts.applicationNameContext',
-                'app_src.contexts.applicationVersionContext',
-                'app_src.contexts.applicationEnvironmentContext'
+                'app_src.contexts.application_metadata',
+                'app_src.contexts.navigation_permissions',
             ],
         },
     },
@@ -152,6 +151,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")

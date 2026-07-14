@@ -3,10 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class DomainUnicodeUsernameValidator(UnicodeUsernameValidator):
+    r"""Also allows the \ character, for DOMAIN\username style usernames."""
 
-    """Now supports \ character for domains associated with usernames"""
-
-    regex = r'^[\w.@+-\\]+$'
+    regex = r'^[\w.@+\-\\]+$'
     message = _(
-        'Enter a valid username. This value may only contain letters, numbers, and \/@/./+/-/_ characters.'
+        'Enter a valid username. This value may only contain letters, numbers, '
+        'and \\/@/./+/-/_ characters.'
     )

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+
+    <div class="interview-header">
+        <h1 class="title interview-title">Interview Results</h1>
+        <p class="interview-count">{{ total_responses }} response{{ total_responses|pluralize }} recorded</p>
+    </div>
+
+    {% if questions_with_responses %}
+        {% for question, responses, avg_score in questions_with_responses %}
+        <div class="question-card mb-5">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <p class="has-text-weight-bold">{{ question.text }}</p>
+                {% if avg_score is not None %}
+                <span class="tag is-medium" style="background-color:#1800A8; color:#fff; font-weight:700; font-size:0.9rem;">
+                    Avg: {{ avg_score|floatformat:1 }}
+                </span>
+                {% else %}
+                <span class="tag is-medium is-light has-text-grey">No scores yet</span>
+                {% endif %}
+            </div>
+
+            {% if responses %}
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Score</th>
+                        <th>Notes</th>
+                        <th>Feedback</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for response in responses %}
+                    <tr>
+                        <td>{{ response.application.user.username }}</td>
+                        <td>{{ response.score|default_if_none:"—" }}</td>
+                        <td>{{ response.notes|default:"—" }}</td>
+                        <td>{{ response.feedback|default:"—" }}</td>
+                        <td>{{ response.updated_at|date:"d M Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="has-text-grey">No responses for this question yet.</p>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    {% else %}
+    <p class="has-text-grey">No results to display yet.</p>
+    {% endif %}
+
+</section>
+{% endblock %}
