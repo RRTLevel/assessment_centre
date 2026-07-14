@@ -85,6 +85,7 @@
                     <div class="Score-Box">
                         <div class="notes_box">
                             <label class="notes-label">Notes</label>
+                            <span class="help-field-hint">What they said — specific phrases, examples, hesitations. Write as you go.</span>
                             <textarea class="notes-textarea"
                                       name="notes_{{ pd.ap.id }}_{{ item.question.id }}"
                                       id="notes-{{ pd.ap.id }}-{{ item.question.id }}"
@@ -96,9 +97,13 @@
                                    name="overall_score_{{ pd.ap.id }}_{{ item.question.id }}"
                                    placeholder="1–6" required
                                    value="{{ item.result.score|default:'' }}">
+                            <div class="help-score-legend mt-1">
+                                <span>1 Very poor</span><span>2 Weak</span><span>3 Adequate</span><span>4 Good</span><span>5 Strong</span><span>6 Excellent</span>
+                            </div>
                         </div>
                         <div class="field mt-2">
                             <label class="feedback-label">Feedback</label>
+                            <span class="help-field-hint">Factual summary for panel records — be specific, not "answered well".</span>
                             <textarea class="feedback-textarea"
                                       name="feedback_{{ pd.ap.id }}_{{ item.question.id }}"
                                       id="feedback-{{ pd.ap.id }}-{{ item.question.id }}"
@@ -116,7 +121,8 @@
 
         <!-- ── INDICATORS (interview-level, shown once) ── -->
         <div class="box mb-4">
-            <p class="has-text-weight-semibold mb-3" style="color: #1800A8;">Interview Assessment</p>
+            <p class="has-text-weight-semibold mb-1" style="color: #1800A8;">Interview Assessment</p>
+            <p class="help-field-hint" style="margin-bottom: 0.75rem;">Add indicators once all questions are done — scores behaviours observed across the whole interview, not per question.</p>
 
             <div id="indicator-table-wrap" style="display:none;">
                 <div id="indicator-groups-container"></div>
@@ -150,6 +156,8 @@
 
 </div>
 </main>
+
+<button class="help-fab" id="help-fab" onclick="toggleHints()" aria-label="Toggle interview guidance">?</button>
 
 <script>
 const indicatorGroups = {{ indicator_groups_json|safe }};
@@ -274,20 +282,24 @@ function addIndicatorGroup(name) {
             '<p class="has-text-weight-semibold mb-2" style="color:#1800A8;">' + escHtml(name) + '</p>' +
             '<table class="score-table" style="width:100%;">' +
             '<thead><tr>' +
-            '<th>Positive</th><th>Negative</th><th>Score (1–6)</th>' +
+            '<th>Positive</th><th>Negative</th>' +
+            '<th>Score (1–6)<span class="help-field-hint" style="font-weight:400;">How strongly shown?</span></th>' +
             '</tr></thead>' +
             '<tbody id="' + gid + '-tbody"></tbody>' +
             '<tfoot><tr style="border-top:2px solid #e0e0e0;">' +
-            '<td colspan="2" style="padding:0.5rem 0.75rem; font-weight:700;">Overall Score</td>' +
+            '<td colspan="2" style="padding:0.5rem 0.75rem; font-weight:700;">Overall Score' +
+            '<span class="help-field-hint" style="font-weight:400;">Your overall impression of this indicator across the whole interview.</span></td>' +
             '<td style="padding:0.4rem 0.75rem;">' +
             '<input type="number" min="1" max="6" step="1" class="score-input"' +
             ' name="group_score_' + escHtml(name) + '"' +
             ' id="' + gid + '-overall"' +
             ' placeholder="1–6" required>' +
+            '<div class="help-score-legend mt-1"><span>1 Very poor</span><span>2 Weak</span><span>3 Adequate</span><span>4 Good</span><span>5 Strong</span><span>6 Excellent</span></div>' +
             '</td>' +
             '</tr></tfoot>' +
             '</table>' +
-            '<textarea class="textarea is-small mt-2"' +
+            '<span class="help-field-hint" style="margin-top:0.4rem;">Describe what you observed — what they said or did, not your conclusion.</span>' +
+            '<textarea class="textarea is-small mt-1"' +
             ' name="group_notes_' + escHtml(name) + '"' +
             ' id="' + gid + '-notes"' +
             ' placeholder="Notes for ' + escHtml(name) + '..."></textarea>';
@@ -444,6 +456,12 @@ function autosave() {
 }
 
 setInterval(autosave, 30000);
+
+function toggleHints() {
+    const active = document.body.classList.toggle('hints-visible');
+    document.getElementById('help-fab').style.opacity = active ? '1' : '0.6';
+}
+
 </script>
 
 {% endblock %}
