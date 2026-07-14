@@ -1,23 +1,23 @@
 from django import forms
 
-from ..models import Application, Pack, Questions
+from ..models import Application, Pack, Question
 
 
 class PackForm(forms.ModelForm):
     question_1 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_1"}),
     )
 
     question_2 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_2"}),
     )
 
     question_3 = forms.ModelChoiceField(
-        queryset=Questions.objects.none(),
+        queryset=Question.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_question_3"}),
     )
@@ -27,7 +27,6 @@ class PackForm(forms.ModelForm):
         fields = [
             "title",
             "description",
-            "category",
             "pre_interview_question_1",
             "pre_interview_question_2",
             "pre_interview_question_3",
@@ -48,9 +47,9 @@ class PackForm(forms.ModelForm):
                 category_id = None
 
         if category_id:
-            questions = Questions.objects.filter(category_id=category_id)
+            questions = Question.objects.filter(category_id=category_id)
         else:
-            questions = Questions.objects.all()
+            questions = Question.objects.all()
 
         self.fields["question_1"].queryset = questions
         self.fields["question_2"].queryset = questions
