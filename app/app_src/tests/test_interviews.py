@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from ..models import (
     Application,
+    ApplicationPack,
     Category,
     Indicator,
     IndicatorGroupScore,
@@ -38,6 +39,7 @@ class StartInterviewTest(TestCase):
             answer_3="a3",
             status=Application.STATUS_ACCEPTED,
         )
+        cls.ap = ApplicationPack.objects.create(application=cls.application, pack=pack, order=0)
 
     def setUp(self):
         self.client.force_login(self.admin)
@@ -53,9 +55,9 @@ class StartInterviewTest(TestCase):
 
     def test_submitting_scores_saves_results_and_average(self):
         response = self.client.post(self.interview_url(), {
-            f"overall_score_{self.question.id}": "5",
-            f"notes_{self.question.id}": "Clear and confident.",
-            f"feedback_{self.question.id}": "Well done.",
+            f"overall_score_{self.ap.id}_{self.question.id}": "5",
+            f"notes_{self.ap.id}_{self.question.id}": "Clear and confident.",
+            f"feedback_{self.ap.id}_{self.question.id}": "Well done.",
             f"indicator_score_{self.indicator.id}": "4",
             "group_score_Communication": "3",
             "group_notes_Communication": "Generally strong.",
@@ -83,12 +85,12 @@ class StartInterviewTest(TestCase):
 
     def test_resubmitting_updates_existing_scores(self):
         self.client.post(self.interview_url(), {
-            f"overall_score_{self.question.id}": "2",
+            f"overall_score_{self.ap.id}_{self.question.id}": "2",
             f"indicator_score_{self.indicator.id}": "2",
             "group_score_Communication": "2",
         })
         self.client.post(self.interview_url(), {
-            f"overall_score_{self.question.id}": "6",
+            f"overall_score_{self.ap.id}_{self.question.id}": "6",
             f"indicator_score_{self.indicator.id}": "6",
             "group_score_Communication": "6",
         })

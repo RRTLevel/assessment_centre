@@ -1,90 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .native-calendar-row {
-        display: flex;
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .native-calendar-field {
-        position: relative;
-        flex: 1;
-    }
-
-    .native-calendar-box {
-        background-color: #f9f9f9 !important;
-        border: 2px solid #5cb85c !important; 
-        border-radius: 12px !important;
-        height: 60px !important;
-        font-size: 16px !important;
-        color: #333333 !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        padding: 12px 16px !important;
-        box-shadow: none !important;
-        width: 100%;
-        cursor: pointer;
-    }
-
-    .native-calendar-label {
-        position: absolute;
-        top: -10px;
-        left: 14px;
-        background-color: #ffffff; 
-        padding: 0 6px;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        color: #555555 !important;
-        z-index: 2;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    }
-
-    .native-calendar-box::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        opacity: 0.6;
-        transition: opacity 0.2s;
-    }
-    .native-calendar-box::-webkit-calendar-picker-indicator:hover {
-        opacity: 1;
-    }
-</style>
-
 <section class="section">
     <div class="container" style="max-width: 600px;">
-        <div class="box card shadow-sm" style="border-radius: 16px; padding: 30px;">
+        <div class="box" style="border-radius: 16px; padding: 30px;">
             <h1 class="title is-4 text-rr-primary mb-3">Schedule Interview</h1>
-            
+
             <div class="content mb-4">
                 <p>Assigning interview date for: <strong>{{ application.user.username }}</strong></p>
                 <p class="is-size-7 has-text-grey">Application ID: {{ application.application_id }}</p>
             </div>
-            
+
             <hr>
 
             <form method="POST" id="interview-schedule-form">
                 {% csrf_token %}
-                
+
                 <input type="hidden" id="interview_date" name="interview_date">
-                
-                <div class="native-calendar-row mb-6">
-                    
-                    <div class="native-calendar-field">
-                        <label class="native-calendar-label" for="date_picker">Interview Date</label>
-                        <input class="input native-calendar-box" 
-                               type="date" 
-                               id="date_picker" 
-                               required>
-                    </div>
 
-                    <div class="native-calendar-field">
-                        <label class="native-calendar-label" for="time_picker">Interview Time</label>
-                        <input class="input native-calendar-box" 
-                               type="time" 
-                               id="time_picker" 
-                               required>
-                    </div>
+                <div class="mb-5">
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Interview Packs</p>
+                    <p class="is-size-7 has-text-grey mb-3">Select one or more packs for this interview (up to 3).</p>
+                    {% for pack in all_packs %}
+                    <label class="checkbox mb-2" style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" name="interview_packs" value="{{ pack.id }}"
+                               {% if pack == application.pack %}checked{% endif %}
+                               style="margin-top:3px; flex-shrink:0;">
+                        <span>
+                            <strong>{{ pack.title }}</strong>
+                            {% if pack.description %}
+                            <span class="is-size-7 has-text-grey" style="display:block;">{{ pack.description|striptags|truncatechars:80 }}</span>
+                            {% endif %}
+                        </span>
+                    </label>
+                    {% empty %}
+                    <p class="is-size-7 has-text-grey">No packs have been created yet.</p>
+                    {% endfor %}
+                </div>
 
+                <hr style="margin: 1rem 0;">
+
+                <div class="columns mb-5">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="date_picker">Interview Date</label>
+                            <div class="control">
+                                <input class="input schedule-date-input" type="date" id="date_picker" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="time_picker">Interview Time</label>
+                            <div class="control">
+                                <input class="input schedule-date-input" type="time" id="time_picker" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="field is-grouped is-grouped-right">
@@ -92,7 +64,7 @@
                         <a href="{% url 'application_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
                     </p>
                     <p class="control">
-                        <button type="submit" class="button is-success" style="border-radius: 8px; background-color: #5cb85c;">Confirm & Accept</button>
+                        <button type="submit" class="button rr-primary" style="border-radius: 8px;">Confirm &amp; Accept</button>
                     </p>
                 </div>
             </form>
@@ -110,22 +82,18 @@
         return localTime.toISOString();
     }
 
-    function updateMinMaxDateTime() {
+    function updateConstraints() {
         const now = new Date();
         const localISO = getLocalISOString(now);
         const todayStr = localISO.split('T')[0];
         const currentTimeStr = localISO.split('T')[1].substring(0, 5);
 
-        // Calculate maximum limit (3 years ahead)
         const maxDate = new Date();
         maxDate.setFullYear(now.getFullYear() + 3);
-        const maxDateStr = getLocalISOString(maxDate).split('T')[0];
 
-        // Apply HTML validation limits
         datePicker.min = todayStr;
-        datePicker.max = maxDateStr;
+        datePicker.max = getLocalISOString(maxDate).split('T')[0];
 
-        // Apply time limits dynamically for today
         if (datePicker.value === todayStr) {
             timePicker.min = currentTimeStr;
         } else {
@@ -133,14 +101,10 @@
         }
     }
 
-    // Set initial minimum/maximum constraints
-    updateMinMaxDateTime();
+    updateConstraints();
+    datePicker.addEventListener('change', updateConstraints);
 
-    // Check rules whenever date changes
-    datePicker.addEventListener('change', updateMinMaxDateTime);
-
-    // Submission guard against developer tool manual edits
-    document.getElementById('interview-schedule-form').addEventListener('submit', function(e) {
+    document.getElementById('interview-schedule-form').addEventListener('submit', function (e) {
         const now = new Date();
         const localISO = getLocalISOString(now);
         const todayStr = localISO.split('T')[0];
@@ -148,25 +112,22 @@
 
         const maxDate = new Date();
         maxDate.setFullYear(now.getFullYear() + 3);
-        const maxDateStr = getLocalISOString(maxDate).split('T')[0];
 
         const dateVal = datePicker.value;
         const timeVal = timePicker.value;
 
-        // Reject times in the past for today
         if (dateVal === todayStr && timeVal < currentTimeStr) {
             e.preventDefault();
             alert("Please pick a future time for today's interview.");
             return;
         }
 
-        // Reject dates beyond 3 years out
-        if (dateVal > maxDateStr) {
+        if (dateVal > getLocalISOString(maxDate).split('T')[0]) {
             e.preventDefault();
             alert("Interviews cannot be scheduled more than 3 years in the future.");
             return;
         }
-        
+
         if (dateVal && timeVal) {
             document.getElementById('interview_date').value = dateVal + 'T' + timeVal;
         }

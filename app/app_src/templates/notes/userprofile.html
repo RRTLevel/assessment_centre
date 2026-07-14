@@ -3,154 +3,159 @@
 
 {% block content %}
 
-<section class="section">
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
     <div class="container">
-        <div class="columns is-centered">
-            <div class="column is-6">
-                <div class="box">
-                    <div class="columns is-centered mb-0">
-                        <div class="column px-4 pb-0">
+      <h1 class="title rr-white">User Profile</h1>
+      <p class="rr-white">
+        Manage your personal account details, visual themes, and security settings.
+      </p>
+    </div>
+  </div>
+</section>
 
-                            <!-- User Info Section -->
+<main class="section">
+    <div class="container" style="max-width: 800px;">
 
-                            <header class="header title is-4"> User Profile </header>
+        <!-- DISPLAY DJANGO MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %} mb-5">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-                            <div class="field my-4">
-                            <div class="field my-4 profile-setting">
-                                <label class="label">Username</label>
-                                <div class="profile-setting-value">
-                                    {{ user.username }}
-                                </div>
-                            </div>
+        <!-- ACCOUNT OVERVIEW CARD -->
+        <div class="card mb-5">
+            <div class="card-content">
+                <h3 class="title is-5 mb-4">Account Information</h3>
 
-                            <div class="field my-4 profile-setting">
-                                <label class="label">Email</label>
-                                <div class="profile-setting-value">
-                                    {{ user.email }}
-                                </div>
-                            </div>
+                <div class="field profile-setting mb-4">
+                    <label class="label">Username</label>
+                    <div class="profile-setting-value box py-2 px-3" style="background:#f5f5f5;">
+                        {{ user.username }}
+                    </div>
+                </div>
 
-                            <!-- Account Type Section -->
-                            <div class="field my-4 profile-setting">
-                                <label class="label">Account Type</label>
-                                <div class="profile-setting-value">
-                                    <span class="tag rr-secondary is-medium profile-account-type">
-                                        <!-- Fixed: Relying entirely on your team's custom backend context variable -->
-                                        {{ AccountType|default:"Standard User" }}
-                                    </span>
-                                </div>
-                            </div>
+                <div class="field profile-setting mb-4">
+                    <label class="label">Email Address</label>
+                    <div class="profile-setting-value box py-2 px-3" style="background:#f5f5f5;">
+                        {{ user.email }}
+                    </div>
+                </div>
 
-                            <hr> <!-- Visual separator -->
-
-                            <h3 class="title is-4">Appearance</h3>
-
-                            <div class="field my-4">
-                                <label class="label">Theme</label>
-                                <div class="theme-options" role="radiogroup" aria-label="Theme">
-                                    <label class="theme-option">
-                                        <input type="radio" name="theme" value="system">
-                                        <span>System</span>
-                                    </label>
-                                    <label class="theme-option">
-                                        <input type="radio" name="theme" value="light">
-                                        <span>Light</span>
-                                    </label>
-                                    <label class="theme-option">
-                                        <input type="radio" name="theme" value="dark">
-                                        <span>Dark</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <!-- Change Password Form -->
-                            <h3 class="title is-4">Change Password</h3>
-
-                            <br>
-
-                            <!-- Display Django success/error messages if available -->
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-
-                            <form method="POST" action="">
-                                {% csrf_token %}
-
-                                <!-- Old Password Field -->
-                                <div class="field">
-                                    <label class="label">Old Password</label>
-                                    <div class="control has-icons-left has-icons-right">
-                                        <input class="input" type="password" name="old_password" id="id_old_password" required>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-key"></i>
-                                        </span>
-                                        <span class="icon is-small is-right toggle-password" data-target="id_old_password" style="pointer-events: all; cursor: pointer;">
-                                            <i class="fas fa-eye toggle-icon"></i>
-                                        </span>
-                                    </div>
-                                </div>
-
-
-
-                                <!-- New Password Field -->
-                                <div class="field">
-                                    <label class="label">New Password</label>
-                                    <div class="control has-icons-left has-icons-right">
-                                        <input class="input" type="password" name="new_password1" id="id_new_password1" required>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-key"></i>
-                                        </span>
-                                        <span class="icon is-small is-right toggle-password" data-target="id_new_password1" style="pointer-events: all; cursor: pointer;">
-                                            <i class="fas fa-eye toggle-icon"></i>
-                                        </span>
-                                    </div>
-                                </div>
-
-
-
-                                <!-- Confirm New Password Field -->
-                                <div class="field">
-                                    <label class="label">Confirm New Password</label>
-                                    <div class="control has-icons-left has-icons-right">
-                                        <input class="input" type="password" name="new_password2" id="id_new_password2" required>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-key"></i>
-                                        </span>
-                                        <span class="icon is-small is-right toggle-password" data-target="id_new_password2" style="pointer-events: all; cursor: pointer;">
-                                            <i class="fas fa-eye toggle-icon"></i>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="field mt-5">
-                                    <div class="control">
-                                        <button type="submit" class="button rr-primary">Update Password</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                            <!-- Teammate Added Feature: Danger Zone Delete Button -->
-                            <div class="field mt-5">
-                                <button type="button" class="button is-danger" onclick="openDeleteModal()">
-                                    Delete Account
-                                </button>
-                            </div>
-
-                        </div>
+                <div class="field profile-setting mb-0">
+                    <label class="label">Account Type</label>
+                    <div class="profile-setting-value">
+                        <span class="tag rr-secondary is-medium profile-account-type">
+                            {{ AccountType|default:"Standard User" }}
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Teammate Added Feature: Delete Account Modal Overlay -->
+        <!-- APPEARANCE MANAGEMENT CARD -->
+        <div class="card mb-5">
+            <div class="card-content">
+                <h3 class="title is-5 mb-4">Appearance</h3>
+
+                <div class="field mb-0">
+                    <label class="label">Interface Theme</label>
+                    <div class="theme-options" role="radiogroup" aria-label="Theme">
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="system">
+                            <span>System Default</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="light">
+                            <span>Light Mode</span>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="dark">
+                            <span>Dark Mode</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECURITY CONFIGURATION CARD -->
+        <div class="card mb-5">
+            <div class="card-content">
+                <h3 class="title is-5 mb-4">Change Password</h3>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+
+                    <div class="field">
+                        <label class="label">Old Password</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="password" name="old_password" id="id_old_password" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <span class="icon is-small is-right toggle-password" data-target="id_old_password" style="pointer-events: all; cursor: pointer;">
+                                <i class="fas fa-eye toggle-icon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">New Password</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="password" name="new_password1" id="id_new_password1" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <span class="icon is-small is-right toggle-password" data-target="id_new_password1" style="pointer-events: all; cursor: pointer;">
+                                <i class="fas fa-eye toggle-icon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Confirm New Password</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="password" name="new_password2" id="id_new_password2" required>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <span class="icon is-small is-right toggle-password" data-target="id_new_password2" style="pointer-events: all; cursor: pointer;">
+                                <i class="fas fa-eye toggle-icon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field mt-5 mb-0">
+                        <div class="control">
+                            <button type="submit" class="button rr-primary">Update Password</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- SECURITY DANGER ZONE MODULE -->
+        <div class="card" style="border: 1px solid #ff3b3b;">
+            <div class="card-content">
+                <h3 class="title is-5 has-text-danger mb-2">Danger Zone</h3>
+                <p class="is-size-7 has-text-grey mb-4">
+                    Permanently delete your account and all associated operational metadata. This action is irreversible.
+                </p>
+                <button type="button" class="button is-danger is-light" onclick="openDeleteModal()">
+                    Delete Account
+                </button>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- ACCOUNT ERASURE OVERLAY MODAL -->
 <div id="deleteModal" class="modal">
     <div class="modal-background" onclick="closeDeleteModal()"></div>
 
@@ -165,7 +170,7 @@
 
             <section class="modal-card-body">
                 <p class="mb-4">
-                    Enter your password to permanently delete your account.
+                    Enter your account security password to confirm profile data erasure.
                 </p>
 
                 <!-- Updated to match the key and eye icon style of change password fields -->
@@ -195,7 +200,6 @@
     </div>
 </div>
 
-<!-- Scripts for Passwords and Modal Functionality -->
 <script>
     // Eye toggles for passwords
     document.querySelectorAll('.toggle-password').forEach(button => {
@@ -217,6 +221,7 @@
         document.getElementById('deleteModal').classList.add('is-active');
     }
 
+    // Modal cancellation
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.remove('is-active');
     }

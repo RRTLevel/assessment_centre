@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
+from django.db.models import Avg, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -20,6 +20,7 @@ def results_view(request):
         Questions.objects
         .select_related("category")
         .order_by("id")
+        .annotate(avg_score=Avg("interviewresult__score"))
         .prefetch_related(
             Prefetch(
                 "interviewresult_set",
@@ -35,7 +36,7 @@ def results_view(request):
 
     return render(request, "results/results.html", {
         "page_title": settings.APPLICATION_NAME + " - Results",
-        "questions_with_responses": [(question, question.responses) for question in questions],
+        "questions_with_responses": [(question, question.responses, question.avg_score) for question in questions],
         "total_responses": sum(len(question.responses) for question in questions),
     })
 

@@ -1,7 +1,26 @@
 from django.db import models
 
-from .applications import Application
+from .applications import Application, Pack
 from .question_bank import Indicator, Questions
+
+
+class ApplicationPack(models.Model):
+    """An assessment pack assigned to a specific application, with ordering."""
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="interview_packs",
+    )
+    pack = models.ForeignKey(Pack, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+        unique_together = ("application", "pack")
+
+    def __str__(self):
+        return f"{self.application} — {self.pack}"
 
 
 class InterviewResult(models.Model):
@@ -17,6 +36,13 @@ class InterviewResult(models.Model):
     notes = models.TextField(blank=True, default="")
     feedback = models.TextField(blank=True, default="")
     updated_at = models.DateTimeField(auto_now=True)
+    application_pack = models.ForeignKey(
+        ApplicationPack,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="results",
+    )
 
     class Meta:
         unique_together = ("application", "question")
