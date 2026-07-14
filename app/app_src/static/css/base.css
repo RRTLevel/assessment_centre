@@ -451,6 +451,57 @@ html[data-theme="dark"] .select select {
 }
 
 /* =========================================================
+   BRAND UTILITIES — DARK MODE AWARE
+   ========================================================= */
+
+/* text-rr-primary / has-text-rr-primary icons/links */
+html[data-theme="dark"] .text-rr-primary,
+html[data-theme="dark"] a.has-text-rr-primary {
+    color: #9b94ff !important;
+}
+
+/* rr-primary button: dark bg makes #10069f nearly invisible */
+html[data-theme="dark"] .button.rr-primary,
+html[data-theme="dark"] a.button.rr-primary {
+    background-color: #4a42d8 !important;
+    color: #fff !important;
+}
+html[data-theme="dark"] .button.rr-primary:hover,
+html[data-theme="dark"] a.button.rr-primary:hover {
+    background-color: #3830c0 !important;
+}
+
+/* Outlined brand buttons */
+.rr-outlined {
+    border-color: #1800A8 !important;
+    color: #1800A8 !important;
+}
+html[data-theme="dark"] .rr-outlined {
+    border-color: #9b94ff !important;
+    color: #9b94ff !important;
+}
+
+/* Brand-coloured text links and headings */
+.rr-brand-text {
+    color: #1800A8;
+}
+html[data-theme="dark"] .rr-brand-text {
+    color: #9b94ff !important;
+}
+
+/* Muted / grey text */
+html[data-theme="dark"] .has-text-grey {
+    color: var(--rr-muted-text) !important;
+}
+
+/* Light buttons — white bg on dark is jarring */
+html[data-theme="dark"] .button.is-light {
+    background-color: var(--rr-surface-bg) !important;
+    color: var(--rr-text) !important;
+    border-color: var(--rr-border) !important;
+}
+
+/* =========================================================
    BULMA COMPONENT DARK MODE FIXES
    ========================================================= */
 
