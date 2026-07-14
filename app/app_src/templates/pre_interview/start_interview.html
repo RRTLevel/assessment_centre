@@ -68,7 +68,7 @@
 
             {% if pack_data|length == 1 and pd.pack.description %}
             <div class="box mb-4">
-                <h2 class="title is-5">Pack Description</h2>
+                <h2 class="title is-5">Module Description</h2>
                 <p>{{ pd.pack.description }}</p>
             </div>
             {% endif %}
@@ -100,14 +100,6 @@
                             <div class="help-score-legend mt-1">
                                 <span>1 Very poor</span><span>2 Weak</span><span>3 Adequate</span><span>4 Good</span><span>5 Strong</span><span>6 Excellent</span>
                             </div>
-                        </div>
-                        <div class="field mt-2">
-                            <label class="feedback-label">Feedback</label>
-                            <span class="help-field-hint">Factual summary for panel records — be specific, not "answered well".</span>
-                            <textarea class="feedback-textarea"
-                                      name="feedback_{{ pd.ap.id }}_{{ item.question.id }}"
-                                      id="feedback-{{ pd.ap.id }}-{{ item.question.id }}"
-                                      placeholder="Enter feedback for this question...">{{ item.result.feedback|default:'' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -174,17 +166,6 @@ $(document).ready(function () {
         ],
         height: 150,
         placeholder: 'Enter interview notes here...',
-        callbacks: { onChange: function(contents) { $(this).val(contents); } }
-    });
-
-    $('.feedback-textarea').summernote({
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline']],
-            ['para', ['ul', 'ol']],
-            ['misc', ['undo', 'redo']]
-        ],
-        height: 120,
-        placeholder: 'Enter feedback for this question...',
         callbacks: { onChange: function(contents) { $(this).val(contents); } }
     });
 
@@ -430,7 +411,7 @@ const AUTOSAVE_URL = "{% url 'autosave_interview' application.application_id %}"
 const autosaveStatus = document.getElementById('autosave-status');
 
 function syncSummernotes() {
-    $('.notes-textarea, .feedback-textarea').each(function() {
+    $('.notes-textarea').each(function() {
         $(this).val($(this).summernote('code'));
     });
     document.querySelectorAll('#indicator-groups-container textarea').forEach(function(ta) {
