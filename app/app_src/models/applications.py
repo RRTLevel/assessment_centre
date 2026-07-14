@@ -19,6 +19,10 @@ class Pack(models.Model):
 
     def __str__(self):
         return self.title
+    # Rich text (HTML) entered via the Summernote editor.
+    pre_interview_question_1 = models.TextField(blank=True, null=True)
+    pre_interview_question_2 = models.TextField(blank=True, null=True)
+    pre_interview_question_3 = models.TextField(blank=True, null=True)
 
 class PackGroup(models.Model):
     name = models.CharField(max_length=255)

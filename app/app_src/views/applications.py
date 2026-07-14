@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from ..forms import ApplicantForm, PackForm
 from ..models import Application, Pack, PackGroup, Application
+from ..models import Application, ApplicationPack, Pack
 from ..permissions import ASSESSOR_GROUP, ECAM_GROUP, ECD_GROUP, group_required
 from django.contrib.auth.models import Group
 
@@ -139,6 +140,26 @@ def approve_application(request, application_id):
 
     return render(request, "pre_interview/schedule_interview.html", {
         "application": applications.first(),
+        application.status = Application.STATUS_ACCEPTED
+        if interview_date:
+            application.interview_date = interview_date
+        application.save()
+
+        selected_ids = request.POST.getlist("interview_packs")
+        application.interview_packs.all().delete()
+        for order, pack_id in enumerate(selected_ids):
+            try:
+                pack = Pack.objects.get(id=int(pack_id))
+                ApplicationPack.objects.create(application=application, pack=pack, order=order)
+            except (Pack.DoesNotExist, ValueError):
+                pass
+
+        messages.success(request, f"Application for {application.user.username} approved successfully!")
+        return redirect("application_review")
+
+    return render(request, "pre_interview/schedule_interview.html", {
+        "application": application,
+        "all_packs": Pack.objects.all().order_by("title"),
     })
 
 @login_required

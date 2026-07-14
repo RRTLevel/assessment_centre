@@ -59,6 +59,7 @@ urlpatterns = [
     # INTERVIEWS & INBOX
     # =====================
     path("interview/<uuid:application_id>/", views.start_interview, name="start_interview"),
+    path("interview/<uuid:application_id>/autosave/", views.autosave_interview, name="autosave_interview"),
     path("inbox/", views.inbox_view, name="inbox"),
 
     # =====================

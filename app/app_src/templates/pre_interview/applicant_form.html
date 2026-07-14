@@ -9,7 +9,7 @@
     <div class="container">
       <h1 class="title rr-white">{{ pack.title }}</h1>
       <p class="rr-white">
-        {{ pack.description }}
+        {{ pack.description|safe }}
       </p>
     </div>
   </div>
@@ -29,7 +29,7 @@
       <div class="card mb-4">
         <div class="card-content">
           <div class="field">
-            <label class="label mb-3">{{ pack.pre_interview_question_1 }}</label>
+            <label class="label mb-3">{{ pack.pre_interview_question_1|safe }}</label>
             <div class="control">
               {{ form.answer_1 }}
             </div>
@@ -42,7 +42,7 @@
       <div class="card mb-4">
         <div class="card-content">
           <div class="field">
-            <label class="label mb-3">{{ pack.pre_interview_question_2 }}</label>
+            <label class="label mb-3">{{ pack.pre_interview_question_2|safe }}</label>
             <div class="control">
               {{ form.answer_2 }}
             </div>
@@ -55,7 +55,7 @@
       <div class="card mb-4">
         <div class="card-content">
           <div class="field">
-            <label class="label mb-3">{{ pack.pre_interview_question_3 }}</label>
+            <label class="label mb-3">{{ pack.pre_interview_question_3|safe }}</label>
             <div class="control">
               {{ form.answer_3 }}
             </div>

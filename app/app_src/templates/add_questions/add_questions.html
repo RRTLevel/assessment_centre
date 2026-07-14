@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+{% endblock %}
+
 {% block content %}
 
 <br>
@@ -21,8 +26,14 @@
         <div class="card mb-5">
             <div class="card-content">
 
-                <form method="post">
+                <form method="post" id="questions-form">
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="notification is-danger is-light">
+                        {{ form.non_field_errors|striptags }}
+                    </div>
+                    {% endif %}
 
                     <div class="field">
                         <label class="label">Question 1</label>
@@ -81,7 +92,7 @@
                         <tbody>
                             {% for q in questions %}
                             <tr>
-                                <td>{{ q.text }}</td>
+                                <td>{{ q.text|safe }}</td>
                                 <td>
                                     <span class="tag is-info is-light">
                                         {{ q.category.name }}
@@ -112,5 +123,33 @@
 
     </div>
 </main>
+
+<script>
+$(document).ready(function () {
+    $('.richtext').summernote({
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['color', ['forecolor']],
+            ['para', ['ul', 'ol']],
+            ['misc', ['undo', 'redo']]
+        ],
+        height: 100,
+        placeholder: 'Enter question...',
+        callbacks: { onChange: function(contents) { $(this).val(contents); } }
+    });
+
+    document.getElementById('questions-form').addEventListener('submit', function (e) {
+        let hasQuestion = false;
+        $('.richtext').each(function () {
+            const content = $(this).summernote('code').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+            if (content) hasQuestion = true;
+        });
+        if (!hasQuestion) {
+            alert('Please enter at least one question.');
+            e.preventDefault();
+        }
+    });
+});
+</script>
 
 {% endblock %}

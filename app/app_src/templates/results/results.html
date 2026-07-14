@@ -12,7 +12,7 @@
         {% for question, responses in questions_with_responses %}
         <div class="question-card mb-5">
 
-            <p class="has-text-weight-bold mb-3">{{ question.text }}</p>
+            <p class="has-text-weight-bold mb-3">{{ question.text|safe }}</p>
 
             {% if responses %}
             <table class="table is-fullwidth is-striped is-hoverable">

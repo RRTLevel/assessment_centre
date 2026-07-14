@@ -83,7 +83,7 @@
                                 <th>Candidate</th>
                                 <th>Application Date</th>
                                 {% for question in questions %}
-                                    <th title="{{ question.text }}" class="has-text-centered">
+                                    <th title="{{ question.text|striptags }}" class="has-text-centered">
                                         Q{{ forloop.counter }}
                                     </th>
                                 {% endfor %}
