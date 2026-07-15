@@ -36,6 +36,7 @@ from .question_bank import (
     delete_category,
     delete_question,
     load_questions,
+    manage_genres,
     question_list,
 )
 
@@ -67,6 +68,7 @@ __all__ = [
     "help_view",
     "inbox_view",
     "load_questions",
+    "manage_genres",
     "question_list",
     "results_view",
     "start_interview",

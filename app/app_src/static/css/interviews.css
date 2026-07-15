@@ -157,6 +157,52 @@
     font-weight: bold;
 }
 
+/* =========================================================
+   INTERVIEW GUIDE (INLINE)
+   ========================================================= */
+
+.help-score-legend {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+}
+.help-score-legend span {
+    font-size: 0.72rem;
+    background: rgba(24,0,168,0.07);
+    border: 1px solid rgba(24,0,168,0.2);
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    color: #1800A8;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .help-score-legend span { background: rgba(24,0,168,0.18); }
+
+.help-fab {
+    position: fixed;
+    bottom: 1.75rem;
+    left: 1.75rem;
+    z-index: 9000;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #1800A8;
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(24,0,168,0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.15s, background 0.15s;
+}
+.help-fab:hover { background: #12007d; opacity: 1; }
+
 .score-input::-webkit-inner-spin-button,
 .score-input::-webkit-outer-spin-button {
     opacity: 1;
@@ -249,11 +295,24 @@ select:focus {
 .notes-label,
 .feedback-label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
     font-weight: bold;
     color: var(--rr-text);
     font-size: 1rem;
 }
+
+.help-field-hint,
+.help-score-legend {
+    display: none;
+}
+.help-field-hint {
+    font-size: 0.75rem;
+    color: var(--rr-muted-text);
+    margin-bottom: 6px;
+    font-style: italic;
+}
+.hints-visible .help-field-hint { display: block; }
+.hints-visible .help-score-legend { display: flex; }
 
 .notes-textarea,
 .feedback-textarea {
