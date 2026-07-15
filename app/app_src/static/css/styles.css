@@ -811,16 +811,17 @@ html[data-theme] .interview-container .score-table tbody th {
 .avg { font-weight: 600; background: #f0f0f0; }
 
 .title {
+.card-box .title {
     font-size: 18px;
     font-weight: 700;
     margin: 0;
 }
 
 .subtitle {
+.card-box .subtitle {
     font-size: 13px;
     color: #777;
     margin: 2px 0 0 0;
-}
 
 @media screen and (min-width: 1025px) {
     .navbar-item.has-dropdown.is-hoverable .navbar-dropdown {

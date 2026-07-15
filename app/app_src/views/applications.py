@@ -124,7 +124,6 @@ def applicant_form_group(request, group_id, step=0):
         messages.success(request, "Application submitted successfully!")
         return redirect("applications")
 
-    # A missing submission id (expired session, direct URL) restarts the flow.
     if step > 0 and not request.session.get("group_application_id"):
         return redirect("applicant_form_group", group_id=group_id, step=0)
 
@@ -134,9 +133,9 @@ def applicant_form_group(request, group_id, step=0):
     if request.method == "POST" and form.is_valid():
         if step == 0:
             request.session["group_application_id"] = str(uuid.uuid4())
+
         submission_id = request.session["group_application_id"]
 
-        # update_or_create keeps back-button resubmits from duplicating rows.
         Application.objects.update_or_create(
             application_id=submission_id,
             pack=pack,
@@ -149,7 +148,11 @@ def applicant_form_group(request, group_id, step=0):
             },
         )
 
-        return redirect("applicant_form_group", group_id=group_id, step=step + 1)
+        return redirect(
+            "applicant_form_group",
+            group_id=group_id,
+            step=step + 1,
+        )
 
     return render(request, "pre_interview/applicant_form.html", {
         "group": group,
@@ -171,6 +174,7 @@ def application_review(request):
     )
 
     grouped = defaultdict(list)
+
     for application in applications:
         grouped[application.application_id].append(application)
 
@@ -185,6 +189,7 @@ def application_review(request):
 def application_detail(request, application_id):
     """Every pack's questions and answers for one submission."""
     rows = submission_rows(application_id)
+
     if not rows:
         raise Http404("No application with this id.")
 
@@ -197,28 +202,49 @@ def application_detail(request, application_id):
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def approve_application(request, application_id):
-    """Accept a submission: set the interview date and choose interview packs.
-
-    The chosen packs become ApplicationPack rows on the submission's primary
-    application; when none are chosen the interview defaults to the packs the
-    applicant applied to.
-    """
+    """Accept a submission: set the interview date and choose interview packs."""
     rows = submission_rows(application_id)
+
     if not rows:
         raise Http404("No application with this id.")
+
     application = rows[0]
 
     if request.method == "POST":
-        interview_date = parse_datetime(request.POST.get("interview_date") or "")
+        interview_date = parse_datetime(
+            request.POST.get("interview_date") or ""
+        )
+
         if interview_date and timezone.is_naive(interview_date):
             interview_date = timezone.make_aware(interview_date)
 
-        Application.objects.filter(application_id=application_id).update(
+        # Prevent two accepted interviews being scheduled at the exact same time
+        conflict = Application.objects.filter(
+            interview_date=interview_date,
+            status=Application.STATUS_ACCEPTED,
+        ).exclude(
+            application_id=application_id,
+        ).exists()
+
+        if conflict:
+            messages.error(
+                request,
+                "An interview is already scheduled for this exact date and time.",
+            )
+            return redirect(
+                "approve_application",
+                application_id=application_id,
+            )
+
+        Application.objects.filter(
+            application_id=application_id
+        ).update(
             status=Application.STATUS_ACCEPTED,
             interview_date=interview_date,
         )
 
         selected_ids = []
+
         for raw_id in request.POST.getlist("interview_packs"):
             try:
                 selected_ids.append(int(raw_id))
@@ -226,18 +252,24 @@ def approve_application(request, application_id):
                 continue
 
         application.interview_packs.all().delete()
+
         packs_by_id = Pack.objects.in_bulk(selected_ids)
+
         for order, pack_id in enumerate(selected_ids):
             pack = packs_by_id.get(pack_id)
+
             if pack:
                 ApplicationPack.objects.create(
-                    application=application, pack=pack, order=order,
+                    application=application,
+                    pack=pack,
+                    order=order,
                 )
 
         messages.success(
             request,
             f"Application for {application.user.username} approved successfully!",
         )
+
         return redirect("application_review")
 
     return render(request, "pre_interview/schedule_interview.html", {
@@ -253,7 +285,9 @@ def deny_application(request, application_id):
     if request.method == "POST":
         updated = Application.objects.filter(
             application_id=application_id,
-        ).update(status=Application.STATUS_DENIED)
+        ).update(
+            status=Application.STATUS_DENIED
+        )
 
         if updated:
             messages.error(request, "Application denied.")
@@ -273,6 +307,7 @@ def accepted_applicants(request):
     )
 
     grouped = defaultdict(list)
+
     for application in applications:
         grouped[application.application_id].append(application)
 
