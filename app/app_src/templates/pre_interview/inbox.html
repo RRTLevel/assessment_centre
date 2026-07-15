@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Inbox</h1>
+      <p class="rr-white">
+        Overview of upcoming and past interviews
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+    <div class="container interview-container">
+
+        <div class="columns">
+
+            <div class="column is-5">
+
+                <div class="calendar-container box">
+
+                    <div class="calendar-header">
+                        <span class="title is-5 mb-0">{{ month_name }} {{ year }}</span>
+
+                        <div>
+                            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="button is-small is-light">&lt;</a>
+                            <a href="?month={{ next_month }}&year={{ next_year }}" class="button is-small is-light">&gt;</a>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+
+                        <div class="calendar-day-label">S</div>
+                        <div class="calendar-day-label">M</div>
+                        <div class="calendar-day-label">T</div>
+                        <div class="calendar-day-label">W</div>
+                        <div class="calendar-day-label">T</div>
+                        <div class="calendar-day-label">F</div>
+                        <div class="calendar-day-label">S</div>
+
+                        {% for week in month_days %}
+                            {% for day in week %}
+                                {% if day == 0 %}
+                                    <div class="calendar-empty"></div>
+                                {% else %}
+                                    <div class="calendar-day
+                                        {% if day == today_day %}is-today{% endif %}
+                                        {% if day in marked_days %}has-interview{% endif %}">
+                                        {{ day }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="column is-7">
+
+
+                <h3 class="title is-5 mb-3">Upcoming Interviews</h3>
+
+                {% if upcoming_interviews %}
+                    {% for app in upcoming_interviews %}
+                        <div class="card mb-3">
+                            <div class="card-content">
+
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+
+                                    <div>
+                                        <h4 class="title is-6 mb-1 text-rr-primary">
+                                            {{ app.pack.title }}
+                                        </h4>
+
+                                        <p class="is-size-7">
+                                            <strong>Applicant:</strong> {{ app.user.username }}
+                                        </p>
+                                    </div>
+
+                                    <div class="has-text-right">
+
+                                        <span class="tag is-success is-light">
+                                            Upcoming
+                                        </span>
+
+                                        <p class="is-size-7 has-text-grey mt-1">
+                                            {{ app.interview_date|date:"M d, Y - H:i" }}
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="notification is-light">
+                        No upcoming interviews.
+                    </div>
+                {% endif %}
+
+                <br>
+
+                <h3 class="title is-5 mb-3">Past Interviews</h3>
+
+                {% if past_interviews %}
+                    {% for app in past_interviews %}
+
+                        <div class="card mb-3">
+                            <div class="card-content">
+
+                                <div class="is-flex is-justify-content-space-between is-align-items-center">
+
+                                    <div>
+                                        <h4 class="title is-6 mb-1">
+                                            {{ app.pack.title }}
+                                        </h4>
+
+                                        <p class="is-size-7">
+                                            <strong>Applicant:</strong> {{ app.user.username }}
+                                        </p>
+
+                                        <p class="is-size-7 has-text-danger">
+                                            Application ID: {{ app.id }} |
+                                            Results: {{ app.results.count }}
+                                        </p>
+
+                                    </div>
+
+                                    <div class="has-text-right">
+
+                                        <span class="tag is-light">
+                                            Completed
+                                        </span>
+
+                                        {% if app.average_score %}
+                                            <span class="tag is-info is-light">
+                                                Avg Score: {{ app.average_score|floatformat:1 }}
+                                            </span>
+                                        {% endif %}
+
+                                        <p class="is-size-7 has-text-grey mt-1">
+                                            {{ app.interview_date|date:"M d, Y - H:i" }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <details class="mt-3">
+                                    <summary class="is-size-7">
+                                        <strong>Answers</strong>
+                                    </summary>
+
+                                    <p class="is-size-7 mt-2">{{ app.answer_1|default:"—" }}</p>
+                                    <p class="is-size-7">{{ app.answer_2|default:"—" }}</p>
+                                    <p class="is-size-7">{{ app.answer_3|default:"—" }}</p>
+                                </details>
+
+                                <details class="mt-3">
+                                    <summary class="is-size-7">
+                                        <strong>Scores &amp; Feedback</strong>
+                                    </summary>
+
+                                    {% for result in app.results.all %}
+
+                                        <div class="mt-3">
+
+                                            <p class="is-size-7">
+                                                <strong>{{ result.question.text }}</strong>
+                                            </p>
+
+                                            <p class="is-size-7">
+                                                Score:
+                                                {{ result.score|default_if_none:"—" }}
+                                            </p>
+
+                                            {% if result.notes %}
+                                                <p class="is-size-7">
+                                                    <strong>Notes:</strong>
+                                                    {{ result.notes }}
+                                                </p>
+                                            {% endif %}
+
+                                            {% if result.feedback %}
+                                                <p class="is-size-7">
+                                                    <strong>Feedback:</strong>
+                                                    {{ result.feedback }}
+                                                </p>
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% empty %}
+
+                                        <p class="is-size-7 mt-2">
+                                            No interview results have been submitted.
+                                        </p>
+
+                                    {% endfor %}
+
+                                </details>
+
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                    <div class="notification is-light">
+                        No past interviews.
+                    </div>
+                {% endif %}
+
+                                <details class="mt-3">
+                                    <summary class="is-size-7"><strong>Answers</strong></summary>
+                                    <p class="is-size-7 mt-2">{{ app.answer_1|default:"—" }}</p>
+                                    <p class="is-size-7">{{ app.answer_2|default:"—" }}</p>
+                                    <p class="is-size-7">{{ app.answer_3|default:"—" }}</p>
+                                </details>
+
+
+                                <details class="mt-2">
+                                        <summary class="is-size-7">
+                                            <strong>Scores &amp; feedback</strong>
+                                        </summary>
+
+                                        {% if app.avg_score %}
+                                            <p class="is-size-7 mb-2 has-text-weight-semibold">
+                                                Avg score: {{ app.avg_score|floatformat:1 }}
+                                            </p>
+                                        {% endif %}
+
+                                        {% for result in app.results.all %}
+
+                                            <div class="mt-2">
+
+                                                <p class="is-size-7 mb-1">
+                                                    <strong>{{ result.question.text }}</strong>
+                                                    &mdash; Score: {{ result.score|default_if_none:"—" }}
+                                                </p>
+
+                                                {% if result.notes %}
+                                                    <p class="is-size-7">
+                                                        <em>Notes:</em> {{ result.notes }}
+                                                    </p>
+                                                {% endif %}
+
+                                                {% if result.feedback %}
+                                                    <p class="is-size-7">
+                                                        <em>Feedback:</em> {{ result.feedback }}
+                                                    </p>
+                                                {% endif %}
+
+                                            </div>
+
+                                        {% empty %}
+                                            <p class="is-size-7 mt-2">
+                                                No scores submitted yet.
+                                            </p>
+                                        {% endfor %}
+                                    </details>
+
+                            </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

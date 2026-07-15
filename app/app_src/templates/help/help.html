@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Help &amp; Documentation</h1>
+      <p class="rr-white">Everything you need to use the assessment centre system.</p>
+    </div>
+  </div>
+</section>
+
+<main class="section">
+  <div class="container">
+    <div class="columns">
+
+      <!-- Sidebar -->
+      <div class="column is-3">
+        <div class="card" style="position: sticky; top: 1rem;">
+          <div class="card-content">
+            <p class="title is-5 interview-title" style="margin-bottom: 1rem;">Contents</p>
+            <ul class="menu-list">
+              <li><a href="#getting-started">Getting Started</a></li>
+              <li><a href="#navigation">Navigation</a></li>
+              <li><a href="#your-account">Your Account</a></li>
+              <li><a href="#home">Home Page</a></li>
+              <li><a href="#applications">Applying for a Role</a></li>
+              <li><a href="#application-review">Reviewing Applications</a></li>
+              <li><a href="#schedule-interview">Scheduling an Interview</a></li>
+              <li><a href="#interview">Running an Interview</a></li>
+              <li><a href="#indicators">Behavioural Indicators</a></li>
+              <li><a href="#results">Results Page</a></li>
+              <li><a href="#packs">Creating Packs</a></li>
+              <li><a href="#questions">Managing Questions</a></li>
+              <li><a href="#categories">Categories &amp; Packs</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="column">
+
+        <!-- Getting Started -->
+        <div class="card mb-4" id="getting-started">
+          <div class="card-content">
+            <h4 class="title is-4">Getting Started</h4>
+            <div class="my-3 is-size-6">
+              <p>To use the system you need an account. If you don't have one yet, click <strong>Sign Up</strong> on the login page and fill in your username, email address, and password.</p>
+              <br>
+              <p>Once you're logged in, what you can see depends on your role:</p>
+              <br>
+              <ul style="list-style: disc; padding-left: 1.5rem;">
+                <li><strong>Candidates</strong> — can apply for roles and track their application status</li>
+                <li><strong>Early Careers Definer (ECD)</strong> — can manage questions, packs, categories, indicators, and review results</li>
+                <li><strong>Early Careers Assessment Manager (ECAM)</strong> — full access: everything ECD can do, plus running interviews and reviewing all applications</li>
+              </ul>
+              <br>
+              <p>Tick <strong>Remember Me</strong> on the login page if you want to stay logged in between sessions.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="card mb-4" id="navigation">
+          <div class="card-content">
+            <h4 class="title is-4">Navigation</h4>
+            <div class="my-3 is-size-6">
+              <p>The navigation bar at the top of every page gives access to all sections. Some items only appear if your account has the right permissions.</p>
+              <br>
+              <ul style="list-style: disc; padding-left: 1.5rem;">
+                <li><strong>Home</strong> — your dashboard (staff see stats and recent applications; candidates see their own application)</li>
+                <li><strong>Applications</strong> — apply for a role (candidates) or review submitted applications (staff)</li>
+                <li><strong>Inbox</strong> — accepted applicants ready to be interviewed</li>
+                <li><strong>Results</strong> — interview scores and pack summary (staff only)</li>
+                <li><strong>Candidate Dashboard</strong> — performance table across all candidates (staff only)</li>
+                <li><strong>Questions &gt; Add Question</strong> — add interview questions to the bank</li>
+                <li><strong>Questions &gt; View Questions</strong> — see all existing questions</li>
+                <li><strong>Questions &gt; Indicators</strong> — manage behavioural indicator pairs</li>
+                <li><strong>Create Module</strong> — set up a new interview module for a role</li>
+                <li><strong>More &gt; Packs</strong> — group 3 modules into a named pack for quick scheduling</li>
+                <li><strong>Create Category</strong> — add question categories</li>
+                <li><strong>Your username</strong> (top right) — account settings</li>
+                <li><strong>Dark/light toggle</strong> (top right) — switch between themes</li>
+                <li><strong>Logout</strong> (top right) — sign out</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Your Account -->
+        <div class="card mb-4" id="your-account">
+          <div class="card-content">
+            <h4 class="title is-4">Your Account</h4>
+            <div class="my-3 is-size-6">
+              <p>Click your username in the top-right corner to reach your account page. From here you can see your username, email, and role.</p>
+              <br>
+              <p><strong>Changing your password:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Enter your current password</li>
+                <li>Enter your new password twice</li>
+                <li>Click <strong>Update Password</strong></li>
+              </ol>
+              <br>
+              <p><strong>Deleting your account:</strong> Click <strong>Delete Account</strong> and confirm with your password. This is permanent — all your data will be removed.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Home Page -->
+        <div class="card mb-4" id="home">
+          <div class="card-content">
+            <h4 class="title is-4">Home Page</h4>
+            <div class="my-3 is-size-6">
+              <p>What you see on the home page depends on your role.</p>
+              <br>
+              <p><strong>Staff view</strong> shows:</p>
+              <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Count of pending, accepted, and upcoming interviews</li>
+                <li>The five most recently submitted applications with their status</li>
+                <li>Quick links to the application review queue</li>
+              </ul>
+              <br>
+              <p><strong>Candidate view</strong> shows:</p>
+              <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Your current application status (Pending, Accepted, or Denied)</li>
+                <li>Your interview date if one has been scheduled</li>
+                <li>A link to apply if you haven't submitted an application yet</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Applications -->
+        <div class="card mb-4" id="applications">
+          <div class="card-content">
+            <h4 class="title is-4">Applying for a Role</h4>
+            <div class="my-3 is-size-6">
+              <p>The applications page lists all available modules. Each module is linked to a role and contains up to three pre-interview questions for candidates to answer before their interview.</p>
+              <br>
+              <p><strong>To submit a pre-interview form:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Find the relevant module on the applications page</li>
+                <li>Click <strong>Open Pre-Interview Form</strong></li>
+                <li>Answer the questions provided</li>
+                <li>Click <strong>Submit</strong></li>
+              </ol>
+              <br>
+              <p>You'll receive a status of <strong>Pending</strong> after submitting. Staff will review your application and either accept or deny it. If accepted, you'll see your interview date appear on your home page.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Application Review -->
+        <div class="card mb-4" id="application-review">
+          <div class="card-content">
+            <h4 class="title is-4">Reviewing Applications (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>The application review page shows all pre-interview forms submitted by candidates, including their answers to each pre-interview question and the current status of their application.</p>
+              <br>
+              <p><strong>To approve an application:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Find the application in the list</li>
+                <li>Click <strong>Approve</strong> — this moves the candidate to the Accepted Applicants (Inbox) page</li>
+              </ol>
+              <br>
+              <p><strong>To deny an application:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Find the application in the list</li>
+                <li>Click <strong>Deny</strong> — the status updates to Denied</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Schedule Interview -->
+        <div class="card mb-4" id="schedule-interview">
+          <div class="card-content">
+            <h4 class="title is-4">Scheduling an Interview (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>Once an application is approved, you can schedule an interview date from the Inbox page.</p>
+              <br>
+              <ol style="list-style: decimal; padding-left: 1.5rem;">
+                <li>Go to <strong>Inbox</strong> in the navigation bar</li>
+                <li>Find the accepted candidate and click <strong>Schedule Interview</strong></li>
+                <li>Use the <strong>Quick-select by Pack</strong> dropdown to auto-select all 3 modules in a pack at once — or tick modules individually</li>
+                <li>Select the date and time, then click <strong>Confirm &amp; Accept</strong></li>
+              </ol>
+              <br>
+              <p><strong>Packs and Modules:</strong> A <strong>Pack</strong> is a named programme (e.g. Early Careers 2026) that groups exactly 3 interview <strong>Modules</strong> together. Selecting a pack at scheduling time loads all 3 modules as tabs on the interview page. You can manage packs under <strong>More &gt; Packs</strong> in the nav.</p>
+              <br>
+              <p>The interview date will appear on the candidate's home page and on the interview card in the Inbox.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interview -->
+        <div class="card mb-4" id="interview">
+          <div class="card-content">
+            <h4 class="title is-4">Running an Interview (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>The interview page is where you score candidates during a live session. Each question has its own tab with a notes field, a score input, and a feedback field.</p>
+              <br>
+              <p><strong>To run an interview:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Open the interview for the candidate from the Inbox</li>
+                <li>Work through each question tab — ask the question, then fill in Notes, Score, and Feedback</li>
+                <li>Click the <strong>?</strong> button (bottom-left) to open the interview guide overlay — it explains the Pack/Module structure, scoring scale, and what to write in each field</li>
+                <li>Add behavioural indicators at the bottom once all questions are done (see Behavioural Indicators below)</li>
+                <li>Click <strong>Submit</strong> when finished — all fields will be validated before submission</li>
+              </ol>
+              <br>
+              <p><strong>Score scale:</strong></p>
+              <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>1</strong> — Very poor</li>
+                <li><strong>2</strong> — Weak</li>
+                <li><strong>3</strong> — Adequate</li>
+                <li><strong>4</strong> — Good</li>
+                <li><strong>5</strong> — Strong</li>
+                <li><strong>6</strong> — Excellent</li>
+              </ul>
+              <br>
+              <p><strong>Autosave:</strong> The page automatically saves your progress every 30 seconds. You'll see a small "✓ Saved" indicator in the corner — you won't lose work if you need to pause mid-interview.</p>
+              <br>
+              <p><strong>Score validation:</strong> If you try to submit with a score missing, the page will highlight the empty field and jump to the right tab automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicators -->
+        <div class="card mb-4" id="indicators">
+          <div class="card-content">
+            <h4 class="title is-4">Behavioural Indicators</h4>
+            <div class="my-3 is-size-6">
+              <p>Behavioural indicators are traits you score holistically across the whole interview — not against individual questions. Each indicator has a name (e.g. Communication), a positive description (what the behaviour looks like when shown well), and a negative description (what it looks like when it's absent or poor).</p>
+              <br>
+              <p><strong>Adding indicators to an interview:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Scroll to the <strong>Interview Assessment</strong> section at the bottom of the interview page</li>
+                <li>Select an indicator from the dropdown and click <strong>Add</strong></li>
+                <li>A scoring table appears — score each pair from 1–6 and add an overall group score</li>
+                <li>Use the notes field to record what you observed</li>
+              </ol>
+              <br>
+              <p><strong>Managing indicators (staff only):</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Go to <strong>Questions &gt; Indicators</strong> in the nav bar</li>
+                <li>Enter an indicator name, add one or more positive/negative pairs, and click <strong>Save Indicator</strong></li>
+                <li>To delete a single pair, click the <strong>✕</strong> next to it</li>
+                <li>To delete all pairs under a name, click <strong>Delete indicator</strong> next to the group heading and confirm</li>
+              </ol>
+              <br>
+              <p>If you refresh the page with unsaved pairs in the form, a draft restore banner will appear — click <strong>Restore draft</strong> to reload them, or <strong>Discard</strong> to start fresh.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="card mb-4" id="results">
+          <div class="card-content">
+            <h4 class="title is-4">Results Page (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>The results page gives a full view of all interview scores recorded in the system.</p>
+              <br>
+              <p><strong>Pack summary table</strong> — at the top of the page, this table shows the average score and total response count per pack. Use this to see how candidates are performing across different interview programmes.</p>
+              <br>
+              <p><strong>Per-question breakdown</strong> — each question is listed as a card showing:</p>
+              <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>The average score across all candidates (shown as a coloured tag)</li>
+                <li>A table of every response: candidate name, score, notes, feedback, and when it was last updated</li>
+              </ul>
+              <br>
+              <p>The <strong>Candidate Dashboard</strong> (also in the nav) shows a different view — a cross-candidate performance table you can filter by date range and sort by score.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modules -->
+        <div class="card mb-4" id="packs">
+          <div class="card-content">
+            <h4 class="title is-4">Creating Interview Modules (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>A <strong>module</strong> represents a themed section of an interview. It has a title, description, a category (which links it to its interview questions), and up to three pre-interview questions for candidates to answer when applying.</p>
+              <br>
+              <p><strong>To create a module:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Click <strong>Create Module</strong> in the navigation bar</li>
+                <li>Enter a title and description</li>
+                <li>Select the category — this determines which interview questions appear in this module</li>
+                <li>Add up to three pre-interview questions</li>
+                <li>Click <strong>Save Module</strong></li>
+              </ol>
+              <br>
+              <p>The module will appear on the applications page for candidates to apply to, and can be grouped into a <strong>Pack</strong> for multi-module interviews.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Questions -->
+        <div class="card mb-4" id="questions">
+          <div class="card-content">
+            <h4 class="title is-4">Managing Interview Questions (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p>Interview questions are the questions asked during a live interview session. They are grouped by category, which links them to the relevant module.</p>
+              <br>
+              <p><strong>To add questions:</strong></p>
+              <ol style="list-style: decimal; padding-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Go to <strong>Questions &gt; Add Question</strong></li>
+                <li>Enter up to five questions (only the first is required)</li>
+                <li>Select a <strong>Category</strong> — questions will appear in any interview that uses a module with this category</li>
+                <li>Click <strong>Save Questions</strong></li>
+              </ol>
+              <br>
+              <p>To delete a question, find it in the questions list and click <strong>Delete</strong>. This cannot be undone.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories & Packs -->
+        <div class="card mb-4" id="categories">
+          <div class="card-content">
+            <h4 class="title is-4">Categories &amp; Packs (Staff)</h4>
+            <div class="my-3 is-size-6">
+              <p><strong>Categories</strong> link modules to their interview questions. A module is assigned one category, and all questions in that category will appear in the interview for that module.</p>
+              <br>
+              <p>To create a new category, click <strong>Create Category</strong> in the nav bar, enter a name and optional description, and save.</p>
+              <br>
+              <p><strong>Packs</strong> group exactly 3 modules together into a named interview programme. When scheduling an interview, selecting a pack auto-ticks its 3 modules — the interviewer then switches between them as tabs during the live session.</p>
+              <br>
+              <p>To create a pack, go to <strong>More &gt; Packs</strong> in the nav, enter a name, select 3 modules, and save.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

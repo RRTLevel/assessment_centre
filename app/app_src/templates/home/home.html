@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero rr-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title rr-white">Welcome back, {{ user.get_full_name|default:user.username }}</h1>
+            <p class="subtitle rr-white is-size-6">Assessment Centre Dashboard</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+
+        {% if is_staff %}
+
+        <!-- Staff view: aggregate stats + all recent applications -->
+        <div class="columns mb-5">
+            <div class="column">
+                <div class="box has-text-centered" style="border-top: 4px solid #1800A8;">
+                    <p class="is-size-2 has-text-weight-bold rr-brand-text">{{ pending_count }}</p>
+                    <p class="is-size-6 has-text-grey">Pending Applications</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="box has-text-centered" style="border-top: 4px solid #16803c;">
+                    <p class="is-size-2 has-text-weight-bold" style="color:#16803c;">{{ accepted_count }}</p>
+                    <p class="is-size-6 has-text-grey">Accepted Candidates</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="box has-text-centered" style="border-top: 4px solid #fc4191;">
+                    <p class="is-size-2 has-text-weight-bold" style="color:#fc4191;">{{ upcoming_count }}</p>
+                    <p class="is-size-6 has-text-grey">Upcoming Interviews</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-4">
+                <div class="box">
+                    <p class="has-text-weight-semibold mb-3 rr-brand-text">Quick Actions</p>
+                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                        {% if can_see_applications %}
+                        <a href="{% url 'application_review' %}" class="button rr-primary is-fullwidth">
+                            <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                            <span>Application Review</span>
+                        </a>
+                        <a href="{% url 'inbox' %}" class="button is-outlined rr-outlined is-fullwidth">
+                            <span class="icon"><i class="fas fa-inbox"></i></span>
+                            <span>Interview Inbox</span>
+                        </a>
+                        <a href="{% url 'candidate_dashboard' %}" class="button is-outlined rr-outlined is-fullwidth">
+                            <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                            <span>Candidate Statistics</span>
+                        </a>
+                        {% endif %}
+                        {% if can_see_create_pack %}
+                        <a href="{% url 'create_pack' %}" class="button is-outlined rr-outlined is-fullwidth">
+                            <span class="icon"><i class="fas fa-folder-plus"></i></span>
+                            <span>Create Module</span>
+                        </a>
+                        {% endif %}
+                        {% if can_see_add_question %}
+                        <a href="{% url 'add_questions' %}" class="button is-outlined rr-outlined is-fullwidth">
+                            <span class="icon"><i class="fas fa-question-circle"></i></span>
+                            <span>Add Questions</span>
+                        </a>
+                        <a href="{% url 'add_indicators' %}" class="button is-outlined rr-outlined is-fullwidth">
+                            <span class="icon"><i class="fas fa-sliders-h"></i></span>
+                            <span>Indicators</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+                        <p class="has-text-weight-semibold rr-brand-text">Recent Applications</p>
+                        <div style="display:flex; gap:0.35rem;">
+                            <button class="app-filter button is-small is-active" data-filter="all">All</button>
+                            <button class="app-filter button is-small" data-filter="Pending">Pending</button>
+                            <button class="app-filter button is-small" data-filter="Accepted">Accepted</button>
+                            <button class="app-filter button is-small" data-filter="Denied">Denied</button>
+                        </div>
+                    </div>
+                    {% if recent_applications %}
+                    <table class="table is-fullwidth is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Module</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in recent_applications %}
+                            <tr data-status="{{ app.status }}">
+                                <td>{{ app.user.username }}</td>
+                                <td>{{ app.pack.title }}</td>
+                                <td>
+                                    {% if app.status == "Pending" %}
+                                    <span class="tag is-warning">Pending</span>
+                                    {% elif app.status == "Accepted" %}
+                                    <span class="tag is-success">Accepted</span>
+                                    {% else %}
+                                    <span class="tag is-danger">Denied</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'application_detail' app.application_id %}" class="is-size-7 rr-brand-text">View &rarr;</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'application_review' %}" class="is-size-7 rr-brand-text">View all applications &rarr;</a>
+                    {% else %}
+                    <p class="has-text-grey has-text-centered" style="padding:2rem 0;">No applications yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+
+        <!-- Candidate view: only their own application -->
+        <div class="columns is-centered">
+            <div class="column is-6">
+                {% if my_application %}
+                <div class="box">
+                    <p class="has-text-weight-semibold mb-3 rr-brand-text">Your Application</p>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <th>Module</th>
+                                <td>{{ my_application.pack.title }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if my_application.status == "Pending" %}
+                                    <span class="tag is-warning">Pending review</span>
+                                    {% elif my_application.status == "Accepted" %}
+                                    <span class="tag is-success">Accepted</span>
+                                    {% else %}
+                                    <span class="tag is-danger">Unsuccessful</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if my_application.interview_date %}
+                            <tr>
+                                <th>Interview</th>
+                                <td>{{ my_application.interview_date|date:"d M Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="box has-text-centered" style="padding:3rem 1rem;">
+                    <p class="has-text-grey mb-4">You have not submitted an application yet.</p>
+                    <a href="{% url 'applications' %}" class="button rr-primary">View available modules</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+<style>
+.app-filter { background: transparent; border: 1px solid var(--rr-border); color: var(--rr-muted-text); }
+.app-filter.is-active { background: #1800A8; border-color: #1800A8; color: #fff; }
+html[data-theme="dark"] .app-filter.is-active { background: #4a42d8; border-color: #4a42d8; }
+</style>
+<script>
+document.querySelectorAll('.app-filter').forEach(btn => {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.app-filter').forEach(b => b.classList.remove('is-active'));
+        this.classList.add('is-active');
+        const filter = this.dataset.filter;
+        document.querySelectorAll('tr[data-status]').forEach(row => {
+            row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -2,26 +2,31 @@
 
 {% block content %}
 
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Create New Category</h1>
+      <p class="rr-white">
+        Create and manage categories.
+      </p>
+    </div>
+  </div>
+</section>
+
 <div class="container mt-6">
 
-    <!-- Header -->
-    <div class="interview-header mb-5">
-        <h1 class="title is-3 interview-title">Create New Pack</h1>
-        <p class="subtitle is-6 interview-count">
-            Create and manage your interview question packs
-        </p>
-    </div>
+    <br>
 
     <div class="columns">
 
         <!-- FORM -->
         <div class="column is-5">
-
             <div class="card">
                 <div class="card-content">
-
                     <h2 class="title is-5 text-rr-primary mb-4">
-                        Pack Details
+                        Category Details
                     </h2>
 
                     <form method="POST">
@@ -29,7 +34,7 @@
 
                         <!-- Name -->
                         <div class="field">
-                            <label class="label">Pack Name</label>
+                            <label class="label">Category Name</label>
                             <div class="control">
                                 <input
                                     class="input"
@@ -47,7 +52,7 @@
                                 <textarea
                                     class="textarea"
                                     name="description"
-                                    placeholder="Describe this pack..."
+                                    placeholder="Describe this Category..."
                                 ></textarea>
                             </div>
                         </div>
@@ -56,7 +61,7 @@
                         <div class="field mt-5">
                             <div class="control">
                                 <button type="submit" class="button submit-btn is-fullwidth">
-                                    Create Pack
+                                    Create Category
                                 </button>
                             </div>
                         </div>
@@ -75,7 +80,7 @@
                 <div class="card-content">
 
                     <h2 class="title is-5 text-rr-primary mb-4">
-                        Existing Packs
+                        Existing Categories
                     </h2>
 
                     <div class="table-container">
@@ -101,13 +106,15 @@
                                         </span>
                                     </td>
                                     <td class="has-text-right">
-                                        <a
-                                            href="{% url 'delete_category' category.id %}"
-                                            class="button is-small is-danger is-light"
-                                            onclick="return confirm('Delete this pack?')"
-                                        >
-                                            Delete
-                                        </a>
+                                        <form method="post"
+                                              action="{% url 'delete_category' category.id %}"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('Delete this Category?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button is-small is-danger is-light">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 {% endfor %}

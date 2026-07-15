@@ -1,13 +1,18 @@
+"""Template context processors registered in settings.TEMPLATES."""
+
 from django.conf import settings
 
-def applicationNameContext(request):
-    application_name = settings.APPLICATION_NAME
-    return{"application_name":application_name}
+from .permissions import nav_permissions
 
-def applicationVersionContext(request):
-    application_version = settings.APPLICATION_VERSION
-    return{"application_version":application_version}
 
-def applicationEnvironmentContext(request):
-    application_environment = settings.APPLICATION_ENVIRONMENT
-    return{"application_environment":application_environment}
+def application_metadata(request):
+    """Expose the application name, version and environment to every template."""
+    return {
+        "application_name": settings.APPLICATION_NAME,
+        "application_version": settings.APPLICATION_VERSION,
+        "application_environment": settings.APPLICATION_ENVIRONMENT,
+    }
+
+
+def navigation_permissions(request):
+    return nav_permissions(request.user)

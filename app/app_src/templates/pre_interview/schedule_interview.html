@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 600px;">
+        <div class="box" style="border-radius: 16px; padding: 30px;">
+            <h1 class="title is-4 text-rr-primary mb-3">Schedule Interview</h1>
+
+            <div class="content mb-4">
+                <p>Assigning interview date for: <strong>{{ application.user.username }}</strong></p>
+                <p class="is-size-7 has-text-grey">Application ID: {{ application.application_id }}</p>
+            </div>
+
+            <hr>
+
+            <form method="POST" id="interview-schedule-form">
+                {% csrf_token %}
+
+                <input type="hidden" id="interview_date" name="interview_date">
+
+                {% if genres %}
+                <div class="mb-4">
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Quick-select by Pack</p>
+                    <p class="is-size-7 has-text-grey mb-2">Pick a pack to auto-select its 3 modules below.</p>
+                    <div class="select is-fullwidth">
+                        <select id="genre-picker">
+                            <option value="">— Choose a pack —</option>
+                            {% for g in genres %}
+                            <option value="{{ g.id }}">{{ g.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="mb-5">
+                    <p class="has-text-weight-semibold mb-2" style="color:#1800A8;">Interview Modules</p>
+                    <p class="is-size-7 has-text-grey mb-3">Select up to 3 modules for this interview, or use the pack picker above.</p>
+                    {% for pack in all_packs %}
+                    <label class="checkbox mb-2" style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
+                        <input type="checkbox" name="interview_packs" value="{{ pack.id }}"
+                               id="pack-cb-{{ pack.id }}"
+                               {% if pack == application.pack %}checked{% endif %}
+                               style="margin-top:3px; flex-shrink:0;">
+                        <span>
+                            <strong>{{ pack.title }}</strong>
+                            {% if pack.description %}
+                            <span class="is-size-7 has-text-grey" style="display:block;">{{ pack.description|striptags|truncatechars:80 }}</span>
+                            {% endif %}
+                        </span>
+                    </label>
+                    {% empty %}
+                    <p class="is-size-7 has-text-grey">No packs have been created yet.</p>
+                    {% endfor %}
+                </div>
+
+                <hr style="margin: 1rem 0;">
+
+                <div class="columns mb-5">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="date_picker">Interview Date</label>
+                            <div class="control">
+                                <input class="input schedule-date-input" type="date" id="date_picker" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="time_picker">Interview Time</label>
+                            <div class="control">
+                                <input class="input schedule-date-input" type="time" id="time_picker" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right">
+                    <p class="control">
+                        <a href="{% url 'application_review' %}" class="button is-light" style="border-radius: 8px;">Cancel</a>
+                    </p>
+                    <p class="control">
+                        <button type="submit" class="button rr-primary" style="border-radius: 8px;">Confirm &amp; Accept</button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Pack quick-picker — auto-checks the pack's 3 modules and unchecks everything else
+    const GENRES = {{ genres_json|safe }};
+    const genrePicker = document.getElementById('genre-picker');
+    if (genrePicker) {
+        genrePicker.addEventListener('change', function () {
+            const selected = GENRES.find(g => String(g.id) === this.value);
+            document.querySelectorAll('input[name="interview_packs"]').forEach(cb => {
+                cb.checked = selected ? selected.pack_ids.includes(parseInt(cb.value)) : false;
+            });
+        });
+    }
+
+    const datePicker = document.getElementById('date_picker');
+    const timePicker = document.getElementById('time_picker');
+
+    function getLocalISOString(dateObj = new Date()) {
+        const offset = dateObj.getTimezoneOffset();
+        const localTime = new Date(dateObj.getTime() - (offset * 60 * 1000));
+        return localTime.toISOString();
+    }
+
+    function updateConstraints() {
+        const now = new Date();
+        const localISO = getLocalISOString(now);
+        const todayStr = localISO.split('T')[0];
+        const currentTimeStr = localISO.split('T')[1].substring(0, 5);
+
+        const maxDate = new Date();
+        maxDate.setFullYear(now.getFullYear() + 3);
+
+        datePicker.min = todayStr;
+        datePicker.max = getLocalISOString(maxDate).split('T')[0];
+
+        if (datePicker.value === todayStr) {
+            timePicker.min = currentTimeStr;
+        } else {
+            timePicker.removeAttribute('min');
+        }
+    }
+
+    updateConstraints();
+    datePicker.addEventListener('change', updateConstraints);
+
+    document.getElementById('interview-schedule-form').addEventListener('submit', function (e) {
+        const now = new Date();
+        const localISO = getLocalISOString(now);
+        const todayStr = localISO.split('T')[0];
+        const currentTimeStr = localISO.split('T')[1].substring(0, 5);
+
+        const maxDate = new Date();
+        maxDate.setFullYear(now.getFullYear() + 3);
+
+        const dateVal = datePicker.value;
+        const timeVal = timePicker.value;
+
+        if (dateVal === todayStr && timeVal < currentTimeStr) {
+            e.preventDefault();
+            alert("Please pick a future time for today's interview.");
+            return;
+        }
+
+        if (dateVal > getLocalISOString(maxDate).split('T')[0]) {
+            e.preventDefault();
+            alert("Interviews cannot be scheduled more than 3 years in the future.");
+            return;
+        }
+
+        if (dateVal && timeVal) {
+            document.getElementById('interview_date').value = dateVal + 'T' + timeVal;
+        }
+    });
+</script>
+{% endblock %}

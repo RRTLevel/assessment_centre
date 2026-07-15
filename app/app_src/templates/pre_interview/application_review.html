@@ -2,17 +2,21 @@
 
 {% block content %}
 
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title rr-white">Application Review</h1>
+      <p class="rr-white">
+        Accept, Deny or View pending applications.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section class="section">
     <div class="container">
-
-        <div class="interview-header">
-            <h1 class="title interview-title text-rr-primary">
-                Application Review Dashboard
-            </h1>
-            <p class="interview-count">
-                Review incoming applications and approve or reject them.
-            </p>
-        </div>
 
         {% if applications %}
         <div class="table-container">
@@ -21,7 +25,7 @@
                     <tr>
                         <th>User</th>
                         <th>ID</th>
-                        <th>Category</th>
+                        <th>Status / Interview Date</th>
                         <th>Answers</th>
                         <th>Created</th>
                         <th style="width: 200px;">Actions</th>
@@ -42,9 +46,19 @@
                         </td>
 
                         <td>
-                            <span class="tag is-info">
-                                {{ application.pack.category }}
-                            </span>
+                            <!-- VISUAL STATUS & CALENDAR DATE TRACKER -->
+                            {% if application.status == 'Accepted' %}
+                                <span class="tag is-success mb-1">Accepted</span>
+                                {% if application.interview_date %}
+                                    <div class="is-size-7 has-text-weight-semibold">
+                                        🗓️ {{ application.interview_date|date:"M d, Y g:i a" }}
+                                    </div>
+                                {% endif %}
+                            {% elif application.status == 'Denied' %}
+                                <span class="tag is-danger">Denied</span>
+                            {% else %}
+                                <span class="tag is-warning">Pending</span>
+                            {% endif %}
                         </td>
 
                         <td>
@@ -62,24 +76,22 @@
                         <td>
                             <div class="buttons are-small">
 
-                                <!-- ACCEPT -->
-                                <form method="post" action="{% url 'approve_application' application.id %}">
-                                    {% csrf_token %}
-                                    <button class="button is-success is-outlined">
-                                        Accept
-                                    </button>
-                                </form>
+                                <!-- REDIRECTS TO CALENDAR ASSIGNMENT VIEW -->
+                                <a href="{% url 'approve_application' application.application_id %}" class="button is-success is-outlined">
+                                    Accept
+                                </a>
 
                                 <!-- DENY -->
-                                <form method="post" action="{% url 'deny_application' application.id %}">
+                                <form method="post" action="{% url 'deny_application' application.application_id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button class="button is-danger is-outlined">
                                         Deny
                                     </button>
                                 </form>
 
+                                <!-- VIEW MORE BUTTON -->
                                 <a class="button is-link is-light is-small"
-                                    href="{% url 'application_detail' application.id %}">
+                                    href="{% url 'application_detail' application.application_id %}">
                                     View More
                                 </a>
 
@@ -90,6 +102,10 @@
                 </tbody>
 
             </table>
+        </div>
+
+        <div class="box">
+            <a class="" href="{% url 'accepted_applicants' %}">View Accepted Applicants</a>
         </div>
 
         {% else %}
