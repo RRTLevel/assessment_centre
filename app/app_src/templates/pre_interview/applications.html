@@ -7,9 +7,9 @@
 <section class="hero rr-primary">
   <div class="hero-body">
     <div class="container">
-      <h1 class="title rr-white">Choose Your Application Pack</h1>
+      <h1 class="title rr-white">Choose Your Application Group</h1>
       <p class="rr-white">
-        Select the role that best matches your application path
+        Select a group to begin your application
       </p>
     </div>
   </div>
@@ -20,36 +20,41 @@
 
     <div class="columns is-multiline">
 
-      {% for pack in packs %}
-
+      {% for group in groups %}
       <div class="column is-one-third">
         <div class="box has-text-centered pack-card">
-          <h2 class="title is-5 rr-primary">
-            <p class = "has-text-white">{{ pack.title }}</p>
+
+          <h2 class="title is-4 rr-primary">
+            <span class="has-text-white">{{ group.name }}</span>
           </h2>
 
-          <br>
-
           <p class="mb-4">
-            {{ pack.description }}
+            {{ group.packs.count }} pack{{ group.packs.count|pluralize }} included
           </p>
+
+          <ul class="mb-4">
+            {% for pack in group.packs.all %}
+            <li class="is-size-7">{{ pack.title }}</li>
+            {% endfor %}
+          </ul>
+
           <small class="has-text-grey">
-            Created: {{ pack.created_at|date:"d M Y" }}
+            Created: {{ group.created_at|date:"d M Y" }}
           </small>
+
           <div class="mt-5">
-            <a href="{% url 'applicant_form' pack.id %}">
-                Open Pre-Interview Form
+            <a class="button is-primary"
+               href="{% url 'applicant_form_group' group.id 0 %}">
+              Apply to this Group
             </a>
           </div>
 
         </div>
-
       </div>
-
       {% empty %}
-        <div class="column">
-          <p>No application packs available.</p>
-        </div>
+      <div class="column">
+        <p>No application groups available.</p>
+      </div>
       {% endfor %}
 
     </div>

@@ -15,6 +15,140 @@
     </div>
   </div>
 </section>
+        <div class="columns is-centered">
+            <div class="column is-6">
+                <div class="box">
+                    <div class="columns is-centered mb-0">
+                        <div class="column px-4 pb-0">
+
+                            <!-- User Info Section -->
+
+                            <header class="header title is-4"> User Profile </header>
+
+                            <div class="field my-4 profile-setting">
+                                <label class="label">Username</label>
+                                <div class="profile-setting-value">
+                                    {{ user.username }}
+                                </div>
+                            </div>
+
+                            <div class="field my-4 profile-setting">
+                                <label class="label">Email</label>
+                                <div class="profile-setting-value">
+                                    {{ user.email }}
+                                </div>
+                            </div>
+
+                            <!-- Account Type Section -->
+                            <div class="field my-4 profile-setting">
+                                <label class="label">Account Type</label>
+                                <div class="profile-setting-value">
+                                    <span class="tag rr-secondary is-medium profile-account-type">
+                                        <!-- Fixed: Relying entirely on your team's custom backend context variable -->
+                                        {{ AccountType|default:"Standard User" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr> <!-- Visual separator -->
+
+                            <h3 class="title is-4">Appearance</h3>
+
+                            <div class="field my-4">
+                                <label class="label">Theme</label>
+                                <div class="theme-options" role="radiogroup" aria-label="Theme">
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="system">
+                                        <span>System</span>
+                                    </label>
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="light">
+                                        <span>Light</span>
+                                    </label>
+                                    <label class="theme-option">
+                                        <input type="radio" name="theme" value="dark">
+                                        <span>Dark</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Change Password Form -->
+                            <h3 class="title is-4">Change Password</h3>
+
+                            <br>
+
+                            <!-- Display Django success/error messages if available -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <form method="POST" action="">
+                                {% csrf_token %}
+
+                                <!-- Old Password Field -->
+                                <div class="field">
+                                    <label class="label">Old Password</label>
+                                    <div class="control has-icons-left has-icons-right">
+                                        <input class="input" type="password" name="old_password" id="id_old_password" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                        <span class="icon is-small is-right toggle-password" data-target="id_old_password" style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye toggle-icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- New Password Field -->
+                                <div class="field">
+                                    <label class="label">New Password</label>
+                                    <div class="control has-icons-left has-icons-right">
+                                        <input class="input" type="password" name="new_password1" id="id_new_password1" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                        <span class="icon is-small is-right toggle-password" data-target="id_new_password1" style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye toggle-icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Confirm New Password Field -->
+                                <div class="field">
+                                    <label class="label">Confirm New Password</label>
+                                    <div class="control has-icons-left has-icons-right">
+                                        <input class="input" type="password" name="new_password2" id="id_new_password2" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                        <span class="icon is-small is-right toggle-password" data-target="id_new_password2" style="pointer-events: all; cursor: pointer;">
+                                            <i class="fas fa-eye toggle-icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="field mt-5">
+                                    <div class="control">
+                                        <button type="submit" class="button rr-primary">Update Password</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div class="field mt-5">
+                                <button type="button" class="button is-danger" data-open-modal="deleteModal">
+                                    Delete Account
+                                </button>
+                            </div>
 
 <main class="section">
     <div class="container" style="max-width: 800px;">
@@ -157,12 +291,12 @@
 
 <!-- ACCOUNT ERASURE OVERLAY MODAL -->
 <div id="deleteModal" class="modal">
-    <div class="modal-background" onclick="closeDeleteModal()"></div>
+    <div class="modal-background"></div>
 
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Delete Account</p>
-            <button class="delete" type="button" onclick="closeDeleteModal()"></button>
+            <button class="delete" type="button" data-close-modal></button>
         </header>
 
         <form method="post" action="{% url 'delete_account' %}">
@@ -192,7 +326,7 @@
                 <button type="submit" class="button is-danger">
                     Confirm Delete
                 </button>
-                <button type="button" class="button" onclick="closeDeleteModal()">
+                <button type="button" class="button" data-close-modal>
                     Cancel
                 </button>
             </footer>
@@ -266,4 +400,5 @@
     });
 </script>
 
+{% endblock %}
 {% endblock %}

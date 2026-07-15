@@ -10,6 +10,11 @@ from ..models import Genre, IndicatorGroupScore, InterviewResult, Questions
 
 from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
 from ..services.dashboard import available_years, candidate_dashboard_data
+from django.http import HttpResponse
+from django.shortcuts import render
+
+from ..permissions import ECAM_GROUP, ECD_GROUP, group_required
+from ..services.dashboard import candidate_dashboard_data, interview_results_by_candidate
 from ..services.pdf import render_candidate_dashboard_pdf
 
 
@@ -34,6 +39,10 @@ def results_view(request):
             )
         )
     )
+    """Interview results per candidate submission, organised by pack: the
+    scores, notes and feedback recorded per question plus the indicator
+    assessment."""
+    candidates = interview_results_by_candidate()
 
     genre_summary = []
     for genre in Genre.objects.select_related("pack_1", "pack_2", "pack_3").order_by("name"):
@@ -66,6 +75,7 @@ def results_view(request):
         "total_responses": sum(len(question.responses) for question in questions),
         "genre_summary": genre_summary,
         "indicator_group_summary": indicator_group_summary,
+        "candidates": candidates,
     })
 
 
@@ -74,6 +84,8 @@ def results_view(request):
 def candidate_dashboard(request):
     year = request.GET.get("year")
     questions, rows, col_avgs = candidate_dashboard_data(
+    """Heatmap of question scores, one row per interviewed submission."""
+    questions, rows = candidate_dashboard_data(
         date_from=request.GET.get("from"),
         date_to=request.GET.get("to"),
         sort=request.GET.get("sort"),
@@ -92,6 +104,7 @@ def candidate_dashboard(request):
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def candidate_dashboard_pdf(request):
+    """PDF export of the dashboard heatmap plus per-candidate detail pages."""
     date_from = request.GET.get("from")
     date_to = request.GET.get("to")
 

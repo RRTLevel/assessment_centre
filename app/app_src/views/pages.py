@@ -37,6 +37,9 @@ class HomeView(LoginRequiredMixin, TemplateView):
             )
         context["is_staff"] = is_staff
         return context
+def HomeView(request):
+
+    return render(request, "home.html")
 
 
 def documentation_view(request):

@@ -5,7 +5,7 @@
 
     <div class="interview-header">
         <h1 class="title interview-title">Interview Results</h1>
-        <p class="interview-count">{{ total_responses }} response{{ total_responses|pluralize }} recorded</p>
+        <p class="interview-count">{{ candidates|length }} interviewed candidate{{ candidates|length|pluralize }}</p>
     </div>
 
     {% if genre_summary %}
@@ -122,13 +122,99 @@
             </table>
             {% else %}
             <p class="has-text-grey">No responses for this question yet.</p>
-            {% endif %}
+    {% for entry in candidates %}
+    <div class="box mb-5">
 
+        <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+            <div>
+                <h2 class="title is-5 mb-1">{{ entry.application.user.username }}</h2>
+                <p class="is-size-7 has-text-grey">
+                    {% if entry.group %}Group: {{ entry.group.name }}{% else %}Pack: {{ entry.application.pack.title }}{% endif %}
+                    &middot; Applied {{ entry.application.created_at|date:"d M Y" }}
+                    {% if entry.application.interview_date %}
+                    &middot; Interviewed {{ entry.application.interview_date|date:"d M Y" }}
+                    {% endif %}
+                </p>
+            </div>
+            {% if entry.application.average_score %}
+            <span class="tag is-info is-medium">
+                Average: {{ entry.application.average_score|floatformat:1 }}
+            </span>
+            {% endif %}
+        </div>
+
+        {% for pack_entry in entry.pack_results %}
+        <h3 class="title is-6 mb-2 {% if not forloop.first %}mt-5{% endif %}" style="color:#1800A8;">
+            {{ pack_entry.pack.title }}
+        </h3>
+
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+                <tr>
+                    <th style="width:30%;">Question</th>
+                    <th style="width:8%;">Score</th>
+                    <th style="width:28%;">Notes</th>
+                    <th style="width:28%;">Feedback</th>
+                    <th>Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in pack_entry.results %}
+                <tr>
+                    <td>{{ result.question.text|safe }}</td>
+                    <td>{{ result.score|default_if_none:"—" }}</td>
+                    <td>{{ result.notes|safe|default:"—" }}</td>
+                    <td>{{ result.feedback|safe|default:"—" }}</td>
+                    <td class="is-size-7">{{ result.updated_at|date:"d M Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+
+        {% if entry.indicator_scores or entry.indicator_group_scores %}
+        <h3 class="title is-6 mb-2 mt-5" style="color:#1800A8;">
+            Interview Assessment
+        </h3>
+
+        {% for name, scores in entry.indicator_scores.items %}
+        <p class="has-text-weight-semibold is-size-7 mb-1">{{ name }}</p>
+        <table class="table is-fullwidth is-narrow mb-3">
+            <thead>
+                <tr>
+                    <th style="width:46%;">Positive</th>
+                    <th style="width:46%;">Negative</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for score in scores %}
+                <tr>
+                    <td class="indicator-positive">{{ score.indicator.positive|safe }}</td>
+                    <td class="indicator-negative">{{ score.indicator.negative|safe }}</td>
+                    <td>{{ score.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+
+        {% for group_score in entry.indicator_group_scores %}
+        <div class="mb-2">
+            <p class="is-size-7">
+                <strong>{{ group_score.group_name }}</strong> — Overall Score: {{ group_score.score }}
+            </p>
+            {% if group_score.notes %}
+            <div class="is-size-7 has-text-grey">{{ group_score.notes|safe }}</div>
+            {% endif %}
         </div>
         {% endfor %}
-    {% else %}
+        {% endif %}
+
+    </div>
+    {% empty %}
     <p class="has-text-grey">No results to display yet.</p>
-    {% endif %}
+    {% endfor %}
 
 </section>
 {% endblock %}

@@ -17,36 +17,45 @@
         <div>
             <h1 class="title interview-title">Interview &mdash; {{ application.user.username }}</h1>
             <p class="interview-count">
+                {% if application.group %}Group: {{ application.group.name }} &middot;{% endif %}
                 {{ pack_data|length }} pack{{ pack_data|length|pluralize }} &middot; Total Questions: {{ total_questions }}
             </p>
         </div>
         <span id="autosave-status" style="font-size:0.78rem; color:#888; margin-bottom:0.4rem;"></span>
     </div>
 
+    <!-- ── PRE-INTERVIEW ANSWERS (one block per pack applied to) ── -->
     <div class="box mb-4">
-        <button type="button" class="button is-light is-fullwidth" onclick="toggleAnswers()">
+        <button type="button" class="button is-light is-fullwidth" id="toggle-answers-btn">
             <span>Pre Interview Answers</span>
             <span id="answers-arrow" style="margin-left: auto;">&#9660;</span>
         </button>
         <div id="applicant-answers" style="display: none; margin-top: 1rem;">
-            {% with pd=pack_data.0 %}
-            {% if pd.pack.pre_interview_question_1 %}
-                <p><strong>{{ pd.pack.pre_interview_question_1 }}</strong></p>
-                <p class="mb-3">{{ application.answer_1|default:"—" }}</p>
-            {% endif %}
-            {% if pd.pack.pre_interview_question_2 %}
-                <p><strong>{{ pd.pack.pre_interview_question_2 }}</strong></p>
-                <p class="mb-3">{{ application.answer_2|default:"—" }}</p>
-            {% endif %}
-            {% if pd.pack.pre_interview_question_3 %}
-                <p><strong>{{ pd.pack.pre_interview_question_3 }}</strong></p>
-                <p class="mb-3">{{ application.answer_3|default:"—" }}</p>
-            {% endif %}
-            {% endwith %}
+            {% for app in group_applications %}
+            <div class="mb-4">
+                {% if group_applications|length > 1 %}
+                <p class="has-text-weight-semibold" style="color: #1800A8;">{{ app.pack.title }}</p>
+                {% endif %}
+                {% if app.pack.pre_interview_question_1 %}
+                    <p><strong>{{ app.pack.pre_interview_question_1|safe }}</strong></p>
+                    <p class="mb-3">{{ app.answer_1|default:"—" }}</p>
+                {% endif %}
+                {% if app.pack.pre_interview_question_2 %}
+                    <p><strong>{{ app.pack.pre_interview_question_2|safe }}</strong></p>
+                    <p class="mb-3">{{ app.answer_2|default:"—" }}</p>
+                {% endif %}
+                {% if app.pack.pre_interview_question_3 %}
+                    <p><strong>{{ app.pack.pre_interview_question_3|safe }}</strong></p>
+                    <p class="mb-3">{{ app.answer_3|default:"—" }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
     </div>
 
-    <form method="post" action="{% url 'start_interview' application.application_id %}" id="interview-form">
+    <form method="post" action="{% url 'start_interview' application.application_id %}"
+          id="interview-form"
+          data-autosave-url="{% url 'autosave_interview' application.application_id %}">
         {% csrf_token %}
 
         <!-- ── PACK TABS (only when multiple packs) ── -->
@@ -55,7 +64,7 @@
             <ul>
                 {% for pd in pack_data %}
                 <li id="tab-{{ pd.ap.id }}"{% if forloop.first %} class="is-active"{% endif %}>
-                    <a onclick="switchPack({{ pd.ap.id }})">{{ pd.pack.title }}</a>
+                    <a data-pack-tab="{{ pd.ap.id }}">{{ pd.pack.title }}</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -66,10 +75,12 @@
         {% for pd in pack_data %}
         <div id="pack-{{ pd.ap.id }}" class="pack-section"{% if not forloop.first %} style="display:none;"{% endif %}>
 
-            {% if pack_data|length == 1 and pd.pack.description %}
+            {% if pd.pack.description %}
             <div class="box mb-4">
                 <h2 class="title is-5">Module Description</h2>
                 <p>{{ pd.pack.description }}</p>
+                <h2 class="title is-5">{{ pd.pack.title }}</h2>
+                <p>{{ pd.pack.description|safe }}</p>
             </div>
             {% endif %}
 
@@ -80,7 +91,7 @@
                 </p>
                 <div class="question-row">
                     <div class="question-card">
-                        <p class="question-text">{{ item.question.text }}</p>
+                        <p class="question-text">{{ item.question.text|safe }}</p>
                     </div>
                     <div class="Score-Box">
                         <div class="notes_box">
@@ -121,7 +132,7 @@
             </div>
 
             <div class="mt-3">
-                <button type="button" class="submit-btn" onclick="openIndicatorModal()">
+                <button type="button" class="submit-btn" id="open-indicator-modal-btn">
                     + Add Indicator
                 </button>
             </div>
@@ -135,11 +146,11 @@
 
     <!-- Indicator picker modal -->
     <div class="modal" id="indicator-modal">
-        <div class="modal-background" onclick="closeIndicatorModal()"></div>
+        <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head" style="background:#1800A8;">
                 <p class="modal-card-title" style="color:#fff;">Add Indicator</p>
-                <button class="delete" aria-label="close" onclick="closeIndicatorModal()"></button>
+                <button class="delete" aria-label="close" type="button"></button>
             </header>
             <section class="modal-card-body" id="indicator-modal-body">
             </section>
@@ -444,5 +455,10 @@ function toggleHints() {
 }
 
 </script>
+<!-- Data for the interview page script in static/js/main.js -->
+{{ indicator_groups|json_script:"indicator-groups-data" }}
+{{ saved_indicator_scores|json_script:"saved-indicator-scores-data" }}
+{{ saved_group_scores|json_script:"saved-group-scores-data" }}
+{{ saved_group_notes|json_script:"saved-group-notes-data" }}
 
 {% endblock %}

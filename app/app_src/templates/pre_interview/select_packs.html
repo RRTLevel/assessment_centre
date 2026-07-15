@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="section">
+    <div class="container">
+
+        <div class="card-box">
+
+            <div class="card-header">
+                <div class="icon-circle purple">
+                    📦
+                </div>
+
+                <div>
+                    <h1 class="title">
+                        Create Pack Group
+                    </h1>
+                    <p class="subtitle">
+                        Combine multiple assessment packs into one group.
+                    </p>
+                </div>
+            </div>
+
+
+            <form method="post" class="indicator-form">
+                {% csrf_token %}
+
+
+                <div class="field">
+                    <label class="label">
+                        Group name
+                    </label>
+
+                    <div class="control">
+                        <input 
+                            class="input"
+                            type="text"
+                            name="group_name"
+                            placeholder="Enter group name"
+                            required
+                        >
+                    </div>
+                </div>
+
+
+                <div class="field">
+
+                    <label class="label">
+                        Select packs
+                    </label>
+
+
+                    <div class="pack-list">
+
+                        {% for pack in packs %}
+
+                            <label class="pack-option">
+
+                                <input 
+                                    type="checkbox"
+                                    name="packs"
+                                    value="{{ pack.id }}"
+                                >
+
+                                <div class="pack-card">
+
+                                    <strong>
+                                        {{ pack.title }}
+                                    </strong>
+
+                                    {% if pack.description %}
+                                        <p>
+                                            {{ pack.description }}
+                                        </p>
+                                    {% endif %}
+
+                                    {% if pack.category %}
+                                        <span class="category-tag">
+                                            {{ pack.category }}
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+                            </label>
+
+                        {% empty %}
+
+                            <p class="empty">
+                                No packs available.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+                <button type="submit" class="btn-primary">
+                    Create Pack Group
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

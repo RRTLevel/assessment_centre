@@ -41,6 +41,7 @@
                         <input type="checkbox" name="interview_packs" value="{{ pack.id }}"
                                id="pack-cb-{{ pack.id }}"
                                {% if pack == application.pack %}checked{% endif %}
+                               {% if pack.id in submission_pack_ids %}checked{% endif %}
                                style="margin-top:3px; flex-shrink:0;">
                         <span>
                             <strong>{{ pack.title }}</strong>

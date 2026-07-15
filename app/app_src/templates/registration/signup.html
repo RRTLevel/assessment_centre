@@ -113,24 +113,4 @@
     </div>
 </section>
 
-<!-- JAVASCRIPT TO TOGGLE BOTH PASWORDS REUSABLY -->
-<script>
-    document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function () {
-            // Get the target input ID from the data attribute
-            const targetId = this.getAttribute('data-target');
-            const passwordInput = document.getElementById(targetId);
-            const toggleIcon = this.querySelector('.toggle-icon');
-
-            // Toggle the type attribute
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-
-            // Toggle the eye / eye-slash class names
-            toggleIcon.classList.toggle('fa-eye');
-            toggleIcon.classList.toggle('fa-eye-slash');
-        });
-    });
-</script>
-
 {% endblock %}

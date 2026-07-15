@@ -54,7 +54,7 @@
 
                     <label class="field-label">Indicator Name</label>
                     <div class="select is-fullwidth mb-3">
-                        <select id="name-select" onchange="handleNameSelect(this)">
+                        <select id="name-select">
                             <option value="">— Select or create —</option>
                             <option value="__new__" style="font-weight:bold;">＋ Add New Indicator</option>
                             {% for name in indicator_names %}
@@ -71,8 +71,9 @@
                     <div id="pairs-container"></div>
 
                     <button type="button" class="button is-small mb-3 rr-primary" onclick="addPair()">+ Add Pair</button>
+                    <button type="button" class="button is-light is-small mb-3" id="add-pair-btn">+ Add Pair</button>
 
-                    <button type="button" class="submit-btn" style="width:100%;" onclick="handleSave()">Save Indicator</button>
+                    <button type="button" class="submit-btn" style="width:100%;" id="save-indicator-btn">Save Indicator</button>
                 </form>
             </div>
         </div>
@@ -120,6 +121,7 @@
                                         <button type="submit" name="delete_indicator"
                                                 class="button is-danger is-small"
                                                 aria-label="Delete pair" title="Delete pair">✕</button>
+                                        <button type="submit" name="delete_indicator" class="button is-danger is-small" data-confirm="Delete this behaviour pair?">✕</button>
                                     </form>
                                 </td>
                             </tr>
@@ -145,8 +147,8 @@
         <h3 id="ar-title">Indicator already exists</h3>
         <p id="ar-body">What would you like to do with the existing behaviour pairs?</p>
         <div class="ar-buttons">
-            <button class="button is-light" onclick="submitWith('add')">Add to existing</button>
-            <button class="button is-danger" onclick="submitWith('replace')">Replace all</button>
+            <button class="button is-light" data-ar-mode="add">Add to existing</button>
+            <button class="button is-danger" data-ar-mode="replace">Replace all</button>
         </div>
     </div>
 </div>
@@ -358,4 +360,5 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') document.getElementById('ar-modal').classList.remove('active');
 });
 </script>
+{{ indicator_names|json_script:"indicator-names-data" }}
 {% endblock %}
