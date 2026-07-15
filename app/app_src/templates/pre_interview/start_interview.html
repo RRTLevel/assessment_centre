@@ -105,14 +105,7 @@
                                    name="overall_score_{{ pd.ap.id }}_{{ item.question.id }}"
                                    placeholder="1–6" required
                                    value="{{ item.result.score|default:'' }}">
-                        </div>
-                        <div class="field mt-2">
-                            <label class="feedback-label">Feedback</label>
-                            <textarea class="feedback-textarea"
-                                      name="feedback_{{ pd.ap.id }}_{{ item.question.id }}"
-                                      id="feedback-{{ pd.ap.id }}-{{ item.question.id }}"
-                                      placeholder="Enter feedback for this question...">{{ item.result.feedback|default:'' }}</textarea>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
