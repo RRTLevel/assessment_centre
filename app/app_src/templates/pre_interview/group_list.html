@@ -2,121 +2,91 @@
 
 {% block content %}
 
-<section class="section">
+<br>
+
+<section class="hero rr-primary">
+  <div class="hero-body">
     <div class="container">
-
-        <div class="card-box">
-
-            <div class="card-header">
-                <div class="icon-circle purple">
-                    📦
-                </div>
-
-                <div>
-                    <h1 class="title">
-                        Pack Groups
-                    </h1>
-                    <p class="subtitle">
-                        Groups of assessment packs combined together.
-                    </p>
-                </div>
-            </div>
-
-
-            {% for group in groups %}
-
-                <div class="pack-card">
-
-                    <!-- TOP HEADER -->
-                    <div class="group-header">
-                        <h2 class="group-title">
-                            {{ group.name }}
-                        </h2>
-
-                        <span class="group-count">
-                            {{ group.packs.count }} pack{{ group.packs.count|pluralize }}
-                        </span>
-                    </div>
-
-
-                    <!-- BODY -->
-                    <div class="group-body">
-
-                        <h3 class="label">
-                            Packs
-                        </h3>
-
-                        <ul class="pack-list">
-                            {% for pack in group.packs.all %}
-                                <li>
-                                    📄 {{ pack.title }}
-                                </li>
-                            {% empty %}
-                                <li>
-                                    No packs assigned.
-                                </li>
-                            {% endfor %}
-                        </ul>
-
-                    </div>
-
-                </div>
-
-
-            {% empty %}
-
-                <p class="empty">
-                    No pack groups have been created.
-                </p>
-
-            {% endfor %}
-
-
-        </div>
-
+      <h1 class="title rr-white">Pack Groups</h1>
+      <p class="rr-white">
+        Groups of assessment packs combined together.
+      </p>
     </div>
+  </div>
 </section>
 
+<main class="section">
+    <div class="container group-container">
+
+        {% for group in groups %}
+        <div class="card mb-5">
+            <div class="card-content">
+
+                <!-- TOP HEADER -->
+                <div class="group-header mb-4">
+                    <h2 class="group-title title is-5 mb-0">
+                        {{ group.name }}
+                    </h2>
+
+                    <span class="tag is-info is-light">
+                        {{ group.packs.count }} pack{{ group.packs.count|pluralize }}
+                    </span>
+                </div>
+
+                <!-- BODY -->
+                <div class="group-body">
+                    <h3 class="label is-small has-text-grey mb-2">
+                        Assigned Packs
+                    </h3>
+
+                    <ul class="pack-list">
+                        {% for pack in group.packs.all %}
+                            <li class="mb-2">
+                                📄 {{ pack.title }}
+                            </li>
+                        {% empty %}
+                            <li class="has-text-grey-light">
+                                No packs assigned.
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="card">
+            <div class="card-content">
+                <p class="has-text-grey text-center">No pack groups have been created yet.</p>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</main>
 
 <style>
-
+/* Refined Styles to bridge Bulma and custom spacing gracefully */
 .group-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--rr-border);
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .group-title {
-    font-size: 1.2rem;
-    font-weight: 700;
     margin: 0;
 }
 
-.group-count {
-    background: #eef2ff;
-    color: #4b2fff;
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
 .group-body {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .pack-list {
-    margin-top: 8px;
-    padding-left: 10px;
+    padding-left: 5px;
+    list-style-type: none;
 }
-
-.pack-list li {
-    margin-bottom: 6px;
-}
-
 </style>
 
 {% endblock %}
