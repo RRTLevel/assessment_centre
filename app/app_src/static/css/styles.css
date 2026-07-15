@@ -839,3 +839,82 @@ html[data-theme] .interview-container .score-table tbody th {
         transition-delay: 0s; /* Show instantly on hover */
     }
 }
+/* =========================================================
+   HOME DASHBOARD
+   ========================================================= */
+
+.stat-card {
+    border-top: 4px solid #10069f;
+}
+
+.stat-card .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #10069f;
+}
+
+.stat-card.stat-accepted {
+    border-top-color: #16803c;
+}
+
+.stat-card.stat-accepted .stat-value {
+    color: #16803c;
+}
+
+.stat-card.stat-upcoming {
+    border-top-color: #fc4191;
+}
+
+.stat-card.stat-upcoming .stat-value {
+    color: #fc4191;
+}
+
+html[data-theme="dark"] .stat-card .stat-value {
+    color: #9aa5ff;
+}
+
+html[data-theme="dark"] .stat-card.stat-accepted .stat-value {
+    color: #4ecb79;
+}
+
+html[data-theme="dark"] .stat-card.stat-upcoming .stat-value {
+    color: #fc4191;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.recent-apps-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.recent-apps-filters {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.app-filter {
+    background: transparent;
+    border: 1px solid var(--rr-border);
+    color: var(--rr-muted-text);
+}
+
+.app-filter.is-active {
+    background: #10069f;
+    border-color: #10069f;
+    color: #fff;
+}
+
+html[data-theme="dark"] .app-filter.is-active {
+    background: #4a42d8;
+    border-color: #4a42d8;
+}

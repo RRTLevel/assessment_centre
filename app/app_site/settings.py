@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
 
 # Set the application Name, Version and Environment
 APPLICATION_NAME = "Rolls Royce"
-APPLICATION_VERSION = "1.21.2"
+APPLICATION_VERSION = "2.85"
 APPLICATION_ENVIRONMENT = os.getenv("APPLICATION_ENVIRONMENT", default="local")
 
 # A list representing the host/domain names to serve to
@@ -152,6 +152,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_FROM = os.getenv("EMAIL_FROM")

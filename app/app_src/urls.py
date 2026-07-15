@@ -7,7 +7,7 @@ urlpatterns = [
     # =====================
     # HOME & STATIC PAGES
     # =====================
-    path("", views.HomeView, name="home"),
+    path("", views.HomeView.as_view(), name="home"),
     path("documentation/", views.documentation_view, name="documentation"),
     path("help/", views.help_view, name="help"),
 
