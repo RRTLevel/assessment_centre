@@ -81,21 +81,50 @@ def approve_application(request, application_id):
 
     if request.method == "POST":
         interview_date = request.POST.get("interview_date")
+
+        # Check if another accepted interview already uses this exact date and time
+        conflict = Application.objects.filter(
+            interview_date=interview_date,
+            status=Application.STATUS_ACCEPTED
+        ).exclude(
+            application_id=application.application_id
+        ).exists()
+
+        if conflict:
+            messages.error(
+                request,
+                "An interview is already scheduled for this exact date and time."
+            )
+            return redirect(
+                "approve_application",
+                application_id=application_id
+            )
+
         application.status = Application.STATUS_ACCEPTED
+
         if interview_date:
             application.interview_date = interview_date
+
         application.save()
 
         selected_ids = request.POST.getlist("interview_packs")
         application.interview_packs.all().delete()
+
         for order, pack_id in enumerate(selected_ids):
             try:
                 pack = Pack.objects.get(id=int(pack_id))
-                ApplicationPack.objects.create(application=application, pack=pack, order=order)
+                ApplicationPack.objects.create(
+                    application=application,
+                    pack=pack,
+                    order=order
+                )
             except (Pack.DoesNotExist, ValueError):
                 pass
 
-        messages.success(request, f"Application for {application.user.username} approved successfully!")
+        messages.success(
+            request,
+            f"Application for {application.user.username} approved successfully!"
+        )
         return redirect("application_review")
 
     genres = Genre.objects.select_related("pack_1", "pack_2", "pack_3").order_by("name")
@@ -123,7 +152,10 @@ def deny_application(request, application_id):
     if request.method == "POST":
         application.status = Application.STATUS_DENIED
         application.save()
-        messages.error(request, f"Application for {application.user.username} was denied.")
+        messages.error(
+            request,
+            f"Application for {application.user.username} was denied."
+        )
 
     return redirect("application_review")
 
@@ -131,7 +163,10 @@ def deny_application(request, application_id):
 @login_required
 @group_required(ECD_GROUP, ECAM_GROUP)
 def accepted_applicants(request):
-    applicants = Application.objects.filter(status=Application.STATUS_ACCEPTED)
+    applicants = Application.objects.filter(
+        status=Application.STATUS_ACCEPTED
+    )
+
     return render(request, "pre_interview/accepted_applicants.html", {
         "applicants": applicants,
         "applications": True,
