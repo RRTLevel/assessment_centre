@@ -1,32 +1,74 @@
 {% extends "admin/base.html" %}
-{% load static %}
+{% load i18n static %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" href="{% static 'bulma/css/style.min.css'%}">
-<link rel="stylesheet" href="{% static 'css/styles.css' %}">
-<link rel="stylesheet" type="text/css" href="{% if application_environment|lower != 'production' %} {% static 'css/admin-dev.css' %} {% else %} {% static 'css/admin-prd.css' %} {% endif %}"/>
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script>
+    (function () {
+        const siteToAdminTheme = {
+            system: 'auto',
+            light: 'light',
+            dark: 'dark'
+        };
+
+        const siteTheme = localStorage.getItem('siteTheme') || 'system';
+        const adminTheme = siteToAdminTheme[siteTheme] || 'auto';
+
+        localStorage.setItem('theme', adminTheme);
+        document.documentElement.dataset.theme = adminTheme;
+    })();
+</script>
 {% endblock %}
 
 {% block branding %}
-<span>
-    <h1 class="my-2" id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Administration') }}</a></h1>
+<div class="rr-admin-brand">
+    <a class="rr-admin-brand__link" href="{% url 'admin:index' %}" aria-label="{{ site_header|default:_('Django Administration') }}">
+        <img class="rr-admin-brand__logo" src="{% static 'images/rr-logo-white.svg' %}" alt="Rolls-Royce Logo">
+        <span class="rr-admin-brand__divider" aria-hidden="true"></span>
+        <span class="rr-admin-brand__text">
+            <strong>{{ application_name|default:site_header|default:_('Django Administration') }}</strong>
+            <small>{{ site_header|default:_('Admin') }}{% if application_version %} | v{{ application_version }}{% endif %}</small>
+        </span>
+    </a>
 
-{% if application_environment|lower != "production" %}
-
-<p>You are currently accessing a non production version of this application. ({{ application_environment }})</p>
-
-{% else %}
-
-<p>You are currently accessing a <span class="rr-underlined">production</span> version of this application.</p>
-
-{% endif %}
-</span>
-
-
-
+    <span class="rr-admin-env rr-admin-env--{{ application_environment|default:'local'|lower }}">
+        {{ application_environment|default:"local" }}
+    </span>
+</div>
 {% endblock %}
-<br>
+
+{% block userlinks %}
+    {% if site_url %}
+        <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+    {% endif %}
+    {% if user.is_active and user.is_staff %}
+        {% url 'django-admindocs-docroot' as docsroot %}
+        {% if docsroot %}
+            <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+        {% endif %}
+    {% endif %}
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+    {% endif %}
+    <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+        {% csrf_token %}
+        <button type="submit">{% translate 'Log out' %}</button>
+    </form>
+{% endblock %}
+
 {% block nav-global %}
+<nav class="rr-admin-nav" aria-label="Admin navigation">
+    <a href="{% url 'admin:index' %}">{% translate "Dashboard" %}</a>
+    <a href="{% url 'home' %}">{% translate "Main site" %}</a>
+    {% if user.is_active and user.is_staff %}
+        <a href="{% url 'admin:app_src_domainuser_changelist' %}">{% translate "Users" %}</a>
+    {% endif %}
+</nav>
 {% endblock %}
